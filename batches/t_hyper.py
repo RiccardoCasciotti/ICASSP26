@@ -3,9 +3,16 @@ import os
 import subprocess
 import uuid
 import shutil
+import torch
 
 TEST = True
-BASE_PATH="/project/project_462000765/casciott/DCASE25"
+if torch.backends.mps.is_available(): 
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+
+         # Apple Silicon GPU
+elif torch.cuda.is_available():
+    BASE_PATH="/project/project_462000765/casciott/DCASE25"
+
 
 classes_per_task = 2
 n_experiments = 20

@@ -1,3 +1,4 @@
+import inspect
 import pickle
 import torch
 import torch.nn as nn
@@ -16,6 +17,17 @@ import numpy
 
 BASED_ON_EVAL = False # should be always kept to False at all times.
 
+def load(path, map_location):
+    """
+    Works on both old and new torch versions.
+
+    * Torch < 2.6   → no `weights_only` kwarg, we call as usual.
+    * Torch ≥ 2.6   → pass weights_only=False to keep old behaviour.
+    """
+    kwargs = {"map_location": map_location}
+    if "weights_only" in inspect.signature(torch.load).parameters:
+        kwargs["weights_only"] = False          # ←‑‑‑ key line
+    return torch.load(path, **kwargs)
 
 
 def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}):
@@ -30,7 +42,7 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             model_path = model_path_override
 
         if op.isfile(model_path):
-            checkpoint = torch.load(model_path)  # , map_location=device)
+            checkpoint =  load(model_path, get_device())  # , map_location=device)
             state_dict = checkpoint['state_dict']
             params2 = checkpoint['config']
             if resume == 'without_classifier':

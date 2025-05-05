@@ -8,7 +8,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
-
+if torch.backends.mps.is_available(): 
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+         # Apple Silicon GPU
+elif torch.cuda.is_available():
+    BASE_PATH="/project/project_462000765/casciott/DCASE25"
 username = op.expanduser('~').split('/')[-1]
 #data_candidate = ('/scratch' if 'hrodriguez' == username else '/home') + f'/{username}/workspace'
 data_candidate = "Training"
@@ -127,15 +131,22 @@ def get_device(gpu_id=0):
 
     """
 
-    use_cuda = torch.cuda.is_available() and gpu_id is not None
-    use_cuda = True
-    device = torch.device('cuda:' + str(gpu_id) if use_cuda else 'cpu')
-    #device = torch.device('cuda:' + str(gpu_id))
-
-    print("The device used will be: ")
-    print(torch.cuda.is_available())
+    if torch.backends.mps.is_available():          # Apple Silicon GPU
+        device= torch.device("mps")
+    elif torch.cuda.is_available() and gpu_id is not None:
+        device= torch.device(f"cuda:{gpu_id}")
+    else:
+        device= torch.device("cpu")
     print(device)
-    return device
+    return torch.device("cpu")
+
+    # use_cuda = torch.cuda.is_available() and gpu_id is not None
+    # device = torch.device('cuda:' + str(gpu_id) if use_cuda else 'cpu')
+    # #device = torch.device('cuda:' + str(gpu_id))
+
+    # print("The device used will be: ")
+    # print(torch.cuda.is_available())
+    # return device
 
 DEVICE = get_device()
 def seed_init_fn(seed):
@@ -392,7 +403,7 @@ def load_presets(name=None):
     Load blocks config from name of the models
 
     """
-    f = open('/project/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
+    f = open(f'{BASE_PATH}/SoftHebb-main/presets.json', "r")
     presets = json.load(f)
     if name is None:
         return list(presets['model'].keys())
@@ -434,7 +445,7 @@ def load_config_dataset(name=None, validation=True, cl=False):
     Load dataset config from name of the dataset
 
     """
-    f = open('/project/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
+    f = open(f'{BASE_PATH}/SoftHebb-main/presets.json', "r")
     dataset = json.load(f)['dataset']
     if name is None:
         lst_dataset = []
