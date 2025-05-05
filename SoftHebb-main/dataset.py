@@ -299,6 +299,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         dataset_path,
         split=split,
         train=True,
+        download=True,
         #download=not dataset_config['name'] in ['ImageNet'],  # TODO: make this depend on whether dataset exists or not
         transform=transforms.Compose([transform,
                                                     transforms.Resize((old_dataset_size,old_dataset_size)),  # image size int or tuple
@@ -322,7 +323,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         split=split,
         train=True,
         #download=not dataset_config['name'] in ['ImageNet'],  # TODO: make this depend on whether dataset exists or not
-        download=False,
+        download=True,
         transform=transform, 
         zca=dataset_config['zca_whitened'],
         device=device,
@@ -373,7 +374,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     counter_dataset = dataset_train_class(
             dataset_path,
             #download=not dataset_config['name'] in ['ImageNet'],  # TODO: make this depend on whether dataset exists or not
-            download=False,
+            download=True,
             transform=transform, 
             device=device,
 

@@ -128,6 +128,7 @@ def get_device(gpu_id=0):
     """
 
     use_cuda = torch.cuda.is_available() and gpu_id is not None
+    use_cuda = True
     device = torch.device('cuda:' + str(gpu_id) if use_cuda else 'cpu')
     #device = torch.device('cuda:' + str(gpu_id))
 
@@ -391,7 +392,7 @@ def load_presets(name=None):
     Load blocks config from name of the models
 
     """
-    f = open('presets.json', "r")
+    f = open('/project/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
     presets = json.load(f)
     if name is None:
         return list(presets['model'].keys())
@@ -433,7 +434,7 @@ def load_config_dataset(name=None, validation=True, cl=False):
     Load dataset config from name of the dataset
 
     """
-    f = open('presets.json', "r")
+    f = open('/project/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
     dataset = json.load(f)['dataset']
     if name is None:
         lst_dataset = []

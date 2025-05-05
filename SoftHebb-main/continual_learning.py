@@ -38,7 +38,8 @@ from dataset import make_data_loaders
 import torch
 import torch.optim as optim
 import torch.nn as nn
-import numpy as np
+import numpy as np 
+BASE_PATH="/project/project_462000765/casciott/DCASE25"
 from nb_utils import load_data
 
 warnings.filterwarnings("ignore")
@@ -327,10 +328,10 @@ def save_results(results, file):
 def save_results_new(results, path, name):
     print("results: ", results)
 
-    if not os.path.exists(path):
+    if not os.path.exists(f"{BASE_PATH}/SoftHebb-main/{path}"):
         print("MKDIR")
-        os.mkdir(path)
-    file = path + "/"+ name + ".json"
+        os.mkdir(f"{BASE_PATH}/SoftHebb-main/{path}")
+    file = f"{BASE_PATH}/SoftHebb-main/{path}" + "/"+ name + ".json"
     print(file)
     with open(file, 'w') as f:
         json.dump(results, f, indent=4)
@@ -549,7 +550,7 @@ if __name__ == '__main__':
         # file = "MULTD_CL.json"
         # save_results(results, file)
         save_results_new(results, f"{params.parent_f_id}/MULTD_CL_{params.dataset_sup_1.split('_')[0] + '_' + params.dataset_sup_2.split('_')[0]  + '_' + folder_id}", name_model)
-command = f"rm -rf -d /leonardo_work/IscrC_CATASTRO/rcasciot/neuromodAI/SoftHebb-main/Training/results/hebb/result/network/{name_model}"
+command = f"rm -rf -d {BASE_PATH}/SoftHebb-main/Training/results/hebb/result/network/{name_model}"
 result = subprocess.run(command, shell=True, capture_output=False, text=True)
     
 print(result.stdout)

@@ -4,24 +4,25 @@ import subprocess
 import uuid
 import shutil
 
-TEST = False
-USER = 'IscrC_CATASTRO'
+TEST = True
+BASE_PATH="/project/project_462000765/casciott/DCASE25"
+
 classes_per_task = 2
-n_experiments = 80
+n_experiments = 20
 n_tasks = 6
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_4C/TASKS_CL_CIFAR100_d3_6tasks
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_2C/TASKS_CL_CIFAR100_c1_big_6tasks
 if TEST: 
-    n_experiments = 80
-    #n_tasks = 5
+    n_experiments = 1
+    n_tasks = 2
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
 dataset="C100"
 dataset2 = "C10"
-folder_id = f"_d1_{n_tasks}tasks"
+folder_id = f"_a_{n_tasks}tasks"
 if data_num == 1:
     parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
 else:

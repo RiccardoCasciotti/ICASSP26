@@ -1,0 +1,91 @@
+name: softhebb
+channels:
+  - conda-forge
+  - pytorch
+  - amd
+  - defaults
+dependencies:
+  # Core Python packages
+  - python
+  - pip
+  - setuptools
+  - wheel
+
+  # Scientific computing
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - seaborn
+
+  # Machine learning
+  - scikit-learn
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-lightning
+  - tensorboard
+  - tensorboardx
+
+  # Audio processing
+  - librosa
+  - resampy
+  - ffmpeg
+
+  # Deep learning
+  - tensorflow
+  - tensorflow-estimator
+
+  # Optimization and Tuning
+  - bayesian-optimization
+  - ray-core
+  - ray-tune
+
+  # NLP and additional utilities
+  - spacy
+  - thinc
+  - kornia
+
+  # Other useful packages
+  - tqdm
+  - ipykernel
+  - jupyterlab
+  - notebook
+  - jupyter_client
+  - jupyter_core
+  - pyyaml
+  - click
+  - typer
+  - packaging
+  - cudatoolkit
+
+  # Logging and visualization
+  - tensorboard
+  - matplotlib-inline
+
+  # Misc
+  - joblib
+  - typing-extensions
+  - protobuf
+  - requests
+  - chardet
+  - charset-normalizer
+  - urllib3
+  - idna
+
+  # pip packages
+  - pip:
+      - efficientnet-pytorch
+      - kmeans-pytorch
+      - torchsummary
+      - einops
+      - tabulate
+      - mpltools
+      - eagerpy
+      - foolbox
+      - umap
+      - --extra-index-url https://download.pytorch.org/whl/
+      - pytorch-triton-rocm==2.3.1
+      - torch==2.3.1+rocm6.0
+      - torchaudio==2.3.1+rocm6.0
+      - torchvision==0.18.1+rocm6.0
