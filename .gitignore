@@ -12,6 +12,7 @@ code/model_zoo/pytorch_ipynb/data
 *.out
 *.txt
 *.pdf
+*.tar
 
 # Binary PyTorch models
 *.pt
