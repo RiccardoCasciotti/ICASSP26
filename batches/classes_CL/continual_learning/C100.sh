@@ -17,7 +17,7 @@ module load cotainr
 #     /project/project_462000765/casciott/DCASE25/softhebb_env/softhebb.sif \
 #      python3 /project/project_462000765/casciott/DCASE25/batches/test.py
 srun singularity exec \
-    --bind /project/project_462000765/casciott/DCASE25 \
-    --pwd  /project/project_462000765/casciott/DCASE25 \
-    /project/project_462000765/casciott/DCASE25/softhebb_env/softhebb.sif \
-     python3 /project/project_462000765/casciott/DCASE25/SoftHebb-main/continual_learning.py --preset 6SoftHebbCnnCIFAR --resume all --model-name 'C100_CL' --dataset-unsup CIFAR100_1 --dataset-sup CIFAR100_50 --continual_learning True --evaluate True --training-mode $1 --cf-sol $2 --head-sol $3 --top-k $4 --high-lr $5 --low-lr $6 --t-criteria $7 --delta-w-interval $8 --heads-basis-t $9 --selected-classes "${10}" --n-tasks "${11}" --evaluated-task "${12}" --classes-per-task "${13}" --topk-lock "${14}" --folder-id "${15}" --parent-f-id "${16}"
+    --bind /projappl/project_462000765/casciott/DCASE25 \
+    --pwd  /projappl/project_462000765/casciott/DCASE25 \
+    /projappl/project_462000765/casciott/DCASE25/softhebb_env/softhebb.sif \
+     python3 /projappl/project_462000765/casciott/DCASE25/SoftHebb-main/continual_learning.py --preset 6SoftHebbCnnCIFAR --resume all --model-name 'C100_CL' --dataset-unsup CIFAR100_1 --dataset-sup CIFAR100_50 --continual_learning True --evaluate True --training-mode $1 --cf-sol $2 --head-sol $3 --top-k $4 --high-lr $5 --low-lr $6 --t-criteria $7 --delta-w-interval $8 --heads-basis-t $9 --selected-classes "${10}" --n-tasks "${11}" --evaluated-task "${12}" --classes-per-task "${13}" --topk-lock "${14}" --folder-id "${15}" --parent-f-id "${16}"

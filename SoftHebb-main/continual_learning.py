@@ -44,7 +44,7 @@ if torch.backends.mps.is_available():
     BASE_PATH="/Users/kmc479/Desktop/DCASE25"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/project/project_462000765/casciott/DCASE25"
+    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
 from nb_utils import load_data
 
 warnings.filterwarnings("ignore")

@@ -9,7 +9,8 @@ import random
 import uuid
 import torch
 import numpy as np
-from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id, BASE_PATH
+from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id
+
 def folder_check(path):
     print(os.path.exists(f"{BASE_PATH}/SoftHebb-main/" + path))
     print(f"{BASE_PATH}/SoftHebb-main/" + path)
@@ -95,6 +96,13 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
 # print(result.stdout)
 # if result.stderr:
 #     print("Error:", result.stderr)
+if torch.backends.mps.is_available(): 
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+
+         # Apple Silicon GPU
+else:
+    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
+
 if not os.path.isdir(f"{BASE_PATH}/SoftHebb-main/experiments"):
     os.mkdir(f"{BASE_PATH}/SoftHebb-main/experiments")
 if not os.path.isdir(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}"):
@@ -105,7 +113,7 @@ if data_num == 1:
     if torch.backends.mps.is_available():          # Apple Silicon GPU
         device= torch.device("mps")
         command = f"cd {BASE_PATH}/batches/classes_CL/continual_learning && ./{dataset}_apple.sh "
-    elif torch.cuda.is_available():
+    else:
         command = f"cd {BASE_PATH}/batches/classes_CL/continual_learning && sbatch {dataset}.sh "  
 
     all_classes = list(range(10))

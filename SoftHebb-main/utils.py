@@ -12,9 +12,7 @@ if torch.backends.mps.is_available():
     BASE_PATH="/Users/kmc479/Desktop/DCASE25"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/project/project_462000765/casciott/DCASE25"
-username = op.expanduser('~').split('/')[-1]
-#data_candidate = ('/scratch' if 'hrodriguez' == username else '/home') + f'/{username}/workspace'
+    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
 data_candidate = f"{BASE_PATH}/SoftHebb-main/Training"
 DATA = op.realpath(op.expanduser(data_candidate))
 RESULT = op.join(DATA, 'results', 'hebb', 'result')  # everything from multi_layer.py
