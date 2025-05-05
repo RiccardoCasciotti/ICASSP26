@@ -10,6 +10,7 @@ quickdraw-*
 code/model_zoo/cifar-10
 code/model_zoo/pytorch_ipynb/data
 *.out
+
 *.pdf
 
 # Binary PyTorch models
