@@ -322,7 +322,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         print("AAAAAAAAAAAAAA")
         print(val_dataset.data.shape)
         print(type(val_dataset.data))
-        print(type(val_dataset.data. __getitem__(0)[0]))
+        print(val_dataset.data. __getitem__(0))
         print(val_dataset.data. __getitem__(0).shape)
         
         train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -690,8 +690,9 @@ class ESC50(Dataset):
         targets = []
         device = get_device()
         for i in range(len(df)):
-            data.append(self.__getitem__(i)[0])
-            targets.append(self.__getitem__(i)[1])
+            sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[i, "filename"]}")
+            data.append(self.spectro_gram((sig, sr), 64, 1024, 5000))
+            targets.append(self.df.loc[i, "target"])
         
 
         self.data = torch.stack(data, dim=0)
@@ -703,11 +704,10 @@ class ESC50(Dataset):
         self.targets = torch.tensor(targets, device=device)
 
     def __getitem__(self, index):
-        sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, "filename"]}")
-        return self.spectro_gram((sig, sr), 64, 1024, 5000), self.df.loc[index, "target"]
+        return self.data[index], self.targets[index]
     
     def __len__(self):
-        return len(self.df)
+        return len(self.data)
 
     def spectro_gram(self, aud, n_mels, n_fft, hop_len):
         sig,sr = aud

@@ -5,11 +5,11 @@ import uuid
 import shutil
 import torch
 
-TEST = True
+TEST = False
 
 
 classes_per_task = 2
-n_experiments = 20
+n_experiments = 1
 n_tasks = 6
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
