@@ -400,8 +400,8 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
             
            
             ## 1. forward propagation
-           
-            inputs = inputs.float().to(device)  # , non_blocking=True) send the data to the device (GPU)
+            inputs = inputs.float().to(device)
+            # print("INPUTS SHAPE: ", inputs.shape)  # , non_blocking=True) send the data to the device (GPU)
             output = model(inputs) 
             
             if loss_acc:  

@@ -119,6 +119,8 @@ if data_num == 1:
     all_classes = list(range(10))
     if dataset == "C100":
         all_classes = list(range(100))
+    elif dataset == "ESC50":  
+        all_classes = list(range(50))
     classes = []
     if n_tasks*classes_per_task > len(all_classes):
         for i in range(n_experiments):
@@ -151,6 +153,8 @@ if data_num == 1:
         dataset1 = "ImageNette"
     elif dataset == "STL10": 
         dataset1 = "STL10"
+    elif dataset == "ESC50": 
+        dataset1 = "ESC50"
     if folder_check(f"{parent_f_id}/TASKS_CL_{dataset1 +  folder_id}"):
         res = input(f"!!!! WARNING A FOLDER NAMED 'TASKS_CL_{ dataset +  folder_id}' already exits, press Y to continue anyways or N to abort: ")
         if res == "Y":

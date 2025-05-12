@@ -14,8 +14,18 @@ from torchvision import datasets, transforms
 import torchvision.transforms.functional as TF
 from torchvision.datasets import CIFAR10, CIFAR100, MNIST, FashionMNIST, STL10, ImageNet, ImageFolder
 from typing import Optional, Any
+from utils import load_presets, get_device
+import torchaudio
+from torch.utils.data import Dataset, DataLoader, Subset
+import pandas as pd 
+from pathlib import Path
 
 torch.cuda.empty_cache()
+if torch.backends.mps.is_available(): 
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+         # Apple Silicon GPU
+elif torch.cuda.is_available():
+    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
 
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=1.):
@@ -107,6 +117,19 @@ def select_dataset(dataset_config, device, dataset_path):
         else:
             dataset_train_class = FastCIFAR100
             transform = None
+    
+    elif dataset_config['name'] == 'ESC50':
+        dataset_class = ESC50
+        indices = list(range(2000))
+        dataset_path = f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master"
+        # if dataset_config['augmentation']:
+        #     dataset_train_class = AugFastCIFAR100
+        #     dataset_config['num_workers'] = 4
+        #     device = 'cpu'
+        #     transform = crop_flip(dataset_config['width'], dataset_config['height'])
+    
+        dataset_train_class = ESC50
+        transform = None
 
     elif dataset_config['name'] == 'MNIST':
         dataset_class = FastMNIST
@@ -254,6 +277,14 @@ def reshape_dataset(dataset, old_size):
     dataset.data = new_data
     return dataset
 
+def get_split(dataset, data_path, val_fold=5):
+    # train_df, val_df = train_test_split(
+    #     meta[meta["fold"] != 5],
+    #     test_size=0.20,            # 20 % of the *training* folds
+    #     stratify=meta.loc[meta["fold"] != 5, "category"],
+    #     random_state=42)
+    
+    return ESC50(dataset[dataset["fold"]!=val_fold].reset_index(drop=True), data_path), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path)
 
 def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     """
@@ -280,13 +311,34 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         seed_init_fn(dataset_config['seed'])
         g.manual_seed(dataset_config['seed'] % 2 ** 32)
 
+    if dataset_config["name"] == "ESC50":
+        fd = pd.read_csv(f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master/meta/esc50.csv")
+        fd = fd[["fold", "target", "filename"]]
+        train_split, val_split = get_split(fd, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master")
+        if "n_classes" in dataset_config:
+            selected_classes = dataset_config["selected_classes"]
+            val_dataset = classes_subset(dataset_config, val_split, selected_classes, device) 
+            train_dataset = classes_subset(dataset_config, train_split, selected_classes, device)
+        print("AAAAAAAAAAAAAA")
+        print(val_dataset.data.shape)
+        print(type(val_dataset.data))
+        print(type(val_dataset.data. __getitem__(0)[0]))
+        print(val_dataset.data. __getitem__(0).shape)
+        
+        train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                                batch_size=batch_size,
+                                                num_workers=dataset_config['num_workers'],
+        
+        )   
+        test_loader = torch.utils.data.DataLoader(dataset=val_dataset,
+                                                  batch_size=batch_size,
+                                                  num_workers=dataset_config['num_workers'],)
+        return train_loader, test_loader
+        
+
+        
     dataset_train_class, dataset_class, test_transform, transform, device, split, dataset_path = select_dataset(
         dataset_config, device, dataset_path)
-
-   
-    
-    
-
 
     print("BEFORE RESIZING")
     if dataset_config["continual_learning"] == True:
@@ -394,7 +446,11 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     print("INDICES: ", indices)
 
     train_sampler = SubsetRandomSampler(train_indices, generator=g)
-
+    
+    print(origin_dataset.data.shape)
+    print(type(origin_dataset.data))
+    print(type(origin_dataset.data. __getitem__(0)[0]))
+    print(origin_dataset.data.__getitem__(0).shape)
     train_loader = torch.utils.data.DataLoader(dataset=origin_dataset,
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
@@ -433,7 +489,7 @@ def class_cleaner(dataset_config, dataset, selected_classes):
 
     if dataset_config["name"] == "STL10":
         targets = dataset.labels
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100":
+    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
         targets = dataset.targets
     elif  dataset_config["name"] == "ImageNette":
         targets = torch.tensor(dataset.targets)
@@ -451,8 +507,8 @@ def class_cleaner(dataset_config, dataset, selected_classes):
             targets[targets==selected_classes[i]] = i
     if dataset_config["name"] == "STL10":
         dataset.labels = targets
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100":
-        dataset.targets = targets
+    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
+        dataset.targets = torch.tensor(targets, device=get_device())
     elif dataset_config["name"] == "ImageNette": 
         dataset.imgs = [dataset.imgs[0], targets.numpy()]
         dataset.imgs = list(zip(*dataset.imgs))
@@ -473,7 +529,7 @@ def class_cleaner(dataset_config, dataset, selected_classes):
     
     if dataset_config["name"] == "STL10":
         print("TARGETS AFTER CLEANER: ", dataset.labels[:20])
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ImageNette":
+    else:
         print("TARGETS AFTER CLEANER: ", dataset.targets[:20])
         #print(len(dataset.imgs))
         #print(len(dataset.targets))
@@ -495,7 +551,7 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
     if dataset_config["name"] == "STL10":
         T = dataset.labels.cpu().numpy()
 
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100": 
+    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50": 
         T = dataset.targets.cpu().numpy()
     elif dataset_config["name"] == "ImageNette":
         T = np.array(dataset.targets)
@@ -515,11 +571,11 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
         D = dataset.data.detach().cpu().numpy()
         D = list(D[indices])
         dataset.data = D
-        dataset.data = torch.tensor(dataset.data, device="cpu")
+        dataset.data = torch.tensor(dataset.data, device=get_device())
    
     if dataset_config["name"] == "STL10":
         print("TARGETS BEFORE SUB: ",dataset.labels[:20])
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100":
+    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
         print("TARGETS BEFORE SUB: ",dataset.targets[:20])
     elif dataset_config["name"] == "ImageNette":
         print("TARGETS BEFORE SUB: ",dataset.targets[:20])
@@ -527,14 +583,15 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
 
     if dataset_config["name"] == "STL10":
         dataset.labels = torch.tensor(T, device="cpu")
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100": 
+    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50": 
         dataset.targets = torch.tensor(T, device="cpu")
     elif dataset_config["name"] == "ImageNette":
         dataset.targets = T
+    
 
     if dataset_config["name"] == "STL10":
         print("TARGETS AFTER SUB: ", dataset.labels[:20])
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ImageNette":
+    else:
         print("TARGETS AFTER SUB: ", dataset.targets[:20])
     dataset = class_cleaner(dataset_config ,dataset, selected_classes)
 
@@ -622,7 +679,46 @@ class ImageNetV2(ImageFolder):
     def extra_repr(self) -> str:
         return "Split: {split}".format(**self.__dict__)
 
+# *************************************************** ESC50 ***************************************************
 
+class ESC50(Dataset):
+    def __init__(self, df, data_path):
+        
+        self.df = df
+        self.data_path = data_path
+        data = []
+        targets = []
+        device = get_device()
+        for i in range(len(df)):
+            data.append(self.__getitem__(i)[0])
+            targets.append(self.__getitem__(i)[1])
+        
+
+        self.data = torch.stack(data, dim=0)
+        shape = self.data.shape
+        #self.data = torch.Tensor.reshape(self.data, (shape[0], shape[2], shape[3], shape[1]))
+        data = np.array(data)
+        targets = np.array(targets)
+        self.data = torch.tensor(data, device=device)
+        self.targets = torch.tensor(targets, device=device)
+
+    def __getitem__(self, index):
+        sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, "filename"]}")
+        return self.spectro_gram((sig, sr), 64, 1024, 5000), self.df.loc[index, "target"]
+    
+    def __len__(self):
+        return len(self.df)
+
+    def spectro_gram(self, aud, n_mels, n_fft, hop_len):
+        sig,sr = aud
+        top_db = 80
+
+        # spec has shape [channel, n_mels, time], where channel is mono, stereo etc
+        spec = torchaudio.transforms.MelSpectrogram(sr, n_fft=n_fft, hop_length=hop_len, n_mels=n_mels)(sig)
+
+        # Convert to decibels
+        spec = torchaudio.transforms.AmplitudeToDB(top_db=top_db)(spec)
+        return (spec)
 # *************************************************** STL-10 ***************************************************
 
 class FastSTL10(STL10):
@@ -647,7 +743,6 @@ class FastSTL10(STL10):
         norm = transforms.Normalize(mean,  std)
 
         self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
-
         if train:
             if not isinstance(train_class, str):
                 index_class = np.isin(self.labels, train_class)
@@ -833,7 +928,7 @@ class FastCIFAR100(CIFAR100):
         std = (0.247, 0.2434, 0.2616)
 
         norm = transforms.Normalize(mean, std)
-
+        print("self.data.shape ", type(self.data))
         self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
 
         if self.train:

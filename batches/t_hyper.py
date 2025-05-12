@@ -21,15 +21,15 @@ if TEST:
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
-dataset="C100"
+dataset="ESC50"
 dataset2 = "C10"
-folder_id = f"_a_{n_tasks}tasks"
+folder_id = f"_{n_tasks}tasks"
 if data_num == 1:
     parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
 else:
     parent_f_id = f"experiments/EXP_{dataset}_{dataset2}"
 
-# C100, C10, STL10, IMG
+# C100, C10, STL10, IMG, ESC50
 
 cl_hyper = {
                     'training_mode': 'consecutive',
