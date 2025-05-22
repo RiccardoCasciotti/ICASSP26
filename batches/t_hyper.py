@@ -5,11 +5,11 @@ import uuid
 import shutil
 import torch
 
-TEST = False
+TEST = True
 
 
 classes_per_task = 2
-n_experiments = 1
+n_experiments = 10
 n_tasks = 6
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
@@ -23,7 +23,8 @@ if TEST:
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
 dataset="ESC50"
 dataset2 = "C10"
-folder_id = f"_{n_tasks}tasks"
+id = "TEST"
+folder_id = f"_{id}{n_tasks}tasks"
 if data_num == 1:
     parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
 else:
@@ -33,10 +34,10 @@ else:
 
 cl_hyper = {
                     'training_mode': 'consecutive',
-                    'top_k': 0.15,
+                    'top_k': 0.3,
                     'topk_lock': False,
-                    'high_lr': 0.15,
-                    'low_lr': 1,
+                    'high_lr': 0.1,
+                    'low_lr': 0.4,
                     't_criteria': 'activations', # KSE or activations
                     'delta_w_interval': 30,
                     'heads_basis_t': 0.90,

@@ -132,11 +132,11 @@ def get_device(gpu_id=0):
     if torch.backends.mps.is_available():          # Apple Silicon GPU
         device= torch.device("mps")
     elif torch.cuda.is_available() and gpu_id is not None:
-        device= torch.device(f"cuda:{gpu_id}")
+        device= torch.device(f"cuda")
     else:
         device= torch.device("cpu")
     print(device)
-    return torch.device("cpu")
+    return device
 
     # use_cuda = torch.cuda.is_available() and gpu_id is not None
     # device = torch.device('cuda:' + str(gpu_id) if use_cuda else 'cpu')

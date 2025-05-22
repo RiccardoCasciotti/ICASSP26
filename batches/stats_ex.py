@@ -2,11 +2,16 @@ import os
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, cl_hyper, parent_f_id, data_num, dataset2, USER
-
+from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, cl_hyper, parent_f_id, data_num, dataset2, id
+import torch
 import numpy as np
 from scipy.stats import wilcoxon, kruskal, ttest_rel
 
+if torch.backends.mps.is_available(): 
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+         # Apple Silicon GPU
+else:
+    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
 
 def paired_t_test(accuracies_continual, accuracies_baseline):
     """
@@ -124,9 +129,9 @@ def create_boxplot_graph_runs(stats):
     plt.suptitle("Boxplot of Standard Deviations for Different Configurations of Training")
     plt.tight_layout()
     if data_num == 1:
-        plt.savefig(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_STD-runs", bbox_inches='tight')
+        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_STD-runs", bbox_inches='tight')
     else: 
-        plt.savefig(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_STD-runs", bbox_inches='tight')
+        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_STD-runs", bbox_inches='tight')
 
     plt.close()
 
@@ -154,9 +159,9 @@ def create_boxplot_graph_eval(stats):
     plt.suptitle("Boxplot of Standard Deviations for Different Configurations of evaluation")
     plt.tight_layout()
     if data_num == 1:
-        plt.savefig(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_STD-eval", bbox_inches='tight')
+        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_STD-eval", bbox_inches='tight')
     else:
-        plt.savefig(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_STD-eval", bbox_inches='tight')
+        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_STD-eval", bbox_inches='tight')
 
     plt.close()
 
@@ -290,9 +295,9 @@ for sol in sols:
         dataset2 = "STL10"
 
     if data_num == 1:
-        res = average_behavior(dataset, n_experiments, classes_per_task, n_tasks, f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}")
+        res = average_behavior(dataset, n_experiments, classes_per_task, n_tasks, f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}")
     else:
-        res = average_behavior(dataset, n_experiments, classes_per_task, n_tasks, f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}")
+        res = average_behavior(dataset, n_experiments, classes_per_task, n_tasks, f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}")
 
     #print(res)
     stats.append(res)
@@ -421,13 +426,13 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 if data_num == 1: 
-    plt.savefig(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/graphs/TASKS_CL_{dataset}_{n_tasks}T_{classes_per_task}C")
-    with open(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_statistics.txt", "w") as f: 
+    plt.savefig(f"{BASE_PATH}/SoftHebb-main/graphs/TASKS_CL_{id}_{dataset}_{n_tasks}T_{classes_per_task}C")
+    with open(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_statistics.txt", "w") as f: 
         f.write(statistics)
 
 else:
-    plt.savefig(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}", bbox_inches='tight')
-    with open(f"/leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_statistics.txt", "w") as f: 
+    plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}", bbox_inches='tight')
+    with open(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_statistics.txt", "w") as f: 
         f.write(statistics)
 
 

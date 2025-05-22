@@ -45,7 +45,6 @@ if torch.backends.mps.is_available():
          # Apple Silicon GPU
 elif torch.cuda.is_available():
     BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
-from nb_utils import load_data
 
 warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description='Multi layer Hebbian Training Continual Learning  implementation')
@@ -161,9 +160,10 @@ results = {"count": 0}
 
 
 def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_config, train_config, gpu_id, evaluate, results, cl_hyper):
-    device = get_device(gpu_id)
+    device = get_device()
     model = load_layers(blocks, name_model, resume, dataset_sup_config=dataset_sup_config, batch_size=list(train_config.values())[-1]["batch_size"], cl_hyper=cl_hyper)
-
+    # if torch.cuda.is_available() and torch.cuda.device_count() > 1:
+    #     model = torch.nn.DataParallel(model)
     model = model.to(device)
 
     depth = 0
@@ -199,27 +199,31 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
             if config['mode'] == 'supervised' or config['mode'] == 'hybrid': ## WATCH OUT EVAL LOGGING WORKS ONLY WITH 1 SUPERVISED LAYER
                 train_loader, test_loader = make_data_loaders(dataset_sup_config, config['batch_size'], device)
                 criterion = nn.CrossEntropyLoss()
+                result = {}
                 if cl_hyper["head_sol"]:
                     res = evaluate_sup_multihead(model, criterion, test_loader, device)
                     test_loss = res[0]
                     test_acc = res[1]
                 else: 
                     test_loss, test_acc= evaluate_sup(model, criterion, test_loader, device)
-                print(f'Accuracy of the network on the 1st dataset: {test_acc:.3f} %')
-                print(f'Test loss on the 1st dataset: {test_loss:.3f}')
+                print(f'Accuracy of the network on the 1st task: {test_acc:.3f} %')
+                print(f'Test loss on the 1st task: {test_loss:.3f}')
 
                 conv, R1 = model.convergence()
                 if type(test_loss) ==  torch.Tensor:
                     metrics = {"test_loss":test_loss.item(), "test_acc": test_acc.item(), "convergence":conv, "R1":R1}
                 else: 
                     metrics = {"test_loss":test_loss, "test_acc": test_acc, "convergence":conv, "R1":R1}
-                metrics["dataset_sup"] = dataset_sup_config.copy()
-                metrics["dataset_unsup"] = dataset_unsup_config.copy()
-
-                                
-                results["cl_hyper"] = cl_hyper
-                results[f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] = metrics.copy()
+                if "dataset_sup" not in results.keys() and "cl_hyper" not in results .keys():
+                    metrics["dataset_sup"] = dataset_sup_config.copy()
+                    metrics["dataset_unsup"] = dataset_unsup_config.copy()
+                    results["cl_hyper"] = cl_hyper
+                    
                 results["count"] += 1
+                results["FOLD_#"+str(dataset_sup_config["fold"])][f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] = metrics.copy()
+                if f"eval_{results['count']%results['cl_hyper']['n_tasks']}" not in results["performance_avg_folds"].keys():
+                    results["performance_avg_folds"][f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] = 0
+                results["performance_avg_folds"][f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] += metrics["test_acc"]
         else:
             if config['mode'] == 'unsupervised':
                 run_unsup(
@@ -253,7 +257,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                 result["dataset_unsup"] = dataset_unsup_config.copy()
                 result["train_config"] = train_config.copy()
                 print("RESULT: ", result)
-                results["R" + str(results["count"])] = result.copy()
+                results["FOLD_#"+str(dataset_sup_config["fold"])]["R" + str(results["count"])] = result.copy()
                 print(f"IN R" + str(results["count"]) + ": ", results)
                 results["count"] += 1
             else:
@@ -277,7 +281,8 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                 results["R" + str(results["count"])] = result.copy()
                 print(f"IN R" + str(results["count"]) + ": ", results)
                 results["count"] += 1
-    results["model_config"] = blocks
+    if "model_config" not in results.keys():
+        results["model_config"] = blocks
     # save_logs(log, name_model)
     # print("Name Model: ", name_model)
     
@@ -430,61 +435,67 @@ if __name__ == '__main__':
 
         all_classes = np.arange(0, out_channels)
         
-       
+        folds = 2
         dataset_sup_1 = dataset_sup_ground.copy()
         dataset_unsup_1 = dataset_unsup_ground.copy()
-
+        results["performance_avg_folds"] = {}
         if out_channels >=  2*classes_per_task:
-
-            # TASK 1
-            skip = params.skip_1
-            print("task 1")
-            if not skip: 
-                selected_classes = cl_hyper["selected_classes"][0]
-                task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=False)
-
-            else: 
-                all_classes, selected_classes = random_n_classes(all_classes, classes_per_task)
+            for fold in range(folds):
                 
-                # selected_classes = selected_classes.tolist()
-                # selected_classes = [2,8]
+                print("#########################################################################################################")
+                print("################################## FOLD # " + str(fold+1)+ " ############################################")
+                print("#########################################################################################################")
+                dataset_unsup_1["fold"] = fold + 1
+                dataset_sup_1["fold"] = fold + 1
+                results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
+                # TASK 1
+                skip = params.skip_1
+                if not skip: 
+                    selected_classes = cl_hyper["selected_classes"][0]
+                    task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=False)
 
-                selected_classes = cl_hyper["selected_classes"][0]
-                print(selected_classes)
+                else: 
+                    
+                    selected_classes = cl_hyper["selected_classes"][0]
+                    print(selected_classes)
 
-                dataset_sup_1["selected_classes"] = selected_classes
-                dataset_unsup_1["selected_classes"] = selected_classes
+                    dataset_sup_1["selected_classes"] = selected_classes
+                    dataset_unsup_1["selected_classes"] = selected_classes
+                    params.continual_learning = False
+                    evaluate = True
+                    procedure(params, name_model, blocks, dataset_sup_1, dataset_unsup_1, evaluate, results)
+                
+                for task_num in range(1, cl_hyper["n_tasks"]):
+                    print("################################## TASK " + str(task_num)+ " ############################################")
+
+                    selected_classes = cl_hyper["selected_classes"][task_num]
+                    dataset_sup_x = dataset_sup_ground.copy()
+                    dataset_unsup_x = dataset_unsup_ground.copy()
+                    dataset_unsup_x["fold"] = fold + 1
+                    dataset_sup_x["fold"] = fold + 1
+                    task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume)
+
+            
+                # EVALUATION PHASE
                 params.continual_learning = False
                 evaluate = True
-                procedure(params, name_model, blocks, dataset_sup_1, dataset_unsup_1, evaluate, results)
-            
-            for task_num in range(1, cl_hyper["n_tasks"]):
-                print("################################## TASK " + str(task_num)+ " ############################################")
+                if max(cl_hyper["evaluated_tasks"]) >= cl_hyper['n_tasks']:
+                    cl_hyper["evaluated_tasks"] = list(range(cl_hyper['n_tasks']))
+                for task_num in cl_hyper["evaluated_tasks"]:
+                    print("################################## EVALUATION OF TASK " + str(task_num)+ " ############################################")
 
-                selected_classes = cl_hyper["selected_classes"][task_num]
-                dataset_sup_x = dataset_sup_ground.copy()
-                dataset_unsup_x = dataset_unsup_ground.copy()
-
-                task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume)
-
-           
-            # EVALUATION PHASE
-            params.continual_learning = False
-            evaluate = True
-            if max(cl_hyper["evaluated_tasks"]) >= cl_hyper['n_tasks']:
-                cl_hyper["evaluated_tasks"] = list(range(cl_hyper['n_tasks']))
-            for task_num in cl_hyper["evaluated_tasks"]:
-                print("################################## EVALUATION OF TASK " + str(task_num)+ " ############################################")
-
-                selected_classes = cl_hyper["selected_classes"][task_num]
-                dataset_sup_x = dataset_sup_ground.copy()
-                dataset_unsup_x = dataset_unsup_ground.copy()
-                dataset_sup_x["selected_classes"] = selected_classes
-                dataset_unsup_x["selected_classes"] = selected_classes
-
-                procedure(params, name_model, blocks, dataset_sup_x, dataset_unsup_x, evaluate, results)
-
+                    selected_classes = cl_hyper["selected_classes"][task_num]
+                    dataset_sup_x = dataset_sup_ground.copy()
+                    dataset_unsup_x = dataset_unsup_ground.copy()
+                    dataset_sup_x["selected_classes"] = selected_classes
+                    dataset_unsup_x["selected_classes"] = selected_classes
+                    dataset_unsup_x["fold"] = fold + 1
+                    dataset_sup_x["fold"] = fold + 1
+                    procedure(params, name_model, blocks, dataset_sup_x, dataset_unsup_x, evaluate, results)
+                results["count"] = 0
             results["model_name"] = name_model
+            for k, v in results["performance_avg_folds"].items():
+                results["performance_avg_folds"][k] = v/folds
             save_results_new(results, f"{params.parent_f_id}/TASKS_CL_{params.dataset_sup.split('_')[0] +  folder_id}", name_model)
         else: 
             print("Error: Not enough available classes to be organized in tasks of classes_per_task")

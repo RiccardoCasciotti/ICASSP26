@@ -26,23 +26,40 @@ class SoundDS(Dataset):
         self.data = data
         self.targets = targets
     def __getitem__(self, index):
-        sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, "filename"]}")
+        sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, 'filename']}")
         spectro = self.spectro_gram((sig, sr), 64, 1024, None)
         
         return spectro, self.df.loc[index, "target"]
     
     def __len__(self):
         return len(self.df)
+    
+    
+    def time_shift(self, signal):
+        sig, sr = signal
+        sig_len = len(sig)
+        shift = int(np.random.random()*sig_len)
+        sig = np.roll(sig, shift)
+        
+        return sig, sr
 
     def spectro_gram(self, aud, n_mels, n_fft, hop_len):
         sig,sr = aud
         top_db = 80
-
+        augment = True
+        if augment: 
+            sig, sr = self.time_shift(aud)
+            print(type(sig))
         # spec has shape [channel, n_mels, time], where channel is mono, stereo etc
         spec = torchaudio.transforms.MelSpectrogram(sr, n_fft=n_fft, hop_length=hop_len, n_mels=n_mels)(sig)
-
+            
         # Convert to decibels
         spec = torchaudio.transforms.AmplitudeToDB(top_db=top_db)(spec)
+
+        if augment: 
+            spec = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)(spec)
+            spec = torchaudio.transforms.TimeMasking(freq_mask_param=80)(spec)
+
         return (spec)
 def get_split(dataset, data_path, val_fold=5):
     # train_df, val_df = train_test_split(

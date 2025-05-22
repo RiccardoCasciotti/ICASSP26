@@ -1,5 +1,6 @@
-import os
+import torch
 print("Hello World!")
-if not os.path.exists("prova"):
-        print("MKDIR")
-        os.mkdir("prova")
+if torch.cuda.is_available():
+        
+        print(torch.cuda.device_count())
+        print(torch.cuda.get_device_name("cuda"))

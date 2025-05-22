@@ -2111,8 +2111,11 @@
         "split": "train",
         "channels": 1,
         "out_channels": 50,
-        "width": 64,
-        "height": 45,
+        "width": 128,
+        "height": 431,
+        "n_mels": 128,
+        "n_fft": 2048,
+        "hop_len": 512,
         "training_sample": 2000,
         "nb_epoch": 100,
         "print_freq": 10,
@@ -2140,7 +2143,7 @@
         "training_sample": 50000,
         "nb_epoch": 100,
         "print_freq": 10,
-        "batch_size": 64,
+        "batch_size": 100,
         "augmentation": false,
         "zca_whitened": false
       },
@@ -2178,7 +2181,7 @@
       },
       "1": {
         "nb_epoch": 1,
-        "batch_size": 10,
+        "batch_size": 100,
         "print_freq": 50
       },
       "1-50": {

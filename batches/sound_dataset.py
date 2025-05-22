@@ -1,3 +1,4 @@
+import random
 import torch 
 import torchaudio
 from torch.utils.data import Dataset, DataLoader, Subset
@@ -12,9 +13,12 @@ if torch.backends.mps.is_available():
 elif torch.cuda.is_available():
     BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
 class SoundDS(Dataset):
-    def __init__(self, df, data_path):
+    def __init__(self, df, data_path, pre_aug=False):
         self.df = df
         self.data_path = str(data_path)
+
+        self.pre_aug = pre_aug
+
         data = []
         targets = []
         device = "cpu"
@@ -35,13 +39,20 @@ class SoundDS(Dataset):
         self.data = torch.tensor(data, device=device)
         
     def __getitem__(self, index):
-        sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, "filename"]}")
-        spectro = self.spectro_gram((sig, sr), 64, 1024, 5000)
+        sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, 'filename']}")
+        if self.pre_aug: 
+            sig, sr = self.time_shift(sig, sr)
+        spectro = self.spectro_gram((sig, sr), 128, 2048, 512)
         
         return spectro, self.df.loc[index, "target"]
     
     def __len__(self):
         return len(self.df)
+    
+    def time_shift(self, sig, sr, shift_limit=2):
+        _, sig_len = sig.shape
+        shift = int(random.random*sig_len*shift_limit)
+        return sig.roll(shift), sr
 
     def spectro_gram(self, aud, n_mels, n_fft, hop_len):
         sig,sr = aud
@@ -63,6 +74,11 @@ def get_split(dataset, data_path, val_fold=2):
     return SoundDS(dataset[dataset["fold"]!=val_fold].reset_index(drop=True), data_path), SoundDS(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path)
 
 #read the metadata file
+if torch.backends.mps.is_available(): 
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+         # Apple Silicon GPU
+else:
+    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
 fd = pd.read_csv(f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master/meta/esc50.csv")
 fd = fd[["fold", "target", "filename"]]
 train, validation = get_split(fd, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master")

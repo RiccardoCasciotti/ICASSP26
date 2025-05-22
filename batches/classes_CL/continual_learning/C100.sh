@@ -11,12 +11,7 @@
 module load CrayEnv
 module load cotainr
 
-# srun singularity exec \
-#     --bind /project/project_462000765/casciott/DCASE25 \
-#     --pwd  /project/project_462000765/casciott/DCASE25 \
-#     /project/project_462000765/casciott/DCASE25/softhebb_env/softhebb.sif \
-#      python3 /project/project_462000765/casciott/DCASE25/batches/test.py
-srun singularity exec \
+srun singularity  exec --rocm \
     --bind /projappl/project_462000765/casciott/DCASE25 \
     --pwd  /projappl/project_462000765/casciott/DCASE25 \
     /projappl/project_462000765/casciott/DCASE25/softhebb_env/softhebb.sif \

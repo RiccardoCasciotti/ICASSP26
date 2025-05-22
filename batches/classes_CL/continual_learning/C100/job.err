@@ -5,32 +5,6 @@ Lmod is automatically replacing "craype-x86-rome" with "craype-x86-trento".
 Lmod is automatically replacing "craype-accel-host" with
 "craype-accel-amd-gfx90a".
 
-  0%|          | 0/169001437 [00:00<?, ?it/s]  0%|          | 32768/169001437 [00:00<11:30, 244723.12it/s]  0%|          | 65536/169001437 [00:00<11:41, 240935.98it/s]  0%|          | 98304/169001437 [00:00<11:42, 240488.91it/s]  0%|          | 196608/169001437 [00:00<06:33, 428900.77it/s]  0%|          | 393216/169001437 [00:00<03:32, 791869.74it/s]  0%|          | 786432/169001437 [00:00<01:52, 1499906.45it/s]  1%|          | 1572864/169001437 [00:00<00:57, 2887699.21it/s]  2%|▏         | 3145728/169001437 [00:01<00:29, 5626319.31it/s]  2%|▏         | 4194304/169001437 [00:01<00:43, 3779576.46it/s]
-  0%|          | 0/169001437 [00:00<?, ?it/s]  0%|          | 32768/169001437 [00:00<11:43, 240208.18it/s]  0%|          | 65536/169001437 [00:00<11:42, 240477.41it/s]  0%|          | 98304/169001437 [00:00<11:43, 240161.28it/s]  0%|          | 196608/169001437 [00:00<06:32, 429618.53it/s]  0%|          | 393216/169001437 [00:00<03:32, 793961.60it/s]  0%|          | 786432/169001437 [00:00<01:51, 1503356.16it/s]  1%|          | 1572864/169001437 [00:00<00:57, 2893546.19it/s]  2%|▏         | 3178496/169001437 [00:01<00:29, 5708606.56it/s]  2%|▏         | 4194304/169001437 [00:01<00:43, 3771646.71it/s]
-Traceback (most recent call last):
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 31, in _urlretrieve
-    fh.write(chunk)
-OSError: [Errno 122] Disk quota exceeded
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 132, in download_url
-    _urlretrieve(url, fpath)
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 29, in _urlretrieve
-    with open(filename, "wb") as fh, tqdm(total=response.length) as pbar:
-         ^^^^^^^^^^^^^^^^^^^^
-OSError: [Errno 122] Disk quota exceeded
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 31, in _urlretrieve
-    fh.write(chunk)
-OSError: [Errno 122] Disk quota exceeded
-
-During handling of the above exception, another exception occurred:
-
 Traceback (most recent call last):
   File "/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/continual_learning.py", line 444, in <module>
     task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=False)
@@ -43,22 +17,44 @@ Traceback (most recent call last):
   File "/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/train.py", line 355, in run_unsup
     train_loader, test_loader = make_data_loaders(dataset_config, batch_size, device)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/dataset.py", line 298, in make_data_loaders
-    origin_dataset = dataset_train_class(
-                     ^^^^^^^^^^^^^^^^^^^^
-  File "/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/dataset.py", line 828, in __init__
-    super().__init__(*args, **kwargs)
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/cifar.py", line 66, in __init__
-    self.download()
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/cifar.py", line 140, in download
-    download_and_extract_archive(self.url, self.root, filename=self.filename, md5=self.tgz_md5)
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 395, in download_and_extract_archive
-    download_url(url, download_root, filename, md5)
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 137, in download_url
-    _urlretrieve(url, fpath)
-  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torchvision/datasets/utils.py", line 29, in _urlretrieve
-    with open(filename, "wb") as fh, tqdm(total=response.length) as pbar:
-         ^^^^^^^^^^^^^^^^^^^^
-OSError: [Errno 122] Disk quota exceeded
-srun: error: nid005128: task 0: Exited with exit code 1
-srun: Terminating StepId=10674508.0
+  File "/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/dataset.py", line 481, in make_data_loaders
+    for batch in train_loader:
+                 ^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 631, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1346, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1372, in _process_data
+    data.reraise()
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/_utils.py", line 705, in reraise
+    raise exception
+RuntimeError: Caught RuntimeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/_utils/worker.py", line 308, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 54, in fetch
+    return self.collate_fn(data)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/_utils/collate.py", line 316, in default_collate
+    return collate(batch, collate_fn_map=default_collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/_utils/collate.py", line 173, in collate
+    return [collate(samples, collate_fn_map=collate_fn_map) for samples in transposed]  # Backwards compatibility.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/_utils/collate.py", line 141, in collate
+    return collate_fn_map[elem_type](batch, collate_fn_map=collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/utils/data/_utils/collate.py", line 213, in collate_tensor_fn
+    return torch.stack(batch, 0, out=out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: HIP error: shared object initialization failed
+HIP kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3.
+Compile with `TORCH_USE_HIP_DSA` to enable device-side assertions.
+
+
+srun: error: nid005158: task 0: Exited with exit code 1
+srun: Terminating StepId=11001753.0

@@ -242,7 +242,7 @@ def select_dataset(dataset_config, device, dataset_path):
     else:
         raise ValueError
 
-
+    dataset_config['num_workers'] = 64
     return dataset_train_class, dataset_class, test_transform, transform, device, split, dataset_path
 
 def get_indices(dataset_config, indices):
@@ -277,14 +277,14 @@ def reshape_dataset(dataset, old_size):
     dataset.data = new_data
     return dataset
 
-def get_split(dataset, data_path, val_fold=5):
+def get_split(dataset, data_path, dataset_config, val_fold):
     # train_df, val_df = train_test_split(
     #     meta[meta["fold"] != 5],
     #     test_size=0.20,            # 20 % of the *training* folds
     #     stratify=meta.loc[meta["fold"] != 5, "category"],
     #     random_state=42)
     
-    return ESC50(dataset[dataset["fold"]!=val_fold].reset_index(drop=True), data_path), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path)
+    return ESC50(dataset[dataset["fold"]!=val_fold].reset_index(drop=True), data_path, dataset_config, augment=True), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path, dataset_config, augment=False)
 
 def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     """
@@ -314,25 +314,23 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     if dataset_config["name"] == "ESC50":
         fd = pd.read_csv(f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master/meta/esc50.csv")
         fd = fd[["fold", "target", "filename"]]
-        train_split, val_split = get_split(fd, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master")
-        if "n_classes" in dataset_config:
-            selected_classes = dataset_config["selected_classes"]
-            val_dataset = classes_subset(dataset_config, val_split, selected_classes, device) 
-            train_dataset = classes_subset(dataset_config, train_split, selected_classes, device)
-        print("AAAAAAAAAAAAAA")
-        print(val_dataset.data.shape)
-        print(type(val_dataset.data))
-        print(val_dataset.data. __getitem__(0))
-        print(val_dataset.data. __getitem__(0).shape)
+        train_split, val_split = get_split(fd, dataset_config=dataset_config, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master", val_fold=dataset_config["fold"])
+        # if "n_classes" in dataset_config:
+        #     selected_classes = dataset_config["selected_classes"]
+        #     val_split = classes_subset(dataset_config, val_split, selected_classes, device) 
+        #     train_split = classes_subset(dataset_config, train_split, selected_classes, device)
         
-        train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+        
+        train_loader = torch.utils.data.DataLoader(dataset=train_split,
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
+                                                 
         
         )   
-        test_loader = torch.utils.data.DataLoader(dataset=val_dataset,
+        test_loader = torch.utils.data.DataLoader(dataset=val_split,
                                                   batch_size=batch_size,
-                                                  num_workers=dataset_config['num_workers'],)
+                                                  num_workers=dataset_config['num_workers'],
+                                                   )
         return train_loader, test_loader
         
 
@@ -682,42 +680,51 @@ class ImageNetV2(ImageFolder):
 # *************************************************** ESC50 ***************************************************
 
 class ESC50(Dataset):
-    def __init__(self, df, data_path):
-        
+    def __init__(self, df, data_path, dataset_config, augment):
         self.df = df
         self.data_path = data_path
         data = []
         targets = []
         device = get_device()
         for i in range(len(df)):
-            sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[i, "filename"]}")
-            data.append(self.spectro_gram((sig, sr), 64, 1024, 5000))
+            sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[i, 'filename']}")
+            data.append(self.spectro_gram((sig, sr), n_mels=dataset_config["n_mels"], n_fft=dataset_config["n_fft"], hop_len=dataset_config["hop_len"], augment=augment))
             targets.append(self.df.loc[i, "target"])
         
 
         self.data = torch.stack(data, dim=0)
         shape = self.data.shape
         #self.data = torch.Tensor.reshape(self.data, (shape[0], shape[2], shape[3], shape[1]))
-        data = np.array(data)
-        targets = np.array(targets)
-        self.data = torch.tensor(data, device=device)
-        self.targets = torch.tensor(targets, device=device)
+        self.data = np.array(data)
+        self.targets = np.array(targets)
+        self.data = torch.tensor(self.data, device=device)
+        self.targets = torch.tensor(self.targets, device=device)
 
     def __getitem__(self, index):
         return self.data[index], self.targets[index]
     
+    def time_shift(self, signal):
+        sig, sr = signal
+        sig_len = len(sig)
+        shift = np.random.random()*sig_len
+        return (torch.tensor(np.roll(sig, shift)), sr)
     def __len__(self):
         return len(self.data)
 
-    def spectro_gram(self, aud, n_mels, n_fft, hop_len):
+    def spectro_gram(self, aud, n_mels, n_fft, hop_len, augment):
         sig,sr = aud
         top_db = 80
-
+        if augment: 
+            sig, sr = self.time_shift(aud)
         # spec has shape [channel, n_mels, time], where channel is mono, stereo etc
         spec = torchaudio.transforms.MelSpectrogram(sr, n_fft=n_fft, hop_length=hop_len, n_mels=n_mels)(sig)
 
         # Convert to decibels
         spec = torchaudio.transforms.AmplitudeToDB(top_db=top_db)(spec)
+        if augment: 
+            spec = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)(spec)
+            spec = torchaudio.transforms.TimeMasking(time_mask_param=80)(spec)
+
         return (spec)
 # *************************************************** STL-10 ***************************************************
 

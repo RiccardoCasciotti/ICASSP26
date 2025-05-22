@@ -24,7 +24,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     """
     # with torch.autograd.set_detect_anomaly(True):
     t = time.time()
-
+    model.to(device)
     # avg_deltas = model.avg_deltas
     # delta_weights = {}
     # activations_sum = []
