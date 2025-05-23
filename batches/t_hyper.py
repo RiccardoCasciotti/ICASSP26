@@ -5,11 +5,11 @@ import uuid
 import shutil
 import torch
 
-TEST = True
-
+TEST = False
+ESC50 = True
 
 classes_per_task = 2
-n_experiments = 10
+n_experiments = 2
 n_tasks = 6
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
@@ -17,7 +17,7 @@ evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_2C/TASKS_CL_CIFAR100_c1_big_6tasks
 if TEST: 
     n_experiments = 1
-    n_tasks = 2
+    n_tasks = 1
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
@@ -30,6 +30,9 @@ if data_num == 1:
 else:
     parent_f_id = f"experiments/EXP_{dataset}_{dataset2}"
 
+if ESC50 and not TEST:
+    classes_per_task = 50
+    n_tasks = 5
 # C100, C10, STL10, IMG, ESC50
 
 cl_hyper = {

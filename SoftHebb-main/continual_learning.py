@@ -152,6 +152,8 @@ parser.add_argument('--n-tasks', default=2,   ###################
                     type=int)
 parser.add_argument('--evaluated-tasks', default="[0,1]",   ###################
                     type=str)
+parser.add_argument('--esc50', default="False",   ###################
+                    type=str2bool)
 # we need first to pass both the datasets, the evaluation parameter is not needed, or it could be if we decide to validate just one model on one dataset. 
 # after we passed both the datasets, train the model on the 1st dataset ( the resume all flag must be artificially set to false) and retrieved the model saved. The continual learning flag will cut the dataset, but it must be applied only 
 # during the second training of the model. And so the evaluate must be set to true in the last iteration and continual learning again to false.
@@ -381,6 +383,7 @@ if __name__ == '__main__':
     blocks = load_presets(params.preset)
     classes_per_task = params.classes_per_task
     resume = params.resume
+    esc50 = params.esc50
    
     print(params.selected_classes)
 
@@ -410,7 +413,7 @@ if __name__ == '__main__':
                 "n_tasks": params.n_tasks, 
                 'selected_classes': eval(params.selected_classes),
                 "evaluated_tasks": eval(params.evaluated_tasks), 
-                
+                "esc50": esc50
                 
 
             }
@@ -430,6 +433,9 @@ if __name__ == '__main__':
         dataset_sup_ground["n_classes"] = classes_per_task
         dataset_unsup_ground["n_classes"] = classes_per_task
 
+        dataset_sup_ground["esc50"] = esc50
+        dataset_unsup_ground["esc50"] = esc50
+
         dataset_sup_ground["out_channels"] = classes_per_task
         dataset_unsup_ground["out_channels"] = classes_per_task
 
@@ -439,7 +445,7 @@ if __name__ == '__main__':
         dataset_sup_1 = dataset_sup_ground.copy()
         dataset_unsup_1 = dataset_unsup_ground.copy()
         results["performance_avg_folds"] = {}
-        if out_channels >=  2*classes_per_task:
+        if out_channels >=  2*classes_per_task or esc50:
             for fold in range(folds):
                 
                 print("#########################################################################################################")

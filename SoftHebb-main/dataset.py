@@ -315,10 +315,10 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         fd = pd.read_csv(f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master/meta/esc50.csv")
         fd = fd[["fold", "target", "filename"]]
         train_split, val_split = get_split(fd, dataset_config=dataset_config, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master", val_fold=dataset_config["fold"])
-        # if "n_classes" in dataset_config:
-        #     selected_classes = dataset_config["selected_classes"]
-        #     val_split = classes_subset(dataset_config, val_split, selected_classes, device) 
-        #     train_split = classes_subset(dataset_config, train_split, selected_classes, device)
+        if "n_classes" in dataset_config:
+            selected_classes = dataset_config["selected_classes"]
+            val_split = classes_subset(dataset_config, val_split, selected_classes, device) 
+            train_split = classes_subset(dataset_config, train_split, selected_classes, device)
         
         
         train_loader = torch.utils.data.DataLoader(dataset=train_split,
@@ -591,7 +591,8 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
         print("TARGETS AFTER SUB: ", dataset.labels[:20])
     else:
         print("TARGETS AFTER SUB: ", dataset.targets[:20])
-    dataset = class_cleaner(dataset_config ,dataset, selected_classes)
+    if not dataset_config["esc50"]:
+        dataset = class_cleaner(dataset_config ,dataset, selected_classes)
 
     return dataset
 
@@ -706,7 +707,7 @@ class ESC50(Dataset):
     def time_shift(self, signal):
         sig, sr = signal
         sig_len = len(sig)
-        shift = np.random.random()*sig_len
+        shift = int(np.random.random()*sig_len)
         return (torch.tensor(np.roll(sig, shift)), sr)
     def __len__(self):
         return len(self.data)

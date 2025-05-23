@@ -25,6 +25,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     # with torch.autograd.set_detect_anomaly(True):
     t = time.time()
     model.to(device)
+    print("model.selected_classes: ",model.selected_classes )
     # avg_deltas = model.avg_deltas
     # delta_weights = {}
     # activations_sum = []
@@ -38,9 +39,18 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     #     for subl in layer.children():
     #         depth += 1
     # depth -= 1
+    if model.esc50:
+        prev_dict = model.state_dict()
+        prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in model.train_blocks} 
+        weight_mask = torch.tile(torch.tensor(-1), prev_dict[list(prev_dict.keys())[-1]].shape).to(device)
+        weight_mask[model.selected_classes] = 0
 
-    # prev_dict = deepcopy(model.state_dict())
-    # prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and str(depth) in k} 
+        prev_dict = model.state_dict()
+        prev_dict = {k: v for k, v in prev_dict.items() if "layer.bias" in k and int(k.split(".")[1]) in model.train_blocks} 
+        bias_mask = torch.tile(torch.tensor(-1), prev_dict[list(prev_dict.keys())[-1]].shape).to(device)
+        bias_mask[model.selected_classes] = 0
+
+        print("bias_mask, weight_mask : ", bias_mask, weight_mask)
 
     for inputs, target in loader:
         ## 1. forward propagation$
@@ -55,13 +65,21 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
         loss = criterion(output, target)
 
         # Store the original weights for comparison
-        
-        curr_act = model.blocks[-1].layer.weight.detach().clone()
-
+        if model.esc50:
+            prev_dict = deepcopy(model.state_dict())
+        print("prev_dict : ", prev_dict["blocks.5.layer.weight"][:20])
         ## 3. compute gradient and do SGD step
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        if model.esc50:
+            delta_weights, delta_bias = get_delta_weights_bias(model, device, model.train_blocks, prev_dict)
+            print("LINEAR SHAPE: ", delta_weights[list(delta_weights.keys())[-1]][0].shape, delta_bias[list(delta_bias.keys())[-1]][0].shape)
+            state_dict = deepcopy(model.state_dict())
+            state_dict[list(delta_weights.keys())[-1]] += delta_weights[list(delta_weights.keys())[-1]][0]*weight_mask
+            state_dict[list(delta_bias.keys())[-1]] += delta_bias[list(delta_bias.keys())[-1]][0]*bias_mask
+            model.load_state_dict(state_dict)
+            print("model.state_dict() : ", model.state_dict()[list(delta_weights.keys())[-1]][:20])
         ###################################################################################
 
         # if layer_num == -1:
@@ -75,7 +93,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
 
         #     delta_weights = get_delta_weights(model, device, layer_num, depth, prev_dict, delta_weights)
             
-        #     prev_dict = deepcopy(model.state_dict())
+        #     
         #     #['blocks.0.operations.0.running_mean', 'blocks.0.operations.0.running_var', 'blocks.0.operations.0.num_batches_tracked', 'blocks.0.layer.weight', 'blocks.1.operations.0.running_mean', 'blocks.1.operations.0.running_var', 'blocks.1.operations.0.num_batches_tracked', 'blocks.1.layer.weight', 'blocks.2.operations.0.running_mean', 'blocks.2.operations.0.running_var', 'blocks.2.operations.0.num_batches_tracked', 'blocks.2.layer.weight', 'blocks.3.layer.weight', 'blocks.3.layer.bias']
         #     prev_dict = {k: v for k, v in prev_dict.items() if str(layer_num) + ".layer.weight" in k and str(depth) in k}     
 
@@ -220,6 +238,50 @@ def get_layer(model, depth, prev_dict):
     #print(len(prev_dict))
     return prev_dict, layer_num
 
+def get_delta_weights_bias(model, device, blocks, prev_dict ):
+    #####
+    # function which calculates the delta between the current state of the model and the previous state of the model. After doing so 
+    # it stores the results in the delta_weights dictionary, which contains the delta weights of all the layers.
+    #####
+    i = 3
+    curr_dict = deepcopy(model.state_dict())
+    #print("CURR DICT state: ", list(curr_dict.keys()))
+    delta_bias = {}
+    delta_weights = {}
+    curr_dict = {k: v for k, v in curr_dict.items() if ".layer.weight" in k or ".layer.bias" in k and int(k.split(".")[1]) in blocks }
+    print("curr_dict.keys(): ", curr_dict.keys() )
+
+    # I should put all the tensors from the dict to a tensor which comprises all the layers
+    # to improve performance by loading everything on GPU
+    for kc, tc in curr_dict.items():
+        tc = tc.to(device)
+        tp = prev_dict[kc].to(device)
+                        
+        if i < 1:
+            print(kc)
+            print("TP: ",tp[0, :1, 0])
+            print("TC: ",tc[0, :1, 0])
+            # use subtract_() to do an inplace op and save space 
+        tc.subtract_(tp)
+        if i < 1:
+            print("TC after sub: ",tc[0, :1, 0])
+            print("#########################################")
+            i +=1
+            # !!!! double check if you need a deep copy or not
+            # and also check if the tensor is in cpu or in gpu ...
+        if  "bias" in kc:
+            if kc not in delta_bias:
+                delta_bias[kc] = []
+            delta_bias[kc].append(tc.detach().clone())
+        elif "weight" in kc: 
+            if kc not in delta_weights:
+                delta_weights[kc] = []
+            delta_weights[kc].append(tc.detach().clone())
+        del tc # removes the allocated gpu memory for tensor t
+        del tp
+        torch.cuda.empty_cache()# removes the reserved memory for tensor t
+        
+    return delta_weights, delta_bias
 
 def get_delta_weights(model, device, blocks, depth, prev_dict, delta_weights ):
     #####
@@ -473,7 +535,7 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
 
         
         
-                        K = round(len(activations_sum[k])*model.cl_hyper["top_k"]) # K takes 20% of the kernels
+                        K = round(len(activations_sum[k])*model.cl_hyper["top_k"]) # K takes #% of the kernels
                         print("activations_sum[k]" , len(activations_sum[k]))
                         topk_kernels["conv" + k.split(".")[1]] = activations_sum[k][:K+1]
                         print("activations_sum[k]: ", activations_sum[k][:10])

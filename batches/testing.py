@@ -9,7 +9,7 @@ import random
 import uuid
 import torch
 import numpy as np
-from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id
+from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id, ESC50
 
 def folder_check(path):
     print(os.path.exists(f"{BASE_PATH}/SoftHebb-main/" + path))
@@ -19,6 +19,8 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
     modes = ["successive", "consecutive", "simultaneous"]
     lrs = [(0.0, 1.0), (2000, 1.0), (0.2, 0.8)]
     sols = [(True, True), (False, True), (False, False),  (True, False)]
+    if ESC50:
+        sols = [(False, False),  (True, False)]
     topks = [0.1, 0.2, 0.5, 0.7, 0.85, 0.9, 1.0]
     delta_w_intervals = [20, 100, 300]
     lr = lrs[2]
@@ -54,6 +56,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                     f"{cl_hyper['topk_lock']} "
                     f"{folder_id} "
                     f"{parent_f_id} "
+                    f"{ESC50}"
 
                 )
                 result = subprocess.run(command1, shell=True, capture_output=False, text=True)
@@ -122,28 +125,36 @@ if data_num == 1:
     elif dataset == "ESC50":  
         all_classes = list(range(50))
     classes = []
-    if n_tasks*classes_per_task > len(all_classes):
+    if not ESC50:
+        if n_tasks*classes_per_task > len(all_classes):
+            for i in range(n_experiments):
+                task_classes = []
+                for j in range(n_tasks):
+                    task_classes.append(random.sample(all_classes, classes_per_task))
+                classes.append(task_classes)
+        else:
+            for i in range(n_experiments):
+                classes.append(random.sample(all_classes, classes_per_task*n_tasks))   
+        if len(classes) > n_experiments:
+            selected_classes = classes[:n_experiments]
+        else: 
+            n_experiments = len(classes)
+            selected_classes = classes
+        final = []
+        #print("selected_classes: ", selected_classes)
+        for el in selected_classes: 
+            new = np.asarray(el)
+            final.append(new.reshape(n_tasks,classes_per_task).tolist())
+
+    if ESC50: 
         for i in range(n_experiments):
             task_classes = []
-            for j in range(n_tasks):
-                task_classes.append(random.sample(all_classes, classes_per_task))
+            random.shuffle(all_classes)
+            task_classes.append(all_classes[:30])
+            for i in range(30, 50, 5):
+                task_classes.append(all_classes[i:i+5])
             classes.append(task_classes)
-    else:
-        for i in range(n_experiments):
-            classes.append(random.sample(all_classes, classes_per_task*n_tasks))    
-
-    if len(classes) > n_experiments:
-        selected_classes = classes[:n_experiments]
-    else: 
-        n_experiments = len(classes)
-        selected_classes = classes
-
-    
-    final = []
-    #print("selected_classes: ", selected_classes)
-    for el in selected_classes: 
-        new = np.asarray(el)
-        final.append(new.reshape(n_tasks,classes_per_task).tolist())
+        final = classes
     print("final: ", final)
     if dataset == "C100": 
         dataset1 = "CIFAR100"

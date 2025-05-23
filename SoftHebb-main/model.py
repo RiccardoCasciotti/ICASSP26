@@ -100,6 +100,8 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
     if verbose:
         model.__str__()
     print("model.heads: ", model.heads)
+    model.selected_classes = dataset_sup_config["selected_classes"]
+    model.esc50 = dataset_sup_config["esc50"]
     return model
 
 def best_head(model, state_dict, dataset_sup_config, batch_size): 
