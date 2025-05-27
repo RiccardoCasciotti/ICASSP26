@@ -580,9 +580,9 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
 
 
     if dataset_config["name"] == "STL10":
-        dataset.labels = torch.tensor(T, device="cpu")
+        dataset.labels = torch.tensor(T, device=get_device())
     elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50": 
-        dataset.targets = torch.tensor(T, device="cpu")
+        dataset.targets = torch.tensor(T, device=get_device())
     elif dataset_config["name"] == "ImageNette":
         dataset.targets = T
     

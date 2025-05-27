@@ -25,7 +25,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     # with torch.autograd.set_detect_anomaly(True):
     t = time.time()
     model.to(device)
-    print("model.selected_classes: ",model.selected_classes )
+    # print("model.selected_classes: ",model.selected_classes )
     # avg_deltas = model.avg_deltas
     # delta_weights = {}
     # activations_sum = []
@@ -39,19 +39,25 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     #     for subl in layer.children():
     #         depth += 1
     # depth -= 1
+    printer = 0
+    DEVICE = get_device()
     if model.esc50:
         prev_dict = model.state_dict()
         prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in model.train_blocks} 
-        weight_mask = torch.tile(torch.tensor(-1), prev_dict[list(prev_dict.keys())[-1]].shape).to(device)
+        weight_mask = np.full(prev_dict[list(prev_dict.keys())[-1]].shape, -1)
         weight_mask[model.selected_classes] = 0
+        weight_mask = torch.tensor(weight_mask, device=DEVICE)
 
         prev_dict = model.state_dict()
         prev_dict = {k: v for k, v in prev_dict.items() if "layer.bias" in k and int(k.split(".")[1]) in model.train_blocks} 
-        bias_mask = torch.tile(torch.tensor(-1), prev_dict[list(prev_dict.keys())[-1]].shape).to(device)
+        bias_mask = np.full(prev_dict[list(prev_dict.keys())[-1]].shape, -1)
         bias_mask[model.selected_classes] = 0
+        bias_mask = torch.tensor(bias_mask, device=DEVICE)
 
-        print("bias_mask, weight_mask : ", bias_mask, weight_mask)
 
+        if printer == 0:
+            print("bias_mask, weight_mask : ", bias_mask, weight_mask)
+    
     for inputs, target in loader:
         ## 1. forward propagation$
         inputs = inputs.float().to(device, non_blocking=True)
@@ -67,19 +73,28 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
         # Store the original weights for comparison
         if model.esc50:
             prev_dict = deepcopy(model.state_dict())
-        print("prev_dict : ", prev_dict["blocks.5.layer.weight"][:20])
+            print("prev_dict : ", prev_dict["blocks.5.layer.weight"][:10])
         ## 3. compute gradient and do SGD step
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         if model.esc50:
             delta_weights, delta_bias = get_delta_weights_bias(model, device, model.train_blocks, prev_dict)
-            print("LINEAR SHAPE: ", delta_weights[list(delta_weights.keys())[-1]][0].shape, delta_bias[list(delta_bias.keys())[-1]][0].shape)
+            if printer == 0:
+                print("delta_weights, delta_bias: ", delta_weights[list(delta_weights.keys())[-1]][:10], delta_bias[list(delta_bias.keys())[-1]][:10])
+                print("LINEAR SHAPE: ", delta_weights[list(delta_weights.keys())[-1]][0].shape, delta_bias[list(delta_bias.keys())[-1]][0].shape)
             state_dict = deepcopy(model.state_dict())
+            if printer == 0:
+                print("model.state_dict() before update: ", state_dict[list(delta_weights.keys())[-1]][:10])
             state_dict[list(delta_weights.keys())[-1]] += delta_weights[list(delta_weights.keys())[-1]][0]*weight_mask
             state_dict[list(delta_bias.keys())[-1]] += delta_bias[list(delta_bias.keys())[-1]][0]*bias_mask
+            if printer == 0:
+                print("list(delta_weights.keys())[-1]", list(delta_weights.keys())[-1], list(delta_bias.keys())[-1])
+            
             model.load_state_dict(state_dict)
-            print("model.state_dict() : ", model.state_dict()[list(delta_weights.keys())[-1]][:20])
+            if printer == 0:
+                print("model.state_dict() after update: ", model.state_dict()[list(delta_weights.keys())[-1]][:10])
+                printer += 1
         ###################################################################################
 
         # if layer_num == -1:
