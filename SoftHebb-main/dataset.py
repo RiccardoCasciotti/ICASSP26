@@ -16,16 +16,16 @@ from torchvision.datasets import CIFAR10, CIFAR100, MNIST, FashionMNIST, STL10, 
 from typing import Optional, Any
 from utils import load_presets, get_device
 import torchaudio
-from torch.utils.data import Dataset, DataLoader, Subset
+from torch.utils.data import Dataset, DataLoader, Subset, random_split
 import pandas as pd 
 from pathlib import Path
 
 torch.cuda.empty_cache()
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
+    BASE_PATH="/scratch/project_462000765/casciott"
 
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=1.):
@@ -121,7 +121,7 @@ def select_dataset(dataset_config, device, dataset_path):
     elif dataset_config['name'] == 'ESC50':
         dataset_class = ESC50
         indices = list(range(2000))
-        dataset_path = f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master"
+        dataset_path = f"{BASE_PATH}/Training/data/ESC-50-master"
         # if dataset_config['augmentation']:
         #     dataset_train_class = AugFastCIFAR100
         #     dataset_config['num_workers'] = 4
@@ -277,14 +277,17 @@ def reshape_dataset(dataset, old_size):
     dataset.data = new_data
     return dataset
 
-def get_split(dataset, data_path, dataset_config, val_fold):
+def get_split(dataset, data_path, dataset_config, test_fold):
     # train_df, val_df = train_test_split(
     #     meta[meta["fold"] != 5],
     #     test_size=0.20,            # 20 % of the *training* folds
     #     stratify=meta.loc[meta["fold"] != 5, "category"],
     #     random_state=42)
+    val_fold = (test_fold + 1)%5 +1
+    print("VAL_FOLD TEST_FOLD: ", val_fold, test_fold)
+    folds = [val_fold, test_fold]
     
-    return ESC50(dataset[dataset["fold"]!=val_fold].reset_index(drop=True), data_path, dataset_config, augment=True), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path, dataset_config, augment=False)
+    return ESC50(dataset[~dataset["fold"].isin(folds)].reset_index(drop=True), data_path, dataset_config, augment=False), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path, dataset_config, augment=False), ESC50(dataset[dataset["fold"]==test_fold].reset_index(drop=True), data_path, dataset_config, augment=False)
 
 def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     """
@@ -312,38 +315,51 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         g.manual_seed(dataset_config['seed'] % 2 ** 32)
 
     if dataset_config["name"] == "ESC50":
-        fd = pd.read_csv(f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master/meta/esc50.csv")
+        fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
         fd = fd[["fold", "target", "filename"]]
-        train_split, val_split = get_split(fd, dataset_config=dataset_config, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master", val_fold=dataset_config["fold"])
+        train_split, val_split, test_split = get_split(fd, dataset_config=dataset_config, data_path=f"{BASE_PATH}/Training/data/ESC-50-master", test_fold=dataset_config["fold"])
         if "n_classes" in dataset_config:
             selected_classes = dataset_config["selected_classes"]
-            val_split = classes_subset(dataset_config, val_split, selected_classes, device) 
-            train_split = classes_subset(dataset_config, train_split, selected_classes, device)
-        
-        
+            if dataset_config["shmh"] or dataset_config["SINGLE"]:
+                test_split = classes_subset(dataset_config, test_split, selected_classes, device, False) 
+            else: 
+                test_split = classes_subset(dataset_config, test_split, selected_classes, device, True)
+            if dataset_config["SINGLE"]:
+                train_split = classes_subset(dataset_config, train_split, selected_classes, device, False)
+                val_split = classes_subset(dataset_config, val_split, selected_classes, device, False)
+            else:
+                train_split = classes_subset(dataset_config, train_split, selected_classes, device, True)
+                val_split = classes_subset(dataset_config, val_split, selected_classes, device, True)
+
         train_loader = torch.utils.data.DataLoader(dataset=train_split,
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
                                                  
         
-        )   
-        test_loader = torch.utils.data.DataLoader(dataset=val_split,
+        )
+        val_loader = torch.utils.data.DataLoader(dataset=val_split,
+                                                batch_size=batch_size,
+                                                num_workers=dataset_config['num_workers'],
+                                                 
+        
+        )
+        test_loader = torch.utils.data.DataLoader(dataset=test_split,
                                                   batch_size=batch_size,
                                                   num_workers=dataset_config['num_workers'],
                                                    )
-        return train_loader, test_loader
+        return train_loader, val_loader, test_loader
         
 
         
     dataset_train_class, dataset_class, test_transform, transform, device, split, dataset_path = select_dataset(
         dataset_config, device, dataset_path)
 
-    print("BEFORE RESIZING")
+     
     if dataset_config["continual_learning"] == True:
-        #print("INSIDE CL ###############################")
+        # 
         old_dataset_size = dataset_config["old_dataset_size"]
-        ##print( type(old_dataset_size))
-        #print("I AM IN CL #################################################################################", old_dataset_size)
+        ## 
+        # 
 
         origin_dataset = dataset_train_class(
         dataset_path,
@@ -363,7 +379,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         train_class=dataset_config['training_class'],
         )
 
-        #print("ORIGIN DATASET", origin_dataset)
+        # 
         if not ('ImageNette' == dataset_config['name']):
             origin_dataset = reshape_dataset(origin_dataset, old_dataset_size)
         
@@ -378,16 +394,14 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         zca=dataset_config['zca_whitened'],
         device=device,
         train_class=dataset_config['training_class'],
-        
         )
-
     
         #we need to load the model specified in model_name, see what is the image size accepted and 
         # then resize the whole new dataset
     
     
 
-    print("AFTER RESIZING")
+     
 
 
     if dataset_config["continual_learning"] == True:
@@ -404,7 +418,6 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
                                                     #transforms.ToTensor(),  # convert to tensor at the end
                                                     ]),
                 device=device,
-
             )
         if not ('ImageNette' == dataset_config['name']):
             test_dataset = reshape_dataset(test_dataset, old_dataset_size)
@@ -441,14 +454,14 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         train_indices, val_indices = get_indices(dataset_config, indices)
 
         
-    print("INDICES: ", indices)
+     
 
     train_sampler = SubsetRandomSampler(train_indices, generator=g)
     
-    print(origin_dataset.data.shape)
-    print(type(origin_dataset.data))
-    print(type(origin_dataset.data. __getitem__(0)[0]))
-    print(origin_dataset.data.__getitem__(0).shape)
+     
+     
+     
+     
     train_loader = torch.utils.data.DataLoader(dataset=origin_dataset,
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
@@ -476,7 +489,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
    
     for batch in train_loader:
         images, labels = batch
-        print(f"IMAGE SIZE: {images.shape}")  # Check if the images are resized to [32, 32]
+         
         break  # Print one batch and stop
 
     return train_loader, test_loader
@@ -496,11 +509,11 @@ def class_cleaner(dataset_config, dataset, selected_classes):
 
     selected_classes.sort()
     min_value = min(targets)
-    print(selected_classes)
+     
     for i in range(len(selected_classes)): 
         for j in range(len(targets)): 
             #if  targets[j] == selected_classes[i]: 
-                #print(targets[j], selected_classes[i])
+                # 
             #    targets[j] =  i
             targets[targets==selected_classes[i]] = i
     if dataset_config["name"] == "STL10":
@@ -517,31 +530,31 @@ def class_cleaner(dataset_config, dataset, selected_classes):
         
 
     #if 0 not in selected_classes: 
-    #    print("NON CI STAAAAAAAAA")
+    #     
     #    min_value = min(dataset.targets)
     #    dataset.targets = dataset.targets - min_value # filter doesn't work in this case
-    #print("NON CI STAAAAAAAAA")
-    #print(dataset.targets[:20])
-    #print(dataset.labels[:20])
-    #print(targets[:20])
+    # 
+    # 
+    # 
+    # 
     
-    if dataset_config["name"] == "STL10":
-        print("TARGETS AFTER CLEANER: ", dataset.labels[:20])
-    else:
-        print("TARGETS AFTER CLEANER: ", dataset.targets[:20])
-        #print(len(dataset.imgs))
-        #print(len(dataset.targets))
-        #print(len(dataset.samples))
+    # if dataset_config["name"] == "STL10":
+        # print("TARGETS AFTER CLEANER: ", dataset.labels[:20])
+    # else:
+        # print("TARGETS AFTER CLEANER: ", dataset.targets[:20])
+        # 
+        # 
+        # 
 
-        print(len(dataset))
-        print(type(dataset))
-        print(dataset)
-    print("------------------------")
+         
+         
+         
+    # print("------------------------")
     
 
     return dataset
 
-def classes_subset(dataset_config, dataset,selected_classes, device):
+def classes_subset(dataset_config, dataset,selected_classes, device, class_clean=True):
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # I don't think it will work with ImageNette 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -571,12 +584,12 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
         dataset.data = D
         dataset.data = torch.tensor(dataset.data, device=get_device())
    
-    if dataset_config["name"] == "STL10":
-        print("TARGETS BEFORE SUB: ",dataset.labels[:20])
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
-        print("TARGETS BEFORE SUB: ",dataset.targets[:20])
-    elif dataset_config["name"] == "ImageNette":
-        print("TARGETS BEFORE SUB: ",dataset.targets[:20])
+    # if dataset_config["name"] == "STL10":
+    #     # print("TARGETS BEFORE SUB: ",dataset.labels[:20])
+    # elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
+    #     # print("TARGETS BEFORE SUB: ",dataset.targets[:20])
+    # elif dataset_config["name"] == "ImageNette":
+    #     # print("TARGETS BEFORE SUB: ",dataset.targets[:20])
 
 
     if dataset_config["name"] == "STL10":
@@ -587,12 +600,14 @@ def classes_subset(dataset_config, dataset,selected_classes, device):
         dataset.targets = T
     
 
-    if dataset_config["name"] == "STL10":
-        print("TARGETS AFTER SUB: ", dataset.labels[:20])
-    else:
-        print("TARGETS AFTER SUB: ", dataset.targets[:20])
-    if not dataset_config["esc50"]:
+    # if dataset_config["name"] == "STL10":
+    #     # # print("TARGETS AFTER SUB: ", dataset.labels[:20])
+    # else:
+    #     # print("TARGETS AFTER SUB: ", dataset.targets[:20])
+    
+    if class_clean:
         dataset = class_cleaner(dataset_config ,dataset, selected_classes)
+
 
     return dataset
 
@@ -682,7 +697,8 @@ class ImageNetV2(ImageFolder):
 
 class ESC50(Dataset):
     def __init__(self, df, data_path, dataset_config, augment):
-        self.df = df
+        self.df = df.sample(frac=1).reset_index(drop=True)
+        
         self.data_path = data_path
         data = []
         targets = []
@@ -707,7 +723,7 @@ class ESC50(Dataset):
     def time_shift(self, signal):
         sig, sr = signal
         sig_len = len(sig)
-        shift = int(np.random.random()*sig_len)
+        shift = int(np.random.random()*sig_len*0.3)
         return (torch.tensor(np.roll(sig, shift)), sr)
     def __len__(self):
         return len(self.data)
@@ -715,16 +731,16 @@ class ESC50(Dataset):
     def spectro_gram(self, aud, n_mels, n_fft, hop_len, augment):
         sig,sr = aud
         top_db = 80
-        if augment: 
-            sig, sr = self.time_shift(aud)
+        # if augment: 
+        #     sig, sr = self.time_shift(aud)
         # spec has shape [channel, n_mels, time], where channel is mono, stereo etc
         spec = torchaudio.transforms.MelSpectrogram(sr, n_fft=n_fft, hop_length=hop_len, n_mels=n_mels)(sig)
 
         # Convert to decibels
-        spec = torchaudio.transforms.AmplitudeToDB(top_db=top_db)(spec)
+        spec = torchaudio.transforms.AmplitudeToDB(top_db=80)(spec)
         if augment: 
-            spec = torchaudio.transforms.FrequencyMasking(freq_mask_param=80)(spec)
-            spec = torchaudio.transforms.TimeMasking(time_mask_param=80)(spec)
+            spec = torchaudio.transforms.FrequencyMasking(freq_mask_param=10)(spec)
+            spec = torchaudio.transforms.TimeMasking(time_mask_param=10)(spec)
 
         return (spec)
 # *************************************************** STL-10 ***************************************************
@@ -768,7 +784,7 @@ class FastSTL10(STL10):
         # self.data = norm(self.data)
         if zca:
             self.data = zca_whitening(self.data)
-            print("self.data.mean(), self.data.std()", self.data.mean(), self.data.std())
+             
 
         # self.data = self.data.to(device)  # Rescale to [0, 1]
 
@@ -847,7 +863,7 @@ class FastCIFAR10(CIFAR10):
         std = (0.247, 0.2434, 0.2616)
 
         norm = transforms.Normalize(mean, std)
-        #print("TYPE SELF.DATA: ", type(self.data))
+        # 
         self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
 
         if self.train:
@@ -867,7 +883,7 @@ class FastCIFAR10(CIFAR10):
         # self.data = norm(self.data)
         if zca:
             self.data = zca_whitening(self.data)
-            print("self.data.mean(), self.data.std()", self.data.mean(), self.data.std())
+             
 
         # self.data = self.data.to(device)  # Rescale to [0, 1]
 
@@ -936,7 +952,7 @@ class FastCIFAR100(CIFAR100):
         std = (0.247, 0.2434, 0.2616)
 
         norm = transforms.Normalize(mean, std)
-        print("self.data.shape ", type(self.data))
+         
         self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
 
         if self.train:
@@ -945,7 +961,7 @@ class FastCIFAR100(CIFAR100):
                 self.data = self.data[index_class]
                 self.targets = np.array(self.targets)[index_class]
                 self.len = self.data.shape[0]
-                #print(self.len)
+                # 
 
         if zca:
             self.data = (self.data - mean) / std
@@ -957,7 +973,7 @@ class FastCIFAR100(CIFAR100):
         # self.data = norm(self.data)
         if zca:
             self.data = zca_whitening(self.data)
-            print(self.data.mean(), self.data.std())
+             
 
         # self.data = self.data.to(device)  # Rescale to [0, 1]
 
@@ -1020,7 +1036,7 @@ class FastMNIST(MNIST):
 
         if self.train:
             if not isinstance(train_class, str):
-                #print(train_class)
+                # 
                 self.targets = np.array(self.targets)
                 index_class = np.isin(self.targets, train_class)
                 self.data = self.data[index_class]
@@ -1086,7 +1102,7 @@ class FastFashionMNIST(FashionMNIST):
         self.split = split
         if self.train:
             if not isinstance(train_class, str):
-                #print(train_class)
+                # 
                 self.targets = np.array(self.targets)
                 index_class = np.isin(self.targets, train_class)
                 self.data = self.data[index_class]

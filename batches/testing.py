@@ -1,31 +1,31 @@
-import ast
-import itertools
+
 import json
 import os
 import shlex
 import subprocess
-import time
 import random
-import uuid
 import torch
 import numpy as np
-from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id, ESC50
+from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id, SHMH, SINGLE
 
 def folder_check(path):
-    print(os.path.exists(f"{BASE_PATH}/SoftHebb-main/" + path))
-    print(f"{BASE_PATH}/SoftHebb-main/" + path)
-    return os.path.isdir("../SoftHebb-main/" + path)
+    print(os.path.exists(f"{BASE_PATH}/" + path))
+    print(f"{BASE_PATH}" + path)
+    return os.path.isdir("{BASE_PATH}/" + path)
 def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, classes=[]):
     modes = ["successive", "consecutive", "simultaneous"]
     lrs = [(0.0, 1.0), (2000, 1.0), (0.2, 0.8)]
     sols = [(True, True), (False, True), (False, False),  (True, False)]
-    if ESC50:
-        sols = [(False, False),  (True, False)]
+    if dataset == "ESC50":
+        if SINGLE:
+            sols = [(False, False)]
+        else:
+            sols = [(False, True), (True, True)]
     topks = [0.1, 0.2, 0.5, 0.7, 0.85, 0.9, 1.0]
     delta_w_intervals = [20, 100, 300]
     lr = lrs[2]
     mode = modes[1]
-   
+    cl_hyper["SINGLE"] = SINGLE
     
     for sol in sols:
         cl_hyper['cf_sol'] = sol[0]
@@ -56,7 +56,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                     f"{cl_hyper['topk_lock']} "
                     f"{folder_id} "
                     f"{parent_f_id} "
-                    f"{ESC50}"
+                    f"{SHMH}"
 
                 )
                 result = subprocess.run(command1, shell=True, capture_output=False, text=True)
@@ -100,32 +100,33 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
 # if result.stderr:
 #     print("Error:", result.stderr)
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
 
          # Apple Silicon GPU
 else:
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
+    BASE_PATH="/scratch/project_462000765/casciott"
 
-if not os.path.isdir(f"{BASE_PATH}/SoftHebb-main/experiments"):
-    os.mkdir(f"{BASE_PATH}/SoftHebb-main/experiments")
-if not os.path.isdir(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}"):
-    os.mkdir(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}")
+if not os.path.isdir(f"{BASE_PATH}/experiments"):
+    os.mkdir(f"{BASE_PATH}/experiments")
+if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
+    os.mkdir(f"{BASE_PATH}/{parent_f_id}")
             
 
 if data_num == 1: 
     if torch.backends.mps.is_available():          # Apple Silicon GPU
         device= torch.device("mps")
-        command = f"cd {BASE_PATH}/batches/classes_CL/continual_learning && ./{dataset}_apple.sh "
+        command = f"cd /projappl/project_462000765/casciott/DCASE25/batches/classes_CL/continual_learning && ./{dataset}_apple.sh "
     else:
-        command = f"cd {BASE_PATH}/batches/classes_CL/continual_learning && sbatch {dataset}.sh "  
+        command = f"cd /projappl/project_462000765/casciott/DCASE25/batches/classes_CL/continual_learning && sbatch {dataset}.sh "  
 
     all_classes = list(range(10))
     if dataset == "C100":
         all_classes = list(range(100))
     elif dataset == "ESC50":  
         all_classes = list(range(50))
+        all_classes_ordered = all_classes.copy()
     classes = []
-    if not ESC50:
+    if dataset != "ESC50":
         if n_tasks*classes_per_task > len(all_classes):
             for i in range(n_experiments):
                 task_classes = []
@@ -146,7 +147,7 @@ if data_num == 1:
             new = np.asarray(el)
             final.append(new.reshape(n_tasks,classes_per_task).tolist())
 
-    if ESC50: 
+    if dataset == "ESC50": 
         for i in range(n_experiments):
             task_classes = []
             random.shuffle(all_classes)
@@ -155,6 +156,9 @@ if data_num == 1:
                 task_classes.append(all_classes[i:i+5])
             classes.append(task_classes)
         final = classes
+    if SINGLE:
+        final = [[all_classes_ordered]]
+        #  final = [[[21, 31, 2, 20, 34, 22, 16, 43, 42, 40, 45, 36, 33, 1, 12, 24, 28, 15, 26, 9, 44, 27, 32, 6, 47, 19, 5, 4, 46, 18], [8, 35, 29, 48, 13], [3, 0, 25, 7, 30], [49, 11, 14, 23, 37], [17, 10, 41, 38, 39]]]
     print("final: ", final)
     if dataset == "C100": 
         dataset1 = "CIFAR100"

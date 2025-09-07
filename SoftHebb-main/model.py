@@ -44,21 +44,21 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
         if op.isfile(model_path):
             checkpoint =  load(model_path, get_device())  # , map_location=device)
             state_dict = checkpoint['state_dict']
-            params2 = checkpoint['config']
+            #params2 = checkpoint['config']
+            params2 = params
+            print("params: ", params)
+            print("params2: ", params2)
             if resume == 'without_classifier':
                 classifier_key = list(params.keys())[-1]
                 params2[classifier_key] = params[classifier_key]
 
-            print("PARAMSSSS IN LOAD: ", params2)
-            # print("state_dict.keys(): ", state_dict.keys())
-
-            # print("state_dict: ", state_dict)
             cl_hyper["heads_basis_t"]=float(checkpoint["heads_thresh"])
             model = MultiLayer(params2, topk_kernels=checkpoint["topk_kernels"], avg_deltas=checkpoint["avg_deltas"], heads=checkpoint["heads"], cl_hyper=cl_hyper)
             
 
 
             state_dict2 = model.state_dict()
+            model.model_name = checkpoint['model_name']
 
             if resume == 'without_classifier':
                 for key, value in state_dict.items():
@@ -77,12 +77,20 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             else:
                 if cl_hyper["head_sol"] and dataset_sup_config is not None and batch_size is not None:
                     #call best_head
-                    model.to(get_device())
-                    chosen_head = best_head(model, state_dict, dataset_sup_config, batch_size)
-                    print("chosen_head: ", chosen_head)
+                    model = model.to(get_device())
+                    # chosen_head = best_head(model, state_dict, dataset_sup_config, batch_size)
+                    keys = list(state_dict2.keys())
+                    chosen_head = { keys[-1]:state_dict2[keys[-1]], keys[-2]: state_dict2[keys[-2]]}
                     keys = list(chosen_head.keys())
                     state_dict[keys[0]] = chosen_head[keys[0]]
                     state_dict[keys[1]] = chosen_head[keys[1]]
+                # elif op.isfile(model_path):
+                #     chosen_head = best_head(model, state_dict2, dataset_sup_config, batch_size)
+                #     keys = list(chosen_head.keys())
+                #     state_dict[keys[0]] = state_dict2[keys[0]]
+                #     state_dict[keys[1]] = state_dict2[keys[1]]
+                print("INSIDE THE CORRECT")
+
                 model.load_state_dict(state_dict)
             # log.from_dict(checkpoint['measures'])
             starting_epoch = 0  # checkpoint['epoch']
@@ -95,13 +103,14 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             model = MultiLayer(params, cl_hyper=cl_hyper)
         print('\n')
     else:
-        model = MultiLayer(params, cl_hyper=cl_hyper)
+        # print("BOOOOOOOH")
+        model = MultiLayer(params, cl_hyper=cl_hyper, heads=[])
 
     if verbose:
         model.__str__()
-    print("model.heads: ", model.heads)
+     
     model.selected_classes = dataset_sup_config["selected_classes"]
-    model.esc50 = dataset_sup_config["esc50"]
+    model.shmh = dataset_sup_config["shmh"]
     return model
 
 def best_head(model, state_dict, dataset_sup_config, batch_size): 
@@ -117,7 +126,7 @@ def best_head(model, state_dict, dataset_sup_config, batch_size):
 
         initial_state = state_dict
         criterion = nn.CrossEntropyLoss()
-        train_loader, test_loader = make_data_loaders(dataset_sup_config, batch_size, device)
+        train_loader, val_loader, test_loader = make_data_loaders(dataset_sup_config, batch_size, device)
         for head in model.heads: 
             keys = list(head.keys())
             if keys[0] in state_dict and keys[1]  in state_dict:
@@ -127,11 +136,11 @@ def best_head(model, state_dict, dataset_sup_config, batch_size):
             loss_test, acc_test = evaluate_sup(model, criterion, test_loader, device)
             acc_test = acc_test/100
             avg_acc += acc_test
-            print("test_acc: ", acc_test, model.heads_thresh)
+             
             if acc_test > chosen_acc: 
                 chosen_head = head
                 chosen_acc = acc_test
-                print("chosen_acc: ", chosen_acc)
+                 
     else: 
         # here we create a new head everytime we see a task
         chosen_head = chosen_head
@@ -149,7 +158,7 @@ def best_head(model, state_dict, dataset_sup_config, batch_size):
     #         model.load_state_dict(state_dict)
     #         tot_sum = head_choser(model, criterion, test_loader, device)
     #         heads_performance[head_num] = tot_sum
-    #         print("tot_sum: ", tot_sum, head_num)
+    #          
     #         head_num += 1
     #     max_val = 0
     #     max_key = 0
@@ -157,7 +166,7 @@ def best_head(model, state_dict, dataset_sup_config, batch_size):
     #         if i > max_val:
     #             max_val = i
     #             max_key = k
-    #     print("max_key :", max_key)
+    #      
     #     chosen_head = model.heads[max_key]
     
     return chosen_head
@@ -170,7 +179,7 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
     """
 
     if storing_path is None:
-        print("STORING PATH IS NONEEEEEE")
+         
         if not op.isdir(RESULT):
             os.makedirs(RESULT)
         if not op.isdir(op.join(RESULT, 'network')):
@@ -182,18 +191,18 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
             os.makedirs(op.join(folder_path, 'models'))
         storing_path = op.join(folder_path, 'models')
 
-    print("SAVING THE MODEL")
-    print(storing_path)
+     
+     
     
     
     
         
     
 
-    #print("Current stored value: ", model.topk_kernels["conv0"][:5], model.avg_deltas['blocks.0.layer.weight'][:5] )
-    print("SAVED HEADS THRESHOLD: ", model.heads_thresh)
-    print("SAVED model.topk_kernels", model.topk_kernels)
-    print("SAVED model.heads_thresh", model.heads_thresh)
+    # 
+     
+     
+     
     torch.save({
         'state_dict': model.state_dict(),
         'config': model.config,
@@ -202,6 +211,7 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
         'epoch': epoch, 
         'heads': model.heads, 
         'heads_thresh' : model.heads_thresh, 
+        'model_name' : model_name
     }, op.join(storing_path, filename))
 
     for block_id in blocks:
@@ -256,12 +266,12 @@ class MultiLayer(nn.Module):
         avg_deltas_layer = None
         topk_layer = None
         depth = len(blocks_params)-1
-        if avg_deltas is not None and topk_layer is not None: 
-            print(avg_deltas.keys())
-            print(topk_layer.keys())
-        else: 
-            print("avg_deltas: ", avg_deltas)
-            print("topk_layer: ", topk_layer)
+        # if avg_deltas is not None and topk_layer is not None: 
+        #     print(avg_deltas.keys())
+        #     print(topk_layer.keys())
+        # else: 
+        #     print("avg_deltas: ", avg_deltas)
+        #     print("topk_layer: ", topk_layer)
         if blocks_params is not None:
             blocks = []
             for _, params in blocks_params.items():
@@ -269,13 +279,13 @@ class MultiLayer(nn.Module):
                 # params : {'arch': 'CNN', 'preset': 'softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.01-lp0.5-e0', 'operation': 'batchnorm2d', 'num': 2, 'batch_norm': False, 'pool': {'type': 'avg', 'kernel_size': 2, 'stride': 2, 'padding': 0}, 'activation': {'function': 'triangle', 'param': 1.0}, 'resume': None, 'layer': {'arch': 'CNN', 'nb_train': None, 'lr': 0.01, 'adaptive': True, 'lr_sup': 0.001, 'speed': 7, 'lr_div': 96, 'lebesgue_p': 2, 'padding_mode': 'reflect', 'pre_triangle': False, 'ranking_param': 3, 'delta': 2, 't_invert': 0.25, 'groups': 1, 'stride': 1, 'dilation': 1, 'beta': 1, 'power': 4.5, 'padding': 1, 'weight_init': 'normal', 'weight_init_range': 0.4252586358998573, 'weight_init_offset': 0, 'mask_thsd': 0, 'radius': 25, 'power_lr': 0.5, 'weight_decay': 0, 'soft_activation_fn': 'exp', 'hebbian': True, 'resume': None, 'add_bias': False, 'normalize_inp': False, 'lr_decay': 'linear', 'seed': 0, 'softness': 'softkrotov', 'out_channels': 1536, 'kernel_size': 3, 'in_channels': 384, 'lr_scheduler': {'lr': 0.01, 'adaptive': True, 'nb_epochs': 1, 'ratio': 0.0002, 'speed': 7, 'div': 96, 'decay': 'linear', 'power_lr': 0.5}}}
                 if params['arch'] == 'CNN':
                     if len(self.avg_deltas) > 0:
-                        print("self.avg_deltas inside model: ", self.avg_deltas) 
+                         
                         avg_deltas_layer = self.avg_deltas["blocks." +  str(layer_num) + ".layer.weight"]
                         print('"blocks." +  str(layer_num) + ".layer.weight": ', "blocks." +  str(layer_num) + ".layer.weight") 
 
-                        print("self.avg_deltas_layer inside model after retrieval: ", avg_deltas_layer) 
+                         
                     if len(self.topk_kernels) > 0:
-                        print("self.topk_kernels inside model: ", self.avg_deltas)
+                         
                         if layer_num == depth: 
                             topk_layer = self.topk_kernels["linear" + str(layer_num)]
                         else:
@@ -283,9 +293,10 @@ class MultiLayer(nn.Module):
                                 topk_layer = self.topk_kernels["conv" + str(layer_num)]
                             elif self.cl_hyper["t_criteria"] == "activations":
                                 topk_layer = self.topk_kernels["conv" + str(layer_num)]
-                        print("topk_layer inside model after retrieval: ", topk_layer) 
+                         
                 blocks.append(generate_block(params, avg_deltas_layer, topk_layer, cl_hyper, heads))
                 layer_num += 1
+                
             self.blocks = nn.Sequential(*blocks)
         else:
             self.blocks = nn.Sequential(*blocks)
@@ -386,7 +397,7 @@ class MultiLayer(nn.Module):
         """
         self.training = mode
         self.train_blocks = blocks
-        # print('train mode %s and layer %s'%(mode, blocks))
+        #  
 
         for param in self.parameters():
             param.requires_grad = False

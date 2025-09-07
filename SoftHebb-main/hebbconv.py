@@ -20,7 +20,7 @@ import numpy as np
 R = [True]
 def myprint(t):
     if R[0]: 
-        print("WTA IN delta_weight: ", t)
+         # print("WTA IN delta_weight: ", t)
         R[0] = False
 
 class HebbHardConv2d(nn.Module):
@@ -69,7 +69,7 @@ class HebbHardConv2d(nn.Module):
         self.add_threshold = True
         self.pre_triangle = pre_triangle
         if pre_triangle:
-            print('preactivation using triangle')
+            # print('preactivation using triangle')
             self.triangle = Triangle(1)
 
         self.stat = torch.zeros(3, out_channels)
@@ -442,7 +442,7 @@ class HebbHardConv2d(nn.Module):
         ##########
         mask = (current_kernels_avg > self.avg_deltas_layer).type(torch.uint8).to(device)
         if self.temp == 1:
-            print("CHECK_THRESHOLD: ", mask[0], current_kernels_avg.cpu()[0], self.avg_deltas_layer.cpu()[0])
+             # printintintint("CHECK_THRESHOLD: ", mask[0], current_kernels_avg.cpu()[0], self.avg_deltas_layer.cpu()[0])
             self.temp = 2
         return mask
     
@@ -453,15 +453,15 @@ class HebbHardConv2d(nn.Module):
         topk_mask = torch.zeros(len(threshold_mask)).to(device)
         topk_mask[self.topk_layer] = 1
         
-        if self.temp == 2 and self.cl_hyper["topk_lock"]:
-            print("topk_mask_LOCK", topk_mask.cpu())
+        # if self.temp == 2 and self.cl_hyper["topk_lock"]:
+             # print("topk_mask_LOCK", topk_mask.cpu())
         if self.cl_hyper["topk_lock"]: 
             return topk_mask
         final_mask = topk_mask + threshold_mask
         if self.temp == 2:
-            print("topk_mask ", topk_mask.cpu())
-            print("threshold_mask ", threshold_mask.cpu())
-            print("final_mask", final_mask.cpu())
+             # print("topk_mask ", topk_mask.cpu())
+             # print("threshold_mask ", threshold_mask.cpu())
+             # print("final_mask", final_mask.cpu())
             self.temp = 3
         final_mask = (final_mask == 2 ).type(torch.uint8)
         #############################################################################################à
@@ -480,8 +480,8 @@ class HebbHardConv2d(nn.Module):
         not_topk_mask = (topk_mask == 0).type(torch.uint8)
 
         if self.temp == 2:
-            print("topk_mask ", topk_mask.cpu())
-            print("not_topk_mask ", not_topk_mask.cpu())
+             # print("topk_mask ", topk_mask.cpu())
+             # print("not_topk_mask ", not_topk_mask.cpu())
             self.temp = 3
         ######################################################################
         # return_mask = torch.zeros(len(lower_lr_mask)).to(device)
@@ -512,8 +512,8 @@ class HebbHardConv2d(nn.Module):
             # !!! self.weight.shape is always equal to self.nb_train
 ################################################################################
             if self.temp == 0:
-                print("self.avg_deltas_layer: ", type(self.avg_deltas_layer))
-                print("self.topk_layer: ", type(self.topk_layer))
+                # print("self.avg_deltas_layer: ", type(self.avg_deltas_layer))
+                # print("self.topk_layer: ", type(self.topk_layer))
                 self.temp = 1
             if self.cl_hyper["cf_sol"] and self.avg_deltas_layer is not None and self.topk_layer is not None:
                 lower_lr = self.cl_hyper["low_lr"] # means that we reduce it of x%
@@ -539,11 +539,11 @@ class HebbHardConv2d(nn.Module):
                 # return a mask of the learning rate which limits the learning where the threshold was broken and increases it where it wasn't.
                 if self.temp == 3:
                     
-                    print("lower_lr_mask ", lower_lr_mask.cpu())
-                    print("higher_lr_mask ", higher_lr_mask.cpu())
-                    print("lr_mask ", lr_mask.cpu())
-                    print(self.lr.shape)
-                    print("self.lr", self.lr[0])
+                     # print("lower_lr_mask ", lower_lr_mask.cpu())
+                     # print("higher_lr_mask ", higher_lr_mask.cpu())
+                     # print("lr_mask ", lr_mask.cpu())
+                     # print(self.lr.shape)
+                     # print("self.lr", self.lr[0])
                     self.temp = 4
                 #lr_mask = lr_mask.to("cuda:0")
                 self.weight[:self.nb_train].add_(self.lr *lr_mask*self.delta_w[:self.nb_train])

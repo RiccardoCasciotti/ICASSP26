@@ -1,5 +1,107 @@
 {
   "model": {
+    "2SoftHebbCnnESC": { 
+      "b0": {
+        "arch": "CNN",
+        "preset": "softkrotov-c96-k5-p2-s1-d1-b0-t1-lr0.01-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 0,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      
+      "b1": {
+        "arch": "MLP",
+        "preset": "BP-c10",
+        "operation": "flatten",
+        "num": 1,
+        "att_dropout": null,
+        "dropout": 0.5
+      }
+    },
+    "4SoftHebbCnnESC": { 
+      "b0": {
+        "arch": "CNN",
+        "preset": "softkrotov-c96-k5-p2-s1-d1-b0-t1-lr0.01-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 0,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.1",
+        "resume": null
+      },
+      "b1": {
+        "arch": "CNN",
+        "preset": "softkrotov-c384-k3-p1-s1-d1-b0-t0.65-lr0.008-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 1,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_1.4",
+        "resume": null
+      },
+      "b2": {
+        "arch": "CNN",
+        "preset": "softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 2,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b3": {
+        "arch": "MLP",
+        "preset": "BP-c10",
+        "operation": "flatten",
+        "num": 3,
+        "att_dropout": null,
+        "dropout": 0.5
+      }
+    },
+    "4SoftHebbCnnESC_B": { 
+      "b0": {
+        "arch": "CNN",
+        "preset": "softkrotov-c32-k7-p2-s1-d1-b0-t1-lr0.001-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 0,
+        "batch_norm": false,
+        "pool": "max_2_2_1",
+        "activation": "triangle_0.3",
+        "resume": null
+      },
+      "b1": {
+        "arch": "CNN",
+        "preset": "softkrotov-c64-k7-p1-s1-d1-b0-t0.65-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 1,
+        "batch_norm": false,
+        "pool": "max_2_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      "b2": {
+        "arch": "CNN",
+        "preset": "softkrotov-c128-k5-p1-s1-d1-b0-t0.25-lr0.008-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 2,
+        "batch_norm": false,
+        "pool": "max_2_2_0",
+        "activation": "triangle_1.2",
+        "resume": null
+      },
+      "b3": {
+        "arch": "MLP",
+        "preset": "BP-c10",
+        "operation": "flatten",
+        "num": 3,
+        "att_dropout": null,
+        "dropout": 0.3
+      }
+    },
+    
     "6SoftHebbCnnESC": {
       "b0": {
         "arch": "CNN",
@@ -23,7 +125,7 @@
       },
       "b2": {
         "arch": "CNN",
-        "preset": "softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.01-lp0.5-e0",
+        "preset": "softkrotov-c768-k3-p1-s1-d1-b0-t0.25-lr0.01-lp0.5-e0",
         "operation": "batchnorm2d",
         "num": 2,
         "batch_norm": false,
@@ -33,7 +135,7 @@
       },
       "b3": {
         "arch": "CNN",
-        "preset": "softkrotov-c2560-k3-p1-s1-d1-b0-t0.25-lr0.01-lp0.5-e0",
+        "preset": "softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.01-lp0.5-e0",
         "operation": "batchnorm2d",
         "num": 3,
         "batch_norm": false,
@@ -60,6 +162,129 @@
         "dropout": 0.5
       }
     },
+    "6SoftHebbCnnESC_B": {
+      "b0": {
+        "arch": "CNN",
+        "preset": "softkrotov-c96-k7-p2-s1-d1-b0-t1-lr0.08-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 0,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      "b1": {
+        "arch": "CNN",
+        "preset": "softkrotov-c384-k7-p1-s1-d1-b0-t0.65-lr0.08-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 1,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_1.4",
+        "resume": null
+      },
+      "b2": {
+        "arch": "CNN",
+        "preset": "softkrotov-c768-k5-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 2,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b3": {
+        "arch": "CNN",
+        "preset": "softkrotov-c768-k5-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 3,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b4": {
+        "arch": "CNN",
+        "preset": "softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 4,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b5": {
+        "arch": "MLP",
+        "preset": "BP-c50",
+        "operation": "flatten",
+        "num": 5,
+        "att_dropout": null,
+        "dropout": 0.7
+      }
+    },
+    
+    
+    "6SoftHebbCnnESC_C": {
+      "b0": {
+        "arch": "CNN",
+        "preset": "softkrotov-c96-k5-p2-s1-d1-b0-t1-lr0.08-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 0,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      "b1": {
+        "arch": "CNN",
+        "preset": "softkrotov-c384-k3-p1-s1-d1-b0-t0.65-lr0.08-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 1,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_1.4",
+        "resume": null
+      },
+      "b2": {
+        "arch": "CNN",
+        "preset": "softkrotov-c768-k3-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 2,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b3": {
+        "arch": "CNN",
+        "preset": "softkrotov-c768-k3-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 3,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b4": {
+        "arch": "CNN",
+        "preset": "softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.005-lp0.5-e0",
+        "operation": "batchnorm2d",
+        "num": 4,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1",
+        "resume": null
+      },
+      "b5": {
+        "arch": "MLP",
+        "preset": "BP-c50",
+        "operation": "flatten",
+        "num": 5,
+        "att_dropout": null,
+        "dropout": 0.7
+      }
+    },
+    
     "2SoftMlpMNIST": {
       "b0": {
         "arch": "MLP",
@@ -1731,7 +1956,7 @@
     "6SoftHebbCnnImNet": {
       "b0": {
         "arch": "CNN",
-        "preset": "softkrotov-c48-k5-p2-s1-d1-b0-t1.1-lr0.08",
+        "preset": "softkrotov-c48-k5-p2-s1-d1-b0-t1.1-lr0.008",
         "operation": "batchnorm2d",
         "num": 0,
         "batch_norm": false,
@@ -1741,7 +1966,7 @@
       },
       "b1": {
         "arch": "CNN",
-        "preset": "softkrotov-c192-k3-p1-s1-d1-b0-t0.7-lr0.01",
+        "preset": "softkrotov-c192-k3-p1-s1-d1-b0-t0.7-lr0.001",
         "operation": "batchnorm2d",
         "num": 1,
         "batch_norm": false,
@@ -1751,7 +1976,67 @@
       },
       "b2": {
         "arch": "CNN",
-        "preset": "softkrotov-c768-k3-p1-s1-d1-b0-t0.5-lr0.01",
+        "preset": "softkrotov-c768-k3-p1-s1-d1-b0-t0.5-lr0.001",
+        "operation": "batchnorm2d",
+        "num": 2,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      "b3": {
+        "arch": "CNN",
+        "preset": "softkrotov-c3072-k3-p1-s1-d1-b0-t0.4-lr0.001",
+        "operation": "batchnorm2d",
+        "num": 3,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_1.4",
+        "resume": null
+      },
+      "b4": {
+        "arch": "CNN",
+        "preset": "softkrotov-c12288-k3-p1-s1-d1-b0-t0.25-lr0.001",
+        "operation": "batchnorm2d",
+        "num": 4,
+        "batch_norm": false,
+        "pool": "avg_2_2_0",
+        "activation": "triangle_1.0",
+        "resume": null
+      },
+      "b5": {
+        "arch": "MLP",
+        "preset": "BP-c1000",
+        "operation": "flatten",
+        "num": 5,
+        "att_dropout": null,
+        "dropout": 0.3
+      }
+    },
+  "6SoftHebbCnnImNet_B": {
+      "b0": {
+        "arch": "CNN",
+        "preset": "softkrotov-c48-k7-p2-s1-d1-b0-t1.1-lr0.08",
+        "operation": "batchnorm2d",
+        "num": 0,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      "b1": {
+        "arch": "CNN",
+        "preset": "softkrotov-c192-k5-p1-s1-d1-b0-t0.7-lr0.01",
+        "operation": "batchnorm2d",
+        "num": 1,
+        "batch_norm": false,
+        "pool": "max_4_2_1",
+        "activation": "triangle_0.7",
+        "resume": null
+      },
+      "b2": {
+        "arch": "CNN",
+        "preset": "softkrotov-c768-k5-p1-s1-d1-b0-t0.5-lr0.01",
         "operation": "batchnorm2d",
         "num": 2,
         "batch_norm": false,
@@ -1771,7 +2056,7 @@
       },
       "b4": {
         "arch": "CNN",
-        "preset": "softkrotov-c12288-k3-p1-s1-d1-b0-t0.25-lr0.01",
+        "preset": "softkrotov-c6000-k3-p1-s2-d1-b0-t0.25-lr0.01",
         "operation": "batchnorm2d",
         "num": 4,
         "batch_norm": false,
@@ -1793,12 +2078,12 @@
     "MLP": {
       "default": {
         "arch": "MLP",
-        "lr": 0.05,
+        "lr": 0.00005,
         "adaptive": true,
         "lr_sup": 0.001,
-        "speed": 0.4,
+        "speed": 3,
         "lr_div": 100,
-        "lebesgue_p": 2,
+        "lebesgue_p": 4,
         "t_invert": 10,
         "beta": 0.01,
         "power": 4.5,
@@ -1807,9 +2092,9 @@
         "hebbian": false,
         "add_bias": false,
         "normalize_inp": false,
-        "lr_decay": "linear",
-        "seed": 0,
-        "lr_bias": 600,
+        "lr_decay": "exp",
+        "seed": 2,
+        "lr_bias": 300,
         "softness": "soft",
         "soft_activation_fn": "exp",
         "plasticity": "SoftHebb",
@@ -1826,12 +2111,12 @@
       "default": {
         "arch": "CNN",
         "nb_train": null,
-        "lr": 0.009,
+        "lr": 0.00003,
         "adaptive": true,
         "lr_sup": 0.001,
-        "speed": 7,
+        "speed": 10,
         "lr_div": 96,
-        "lebesgue_p": 2,
+        "lebesgue_p": 4,
         "padding_mode": "reflect",
         "pre_triangle": false,
         "ranking_param": 3,
@@ -1844,10 +2129,10 @@
         "power": 4.5,
         "padding": 0,
         "weight_init": "positive",
-        "weight_init_range": 2,
+        "weight_init_range": 5,
         "weight_init_offset": 0,
         "mask_thsd": 0,
-        "radius": 25,
+        "radius": 5,
         "power_lr": 0.75,
         "weight_decay":0,
         "soft_activation_fn": "exp",
@@ -1855,8 +2140,8 @@
         "resume": null,
         "add_bias": false,
         "normalize_inp": false,
-        "lr_decay": "linear",
-        "seed": 0
+        "lr_decay": "exp",
+        "seed": 2
       }
     }
   },
@@ -2114,12 +2399,12 @@
         "width": 128,
         "height": 431,
         "n_mels": 128,
-        "n_fft": 2048,
+        "n_fft": 1024,
         "hop_len": 512,
         "training_sample": 2000,
         "nb_epoch": 100,
         "print_freq": 10,
-        "batch_size": 64,
+        "batch_size": 32,
         "augmentation": false,
         "zca_whitened": false
       },
@@ -2128,8 +2413,23 @@
         "print_freq": 50,
         "batch_size": 10
       },
+      "10": {
+        "nb_epoch": 10
+      },
+      "15": {
+        "nb_epoch": 10
+      },
+      "20": {
+        "nb_epoch": 10
+      },
+      "25": {
+        "nb_epoch": 25
+      },
       "50": {
         "nb_epoch": 50
+      },
+      "100": {
+        "nb_epoch": 100
       }
     },
     "CIFAR100": {

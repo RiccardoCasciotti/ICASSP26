@@ -9,11 +9,11 @@ import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
-data_candidate = f"{BASE_PATH}/SoftHebb-main/Training"
+    BASE_PATH="/scratch/project_462000765/casciott"
+data_candidate = f"{BASE_PATH}/Training"
 DATA = op.realpath(op.expanduser(data_candidate))
 RESULT = op.join(DATA, 'results', 'hebb', 'result')  # everything from multi_layer.py
 SEARCH = op.join(DATA, 'results', 'hebb', 'search')  # everything from ray_search
@@ -135,16 +135,13 @@ def get_device(gpu_id=0):
         device= torch.device(f"cuda")
     else:
         device= torch.device("cpu")
-    print(device)
     return device
 
     # use_cuda = torch.cuda.is_available() and gpu_id is not None
     # device = torch.device('cuda:' + str(gpu_id) if use_cuda else 'cpu')
     # #device = torch.device('cuda:' + str(gpu_id))
 
-    # print("The device used will be: ")
-    # print(torch.cuda.is_available())
-    # return device
+    #      #      # return device
 
 DEVICE = get_device()
 def seed_init_fn(seed):
@@ -162,7 +159,6 @@ def seed_init_fn(seed):
     None.
 
     """
-    print("SEED: ", seed)
     seed = seed % 2 ** 32
     np.random.seed(seed)
     random.seed(seed)
@@ -401,7 +397,7 @@ def load_presets(name=None):
     Load blocks config from name of the models
 
     """
-    f = open(f'{BASE_PATH}/SoftHebb-main/presets.json', "r")
+    f = open(f'/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
     presets = json.load(f)
     if name is None:
         return list(presets['model'].keys())
@@ -434,7 +430,6 @@ def load_presets(name=None):
             blocks[id]['activation'] = {'function': activation, 'param': param}
         else:
             blocks[id]['activation'] = None
-    print("BLOCKS: ",  blocks)
     return blocks
 
 
@@ -443,7 +438,7 @@ def load_config_dataset(name=None, validation=True, cl=False):
     Load dataset config from name of the dataset
 
     """
-    f = open(f'{BASE_PATH}/SoftHebb-main/presets.json', "r")
+    f = open(f'/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
     dataset = json.load(f)['dataset']
     if name is None:
         lst_dataset = []
@@ -472,8 +467,6 @@ def load_config_dataset(name=None, validation=True, cl=False):
             np.floor(dataset_config['training_sample'] * dataset_config['validation_split']))
         dataset_config['training_sample'] = dataset_config['training_sample'] - dataset_config['val_sample']
     dataset_config["continual_learning"] = cl
-    print("CL: ", cl)
-    print(dataset_config)
     return dataset_config
 
 

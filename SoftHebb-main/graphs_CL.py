@@ -75,8 +75,7 @@ def format_graphs(path):
                         objS = obj[run]
                         if isinstance(objS, str):
                             continue
-                        print(run)
-                        if run != "cl_hyper":
+                                                 if run != "cl_hyper":
                             new_obj["test_loss"] = objS["test_loss"]
                             new_obj["test_acc"] = objS["test_acc"]
                             new_obj["dataset"] = objS["dataset_sup"]["name"]
@@ -123,8 +122,7 @@ def create_graph(graphs, path):
 
                 fig.suptitle("Continual Learning with " + str(g[run]["n_classes"]) + " classes per task " + "("+ T +")")
 
-                # Pretty-print JSON
-                cl_info = json.dumps(g["cl_hyper"], indent=4)
+                # Pretty-                 cl_info = json.dumps(g["cl_hyper"], indent=4)
 
                 # Create an extra subplot for JSON text outside the main plot
                 json_ax = fig.add_axes([1, 0.2, 0.2, 0.6])  # [left, bottom, width, height]
@@ -180,8 +178,7 @@ def create_graph(graphs, path):
 
                 plt.yticks(np.arange(0, 105, 5))
 
-                # Pretty-print JSON
-                cl_info = json.dumps(g["cl_hyper"], indent=4)
+                # Pretty-                 cl_info = json.dumps(g["cl_hyper"], indent=4)
 
                 # Add external JSON box
                 json_ax = plt.gcf().add_axes([0.9, 0.2, 0.2, 0.6])  # Moved further right (left = 0.9)

@@ -39,8 +39,8 @@ def check_dimension(blocks, dataset_config):
             #   'Output channels %s is different than number of classes %s'%(config['out_channels'], out_channels_final)
 
         if 'operation' in block and 'flatten' in block['operation']:
-            print("NOWWWW")
-            print(in_width, in_height)
+             
+             
             config['in_channels'] = int(in_channels * in_width * in_height)
             config['old_channels'] = in_channels
         else:
@@ -60,7 +60,7 @@ def check_dimension(blocks, dataset_config):
                     (in_height - 1 * (block['pool']['kernel_size'] - 1) + 2 * block['pool']['padding'] - 1) /
                     block['pool']['stride'] + 1)
             print('block %s, size : %s %s %s' % (id, config['out_channels'], in_width, in_height))
-        print(config['out_channels'])
+         
         in_channels = config['out_channels']  # prepare for next loop
 
         lp = blocks['b%s' % id]['layer']['lebesgue_p']
@@ -255,6 +255,8 @@ def run_hybrid(
         report=None,
         plot_fc=None,
         model_dir=None, 
+        train_loader=None,
+        val_loader=None
 ):
     """
     Hybrid training of one model, happens during simultaneous training mode
@@ -263,7 +265,6 @@ def run_hybrid(
 
     print('\n', '********** Hybrid learning of blocks %s **********' % blocks)
 
-    train_loader, test_loader = make_data_loaders(dataset_config, batch_size, device)
 
     optimizer_sgd = optim.Adam(
         model.parameters(), lr=lr)  # , weight_decay=1e-4)
@@ -280,35 +281,35 @@ def run_hybrid(
 
         if epoch % print_freq == 0 or epoch == final_epoch or epoch == 1:
 
-            loss_test, acc_test = evaluate_sup(model, criterion, test_loader, device)
+            loss_val, acc_val = evaluate_sup(model, criterion, val_loader, device)
 
-            log_batch = log.step(epoch, log_batch, loss_test, acc_test, lr, save=save_batch)
+            log_batch = log.step(epoch, log_batch, loss_val, acc_val, lr, save=save_batch)
 
             if report is not None:
-                _, train_loss, train_acc, test_loss, test_acc = log.data[-1]
+                _, train_loss, train_acc, val_loss, val_acc = log.data[-1]
 
                 conv, R1 = model.convergence()
-                metrics = {"train_loss":train_loss, "train_acc":train_acc, "test_loss":test_loss, "test_acc": test_acc, "convergence":conv, "R1":R1}
+                metrics = {"train_loss":train_loss, "train_acc":train_acc, "val_loss":val_loss, "val_acc": val_acc, "convergence":conv, "R1":R1}
                 report(metrics)
             
 
             else:
                 log.verbose()
             conv, R1 = model.convergence()
-            _, train_loss, train_acc, test_loss, test_acc = log.data[-1]
+            _, train_loss, train_acc, val_loss, val_acc = log.data[-1]
             if type(train_loss) ==  torch.Tensor:
-                metrics = {"train_loss":train_loss.item(), "train_acc":train_acc.item(), "test_loss":test_loss.item(), "test_acc": test_acc.item(), "convergence":conv.item(), "R1":R1}
+                metrics = {"train_loss":train_loss.item(), "train_acc":train_acc.item(), "val_loss":val_loss.item(), "val_acc": val_acc.item(), "convergence":conv.item(), "R1":R1}
             else: 
-                metrics = {"train_loss":train_loss, "train_acc":train_acc, "test_loss":test_loss, "test_acc": test_acc, "convergence":conv, "R1":R1}
+                metrics = {"train_loss":train_loss, "train_acc":train_acc, "val_loss":val_loss, "val_acc": val_acc, "convergence":conv, "R1":R1}
             
             if epoch == final_epoch:
                 state_dict = model.state_dict()
                 keys = list(state_dict.keys())
                 new_head = {keys[-1]: state_dict[keys[-1]], keys[-2]: state_dict[keys[-2]]}
-                print("new_head: ", new_head)
+                 
                 if len(model.heads) > 0:
                     val =  model.heads_thresh*len(model.heads)
-                    val += test_acc/100
+                    val += val_acc/100
                     model.heads_thresh = val/(len(model.heads)+1)
                 model.heads.append(new_head)
 
@@ -342,6 +343,8 @@ def run_unsup(
         plot_fc=None,
         reset=False,
         model_dir=None, 
+        train_loader=None,
+        val_loader=None
 ):
     """
     Unsupervised training of hebbians blocks of one model
@@ -352,7 +355,6 @@ def run_unsup(
     """
     print('\n', '********** Hebbian Unsupervised learning of blocks %s **********' % blocks)
 
-    train_loader, test_loader = make_data_loaders(dataset_config, batch_size, device)
     print("SAVING FOLDER FOR UNSUP: ", folder_name)
 
     for epoch in range(1, final_epoch + 1):
@@ -360,12 +362,12 @@ def run_unsup(
 
         if epoch % print_freq == 0 or epoch == final_epoch or epoch == 1:
 
-            acc_train, acc_test = evaluate_unsup(model, train_loader, test_loader, device, blocks)
+            acc_train, acc_val = evaluate_unsup(model, train_loader, val_loader, device, blocks)
 
-            log.step(epoch, acc_train, acc_test, info, convergence, R1, lr)
+            log.step(epoch, acc_train, acc_val, info, convergence, R1, lr)
 
             if report is not None:
-                metrics = {"train_loss":0., "train_acc":acc_train, "test_loss":0., "test_acc": acc_test, "convergence":convergence, "R1":R1}
+                metrics = {"train_loss":0., "train_acc":acc_train, "val_loss":0., "val_acc": acc_val, "convergence":convergence, "R1":R1}
                 report(metrics)
             # else:
             log.verbose()
@@ -399,6 +401,8 @@ def run_sup(
         report=None,
         plot_fc=None,
         model_dir=None, 
+        train_loader=None,
+        val_loader=None
 ):
     """
     Supervised training of BP blocks of one model
@@ -406,10 +410,9 @@ def run_sup(
     """
 
     print('\n', '********** Supervised learning of blocks %s **********' % blocks)
-    print("SAVING FOLDER FOR SUP: ", folder_name)
-
-    train_loader, test_loader = make_data_loaders(dataset_config, batch_size, device)
-
+     
+    min_loss_val = 0
+    max_acc_val = 0
     criterion = nn.CrossEntropyLoss()
     log_batch = log.new_log_batch()
     if all([model.get_block(b).is_hebbian() for b in blocks]):
@@ -429,24 +432,24 @@ def run_sup(
         if epoch % print_freq == 0 or epoch == final_epoch or epoch == 1:
 
             # so the diff between evaluate sup and unsup is that former calcs train and test acc, former test loss and acc
-            loss_test, acc_test = evaluate_sup(model, criterion, test_loader, device)
+            loss_val, acc_val = evaluate_sup(model, criterion, val_loader, device)
+            
+            log_batch = log.step(epoch, log_batch, loss_val, acc_val, lr, save_batch)
 
-            log_batch = log.step(epoch, log_batch, loss_test, acc_test, lr, save_batch)
-
-            _, train_loss, train_acc, test_loss, test_acc = log.data[-1]
+            _, train_loss, train_acc, val_loss, val_acc = log.data[-1]
             conv, R1 = model.convergence()
             if type(train_loss) ==  torch.Tensor:
-                metrics = {"train_loss":train_loss.item(), "train_acc":train_acc.item(), "test_loss":test_loss.item(), "test_acc": test_acc.item(), "convergence":conv.item(), "R1":R1}
+                metrics = {"train_loss":train_loss.item(), "train_acc":train_acc.item(), "val_loss":val_loss.item(), "val_acc": val_acc.item(), "convergence":conv.item(), "R1":R1}
             else: 
-                metrics = {"train_loss":train_loss, "train_acc":train_acc, "test_loss":test_loss, "test_acc": test_acc, "convergence":conv, "R1":R1}
+                metrics = {"train_loss":train_loss, "train_acc":train_acc, "val_loss":val_loss, "val_acc": val_acc, "convergence":conv, "R1":R1}
 
             if report is not None:
-                _, train_loss, train_acc, test_loss, test_acc = log.data[-1]
+                _, train_loss, train_acc, val_loss, val_acc = log.data[-1]
                 conv, R1 = model.convergence()
                 if type(train_loss) ==  torch.Tensor:
-                    metrics = {"train_loss":train_loss.item(), "train_acc":train_acc.item(), "test_loss":test_loss.item(), "test_acc": test_acc.item(), "convergence":conv.item(), "R1":R1}
+                    metrics = {"train_loss":train_loss.item(), "train_acc":train_acc.item(), "val_loss":val_loss.item(), "val_acc": val_acc.item(), "convergence":conv.item(), "R1":R1}
                 else: 
-                    metrics = {"train_loss":train_loss, "train_acc":train_acc, "test_loss":test_loss, "test_acc": test_acc, "convergence":conv, "R1":R1}
+                    metrics = {"train_loss":train_loss, "train_acc":train_acc, "val_loss":val_loss, "val_acc": val_acc, "convergence":conv, "R1":R1}
                 report(metrics)
                 
             else:
@@ -456,23 +459,36 @@ def run_sup(
                 state_dict = model.state_dict()
                 keys = list(state_dict.keys())
                 new_head = {keys[-1]: state_dict[keys[-1]], keys[-2]: state_dict[keys[-2]]}
-                print("new_head: ", new_head)
+                 
                 if len(model.heads) > 0:
                     val =  model.heads_thresh*len(model.heads)
-                    val += test_acc/100
+                    val += val_acc/100
                     model.heads_thresh = val/(len(model.heads)+1)
                 model.heads.append(new_head)
 
             if save:
-                print("BLOCKS IN SUP: ", blocks)
+                 
                 save_layers(model, folder_name, epoch, blocks, storing_path=model_dir)
 
             if plot_fc is not None:
                 for block in blocks:
                     plot_fc(model, block)
 
-         
-    
+            # # Early Stopping on loss
+            # if min_loss_val == 0:
+            #     min_loss_val = loss_val
+            # elif min_loss_val > loss_val: 
+            #     min_loss_val = loss_val
+            # elif loss_val >= min_loss_val:
+            #     break
+
+            # Early Stopping on acc
+            if max_acc_val == 0:
+                max_acc_val = acc_val
+            elif max_acc_val < acc_val: 
+                max_acc_val = acc_val
+            elif acc_val <= max_acc_val:
+                break
 
     metrics["dataset_sup"] = dataset_config
     return metrics

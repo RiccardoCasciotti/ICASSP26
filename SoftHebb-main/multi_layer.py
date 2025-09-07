@@ -77,15 +77,9 @@ def main(blocks, name_model, resume, save, evaluate, dataset_sup_config, dataset
 
     # here we obtain the activations of all the layers (which are convolutional layers)
     for layer in model.children():
-        print(list(model.children()))
-        print("LAYER NAME: " , layer)
-        print("LAYER CHILDREN: " , list(layer.children()))
-	# check for convolutional layer
+                           	# check for convolutional layer
         for subl in layer.children():
-            if not subl.__eq__(None):
-                print("SUBLAYER NAME: " , subl)
             for subsubl in subl.children():
-                print("subsubl NAME: " , subsubl)
                 if subsubl._get_name().__eq__("HebbSoftKrotovConv2d"):
                     subsubl.register_forward_hook(getActivation("conv"+str(depth)))
             depth += 1
@@ -100,15 +94,12 @@ def main(blocks, name_model, resume, save, evaluate, dataset_sup_config, dataset
                 train_loader, test_loader = make_data_loaders(dataset_sup_config, config['batch_size'], device)
                 criterion = nn.CrossEntropyLoss()
                 test_loss, test_acc = evaluate_sup(model, criterion, test_loader, device)
-                print(f'Accuracy of the network: {test_acc:.3f} %')
-                print(f'Test loss: {test_loss:.3f}')
         else: 
-            print("BLOCKS: ", config['blocks'])
             if config['mode'] == 'unsupervised':
                 run_unsup(
                     config['nb_epoch'],
                     config['print_freq'],
-                    config['batch_size'],
+                    config['batch_size'],                    
                     name_model,
                     dataset_unsup_config,
                     model,
@@ -117,12 +108,11 @@ def main(blocks, name_model, resume, save, evaluate, dataset_sup_config, dataset
                     blocks=config['blocks'],
                     save=save
                 )
-                print()
             elif config['mode'] == 'supervised':
                 run_sup(
                     config['nb_epoch'],
                     config['print_freq'],
-                    config['batch_size'],
+                    config['batch_size'],                    
                     config['lr'],
                     name_model,
                     dataset_sup_config,
@@ -132,13 +122,12 @@ def main(blocks, name_model, resume, save, evaluate, dataset_sup_config, dataset
                     blocks=config['blocks'],
                     save=save
                 )
-                #print()
-
+                # 
             else:
                 run_hybrid(
                     config['nb_epoch'],
                     config['print_freq'],
-                    config['batch_size'],
+                    config['batch_size'],                    
                     config['lr'],
                     name_model,
                     dataset_sup_config,
@@ -172,11 +161,9 @@ if __name__ == '__main__':
 
     blocks = check_dimension(blocks, dataset_sup_config)
 
-    print("BLOCKS: ", blocks)
-
+     
     train_config = training_config(blocks, dataset_sup_config, dataset_unsup_config, params.training_mode,
                                    params.training_blocks)
-    print("train_config: ", train_config)
-
+     
     main(blocks, name_model, params.resume, params.save, params.evaluate, dataset_sup_config, dataset_unsup_config, train_config,
          params.gpu_id)

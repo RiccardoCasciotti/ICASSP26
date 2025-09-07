@@ -168,8 +168,7 @@ class BasicBlock(nn.Module):
         return nn.Sequential(*elements)
 
     def forward(self, x: Tensor) -> Tensor:
-        # print('*'*(self.num+1), x.mean())
-        # torch.cuda.empty_cache()
+        #          # torch.cuda.empty_cache()
 
         if self.att_dropout is not None:
             x = self.att_dropout(x)

@@ -1,7 +1,7 @@
 import random
 import torch 
 import torchaudio
-from torch.utils.data import Dataset, DataLoader, Subset
+from torch.utils.data import Dataset, DataLoader, Subset, random_split
 import pandas as pd 
 import numpy as np
 from pathlib import Path
@@ -42,7 +42,7 @@ class SoundDS(Dataset):
         sig, sr = torchaudio.load(f"{self.data_path}/audio/{self.df.loc[index, 'filename']}")
         if self.pre_aug: 
             sig, sr = self.time_shift(sig, sr)
-        spectro = self.spectro_gram((sig, sr), 128, 2048, 512)
+        spectro = self.spectro_gram((sig, sr), 32, 2048, 1024)
         
         return spectro, self.df.loc[index, "target"]
     
@@ -56,7 +56,7 @@ class SoundDS(Dataset):
 
     def spectro_gram(self, aud, n_mels, n_fft, hop_len):
         sig,sr = aud
-        top_db = 80
+        top_db = np.max
 
         # spec has shape [channel, n_mels, time], where channel is mono, stereo etc
         spec = torchaudio.transforms.MelSpectrogram(sr, n_fft=n_fft, hop_length=hop_len, n_mels=n_mels)(sig)
@@ -75,14 +75,16 @@ def get_split(dataset, data_path, val_fold=2):
 
 #read the metadata file
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
          # Apple Silicon GPU
 else:
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
-fd = pd.read_csv(f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master/meta/esc50.csv")
+    BASE_PATH="/scratch/project_462000765/casciott"
+fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
 fd = fd[["fold", "target", "filename"]]
-train, validation = get_split(fd, data_path=f"{BASE_PATH}/SoftHebb-main/Training/data/ESC-50-master")
+train, validation = get_split(fd, data_path=f"{BASE_PATH}/Training/data/ESC-50-master")
+train_split, val_split = random_split(train, [len(train.data)*0.9, len(train.data)*0.1])
 
 
-print(validation.data.shape)
+
+print(train_split.data.shape)
 

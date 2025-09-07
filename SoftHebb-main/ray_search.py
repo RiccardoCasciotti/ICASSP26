@@ -141,15 +141,15 @@ def get_config(config_name):
         if params.test: 
             config = {
                 'dataset_unsup': {
-                    #'seed': tune.grid_search([0, 1, 2, 3])
-                    'seed': tune.grid_search([0]) ###############################################
+                    'seed': tune.grid_search([0, 1, 2, 3])
+                    # 'seed': tune.grid_search([0]) ###############################################
                 }
             }
         else: 
             config = {
                 'dataset_unsup': {
                     'seed': tune.grid_search([0, 1, 2, 3])
-                    #'seed': tune.grid_search([0]) ###############################################
+                    # 'seed': tune.grid_search([0]) ###############################################
                 }
             }
     print("config_name", config_name)

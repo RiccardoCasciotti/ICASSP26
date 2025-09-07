@@ -5,44 +5,53 @@ import uuid
 import shutil
 import torch
 
-TEST = False
-ESC50 = True
+TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+SHMH = False
+SINGLE = True
 
 classes_per_task = 2
-n_experiments = 2
-n_tasks = 6
+n_experiments = 5
+n_tasks = 5
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_4C/TASKS_CL_CIFAR100_d3_6tasks
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_2C/TASKS_CL_CIFAR100_c1_big_6tasks
-if TEST: 
-    n_experiments = 1
-    n_tasks = 1
+
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
 dataset="ESC50"
 dataset2 = "C10"
-id = "TEST"
+
+if dataset == "ESC50":
+    classes_per_task = 50
+    n_tasks = 5
+    if SINGLE:
+        n_tasks = 1
+if TEST: 
+    n_experiments = 1
+    n_tasks = 2
+
+id = "BASELINE_2_6SoftHebbImNet_ok"
 folder_id = f"_{id}{n_tasks}tasks"
+
+
 if data_num == 1:
     parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
 else:
     parent_f_id = f"experiments/EXP_{dataset}_{dataset2}"
 
-if ESC50 and not TEST:
-    classes_per_task = 50
-    n_tasks = 5
+
 # C100, C10, STL10, IMG, ESC50
 
 cl_hyper = {
                     'training_mode': 'consecutive',
-                    'top_k': 0.3,
+                    'top_k': 0.50,
                     'topk_lock': False,
-                    'high_lr': 0.1,
-                    'low_lr': 0.4,
+                    'high_lr': 0.15,
+                    'low_lr': 1.0,
                     't_criteria': 'activations', # KSE or activations
-                    'delta_w_interval': 30,
+                    'delta_w_interval': 5,
                     'heads_basis_t': 0.90,
                     'n_tasks': n_tasks, 
                     'classes_per_task': classes_per_task

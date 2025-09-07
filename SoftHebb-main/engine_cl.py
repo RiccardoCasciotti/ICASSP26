@@ -2,6 +2,7 @@ import os
 import torch
 import torch.nn as nn
 import time
+from sklearn.metrics import confusion_matrix
 from PIL import ImageFile
 import matplotlib.pyplot as plt
 from mpltools import special
@@ -9,92 +10,85 @@ from copy import deepcopy
 import pickle
 import numpy as np
 from utils import get_device
+import os.path as op
+try:
+    from utils import RESULT, activation
+except:
+    from hebb.utils import RESULT, activation
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 activations = {}
 curr_layer = 0
 
-POP_HEAD = False
+POP_HEAD = True
 
 
 def train_BP(model, criterion, optimizer, loader, device, measures):
     """
     Train only the traditional blocks with backprop
     """
-    # with torch.autograd.set_detect_anomaly(True):
     t = time.time()
     model.to(device)
-    # print("model.selected_classes: ",model.selected_classes )
-    # avg_deltas = model.avg_deltas
-    # delta_weights = {}
-    # activations_sum = []
-    # acts = model.acts
+   
+    # if model.esc50:
+    #     non_relevant_heads = list(set(range(50)) - set(model.selected_classes))
 
-    # layer_num = -1
-    # iteration = 0
-    # interval = 100
-    # depth = 0
-    # for layer in model.children():
-    #     for subl in layer.children():
-    #         depth += 1
-    # depth -= 1
-    printer = 0
+     
     DEVICE = get_device()
-    if model.esc50:
-        prev_dict = model.state_dict()
-        prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in model.train_blocks} 
-        weight_mask = np.full(prev_dict[list(prev_dict.keys())[-1]].shape, -1)
-        weight_mask[model.selected_classes] = 0
-        weight_mask = torch.tensor(weight_mask, device=DEVICE)
 
-        prev_dict = model.state_dict()
-        prev_dict = {k: v for k, v in prev_dict.items() if "layer.bias" in k and int(k.split(".")[1]) in model.train_blocks} 
-        bias_mask = np.full(prev_dict[list(prev_dict.keys())[-1]].shape, -1)
-        bias_mask[model.selected_classes] = 0
-        bias_mask = torch.tensor(bias_mask, device=DEVICE)
-
-
-        if printer == 0:
-            print("bias_mask, weight_mask : ", bias_mask, weight_mask)
     
     for inputs, target in loader:
         ## 1. forward propagation$
         inputs = inputs.float().to(device, non_blocking=True)
-        #print(inputs.shape)
+        # 
         target = target.to(device, non_blocking=True)
+        # if model.esc50:
+        #     prev_dict = deepcopy(model.state_dict())
+        #     prev_bias = {k: v for k, v in prev_dict.items() if "layer.bias" in k and int(k.split(".")[1]) in model.train_blocks}
+        #     prev_weights = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in model.train_blocks}
+
+        #     prev_bias_els = np.array(prev_bias[list(prev_bias.keys())[-1]].clone().detach().cpu())
+        #     prev_weights_els = np.array(prev_weights[list(prev_weights.keys())[-1]].clone().detach().cpu())
+
+
 
         output = model(inputs)
-        # print(r"%s" % (time.time() - t))
+        #  
 
         ## 2. loss calculation
         loss = criterion(output, target)
-
-        # Store the original weights for comparison
-        if model.esc50:
-            prev_dict = deepcopy(model.state_dict())
-            print("prev_dict : ", prev_dict["blocks.5.layer.weight"][:10])
+        
         ## 3. compute gradient and do SGD step
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if model.esc50:
-            delta_weights, delta_bias = get_delta_weights_bias(model, device, model.train_blocks, prev_dict)
-            if printer == 0:
-                print("delta_weights, delta_bias: ", delta_weights[list(delta_weights.keys())[-1]][:10], delta_bias[list(delta_bias.keys())[-1]][:10])
-                print("LINEAR SHAPE: ", delta_weights[list(delta_weights.keys())[-1]][0].shape, delta_bias[list(delta_bias.keys())[-1]][0].shape)
-            state_dict = deepcopy(model.state_dict())
-            if printer == 0:
-                print("model.state_dict() before update: ", state_dict[list(delta_weights.keys())[-1]][:10])
-            state_dict[list(delta_weights.keys())[-1]] += delta_weights[list(delta_weights.keys())[-1]][0]*weight_mask
-            state_dict[list(delta_bias.keys())[-1]] += delta_bias[list(delta_bias.keys())[-1]][0]*bias_mask
-            if printer == 0:
-                print("list(delta_weights.keys())[-1]", list(delta_weights.keys())[-1], list(delta_bias.keys())[-1])
+        # if model.esc50:
             
-            model.load_state_dict(state_dict)
-            if printer == 0:
-                print("model.state_dict() after update: ", model.state_dict()[list(delta_weights.keys())[-1]][:10])
-                printer += 1
+        #     state_dict = deepcopy(model.state_dict())
+            
+            
+        #     # print("prev_weights_els: ", prev_weights_els)
+        #     linear_weights = np.array(state_dict[list(prev_weights.keys())[-1]].clone().detach().cpu())
+            
+        #     linear_weights[non_relevant_heads] = prev_weights_els[non_relevant_heads]
+        #     # print("linear_weights: ", linear_weights)
+        #     linear_bias = np.array(state_dict[list(prev_bias.keys())[-1]].clone().detach().cpu())
+        #     linear_bias[non_relevant_heads] = prev_bias_els[non_relevant_heads]
+
+        #     state_dict[list(prev_weights.keys())[-1]] = torch.tensor(linear_weights, device=DEVICE)
+        #     state_dict[list(prev_bias.keys())[-1]] = torch.tensor(linear_bias, device=DEVICE)
+            
+        #     model.load_state_dict(state_dict)
+            # print("prev_dict 0: ", prev_dict[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[0])
+            # print("curr_dict 0 : ", model.state_dict()[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[0])
+
+            # print("prev_dict 1: ", prev_dict[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[1])
+            # print("curr_dict 1 : ", model.state_dict()[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[1])
+
+
+        #          
+        #          
         ###################################################################################
 
         # if layer_num == -1:
@@ -124,7 +118,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
 
         # # Forward pass again to compute activations
         # activations = output.detach().clone()  # Detach activations for analysis
-        # #print(activations.shape)
+        # # 
         # # Compute the importance of neurons based on average activation values
         # avg_activation_per_neuron = torch.mean(activations, dim=0) 
 
@@ -146,7 +140,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     #    final_sum += activations_sum[i]
     
     # # here we sum all the values of each activation map to obtain 1 value of activation per kernel instead of a map.ù
-    # print("shape of final_sum: ", final_sum.shape )
+    #  
     # final_sum = torch.sum(final_sum, dim=0)
     # #final_sum = torch.sum(final_sum, dim=1)
 
@@ -158,56 +152,56 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     # final_sum = list(dict(final_sum))
 
     # K = round(len(final_sum)*0.3) # K takes 20% of the kernels
-    # print("FINAL SUM LENNNN " , len(final_sum))
+    #  
     # acts["conv" + str(layer_num)] = final_sum[:K+1]
-    # print("FINAL_SUM: ", final_sum[:10])
-    # print("acts len: ", len(list(acts.keys())))
-    # print("acts keys: ", list(acts.keys()))
-    # print("acts: ", acts)
-    # print("final_sum len: ", len(final_sum))
+    #  
+    #  
+    #  
+    #  
+    #  
 
 
-    # print("delta_weights INFO: ")
-    # print("NUM OF TRACKED COV LAYERS: ", len(list(delta_weights.keys())))
-    # print("NUM OF TRACKED WEIGHTS CHANGES PER LAYER: ", len(delta_weights[list(delta_weights.keys())[0]]) )
+    #  
+    #  
+    #  
     # avg_deltas = average_deltas(delta_weights, avg_deltas, device)
-    # print("avg_deltas INFO: ", type(avg_deltas))
-    # print("avg_deltas keys: ", list(avg_deltas.keys()))
+    #  
+    #  
 
     
     # model.avg_deltas = avg_deltas
     # model.acts = acts
 
-    # print("avg_deltas size: ", len(list(avg_deltas.keys())))
-    # print(f"num of averages for {layer_num} layer: ", avg_deltas[list(avg_deltas.keys())[0]].shape )
+    #  
+    #  
 
-    # print("################################################")
+    #  
     t_criteria = model.cl_hyper["t_criteria"]
     topk_kernels = model.topk_kernels
     num_blocks = len(topk_kernels) + 1
-    print("num_blocks: ", num_blocks)
+     
     # if t_criteria == "KSE":
     #     weights = deepcopy(model.state_dict())
     #     weights = {int(k[7]): v for k, v in weights.items() if ".layer.weight" in k} 
     #     kse_indicators = compute_kse_indicator(weights)
-    #     print("KSE IN")
-    #     print(list(topk_kernels.keys()))
+    #      
+    #      
     #     for layer in kse_indicators.keys():
-    #         print("FOR IN")
-    #         print(layer)
+    #          
+    #          
     #         if layer== (num_blocks-1):
-    #             print("IF IN")
+    #              
     #             kernels = {k:v for k, v in enumerate(kse_indicators[layer])}
     #             kernels = sorted(kernels.items(), key = lambda item : item[1], reverse=True)
-    #             kernels = list(dict(kernels))
+    #             kernels = list(dict(kernels))Y
     #             K = round(len(kernels)*model.cl_hyper["top_k"]) # K takes 20% of the kernels
     #             topk_kernels["conv" + str(layer)] = kernels[:K+1]
-    #             print("len(topk_kernels): ",len(kernels))
+    #              
     # model.topk_kernels = topk_kernels
-    # print("AOOOO")
+    #  
     # for k,v in topk_kernels.items():
 
-    #     print(k, len(v))
+    #      
 
         
     return measures, optimizer.param_groups[0]['lr']
@@ -249,8 +243,8 @@ def get_layer(model, depth, prev_dict):
                 break
         layer_num += 1
     prev_dict = {k: v for k, v in prev_dict.items() if str(layer_num) in k}
-    print("LAYER_NUM: ",layer_num)
-    #print(len(prev_dict))
+     
+    # 
     return prev_dict, layer_num
 
 def get_delta_weights_bias(model, device, blocks, prev_dict ):
@@ -260,11 +254,11 @@ def get_delta_weights_bias(model, device, blocks, prev_dict ):
     #####
     i = 3
     curr_dict = deepcopy(model.state_dict())
-    #print("CURR DICT state: ", list(curr_dict.keys()))
+    # 
     delta_bias = {}
     delta_weights = {}
     curr_dict = {k: v for k, v in curr_dict.items() if ".layer.weight" in k or ".layer.bias" in k and int(k.split(".")[1]) in blocks }
-    print("curr_dict.keys(): ", curr_dict.keys() )
+     
 
     # I should put all the tensors from the dict to a tensor which comprises all the layers
     # to improve performance by loading everything on GPU
@@ -272,15 +266,14 @@ def get_delta_weights_bias(model, device, blocks, prev_dict ):
         tc = tc.to(device)
         tp = prev_dict[kc].to(device)
                         
-        if i < 1:
-            print(kc)
-            print("TP: ",tp[0, :1, 0])
-            print("TC: ",tc[0, :1, 0])
+             
+             
+             
             # use subtract_() to do an inplace op and save space 
         tc.subtract_(tp)
         if i < 1:
-            print("TC after sub: ",tc[0, :1, 0])
-            print("#########################################")
+             
+             
             i +=1
             # !!!! double check if you need a deep copy or not
             # and also check if the tensor is in cpu or in gpu ...
@@ -305,10 +298,10 @@ def get_delta_weights(model, device, blocks, depth, prev_dict, delta_weights ):
     #####
     i = 3
     curr_dict = deepcopy(model.state_dict())
-    #print("CURR DICT state: ", list(curr_dict.keys()))
+    # 
 
     curr_dict = {k: v for k, v in curr_dict.items() if ".layer.weight" in k and int(k.split(".")[1]) in blocks }
-    print("curr_dict.keys(): ", curr_dict.keys() )
+     
 
     # I should put all the tensors from the dict to a tensor which comprises all the layers
     # to improve performance by loading everything on GPU
@@ -316,15 +309,14 @@ def get_delta_weights(model, device, blocks, depth, prev_dict, delta_weights ):
         tc = tc.to(device)
         tp = prev_dict[kc].to(device)
                         
-        if i < 1:
-            print(kc)
-            print("TP: ",tp[0, :1, 0])
-            print("TC: ",tc[0, :1, 0])
+             
+             
+             
             # use subtract_() to do an inplace op and save space 
         tc.subtract_(tp)
         if i < 1:
-            print("TC after sub: ",tc[0, :1, 0])
-            print("#########################################")
+             
+             
             i +=1
             # !!!! double check if you need a deep copy or not
             # and also check if the tensor is in cpu or in gpu ...
@@ -422,9 +414,9 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
     """
     
     t = time.time()
-    #print("LOADER VARIABLE")
-    #print(loader)
-    #print("#############################################")
+    # 
+    # 
+    # 
     loss_acc = (not model.is_hebbian()) and (criterion is not None)
     t = False
     i = 0
@@ -467,25 +459,24 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
     prev_dict = deepcopy(model.state_dict())
     prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in blocks}
     activations_sum = {k: [] for k in prev_dict.keys() if int(k.split(".")[1]) in blocks}
-    print("prev_dict.keys(): ", prev_dict.keys() )
-    print("activations_sum.keys(): ", prev_dict.keys() )
-    print("DEPTH: ", depth)
-    if "conv1" in activations: 
-        print("ACTIVATIONS SHAPE: ", activations["conv1"][0])
+     
+     
+     
+         
     with torch.no_grad(): #Context-manager that disables gradient calculation.
         for inputs, target in loader:
             
            
             ## 1. forward propagation
             inputs = inputs.float().to(device)
-            # print("INPUTS SHAPE: ", inputs.shape)  # , non_blocking=True) send the data to the device (GPU)
+            #  
             output = model(inputs) 
             
             if loss_acc:  
                 target = target.to(device, non_blocking=True)
-                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! INSIDE LOSS ACCURACY")
+                 
                 
-                print("#############################################")
+                 
                 ## 2. loss calculation
                 loss = criterion(output, target)   
 
@@ -532,7 +523,7 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
    
     
     # here we sum all the values of each activation map to obtain 1 value of activation per kernel instead of a map.
-    #print("shape of activation_sum: ", activations_sum[list(activations_sum.keys())[0]][0].shape )
+    # 
 
     if t_criteria == "activations":
         for k in list(activations_sum.keys()):
@@ -551,18 +542,18 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
         
         
                         K = round(len(activations_sum[k])*model.cl_hyper["top_k"]) # K takes #% of the kernels
-                        print("activations_sum[k]" , len(activations_sum[k]))
+                         
                         topk_kernels["conv" + k.split(".")[1]] = activations_sum[k][:K+1]
-                        print("activations_sum[k]: ", activations_sum[k][:10])
-                        print("topk_kernels len: ", len(list(topk_kernels.keys())))
-                        print("topk_kernels keys: ", list(topk_kernels.keys()))
-                        print("topk_kernels: ", topk_kernels)
-                        print("activations_sum[k] len: ", len(activations_sum[k]))
+                         
+                         
+                         
+                         
+                         
     elif t_criteria == "KSE":
         weights = deepcopy(model.state_dict())
         weights = {int(k.split(".")[1]): v for k, v in weights.items() if ".layer.weight" in k and int(k.split(".")[1]) in blocks} 
         kse_indicators = compute_kse_indicator(weights)
-        print("kse_indicators: ", kse_indicators)
+         
         for layer in kse_indicators.keys():
             if layer in blocks:
                 kernels = {k:v for k, v in enumerate(kse_indicators[layer])}
@@ -570,25 +561,25 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
                 kernels = list(dict(kernels))
                 K = round(len(kernels)*model.cl_hyper["top_k"]) # K takes 20% of the kernels
                 topk_kernels["conv" + str(layer)] = kernels[:K+1]
-                print("len(topk_kernels): ",len(kernels))
-    print(list(topk_kernels.keys()))
+                 
+     
     # last = int((list(topk_kernels.keys())[-1])[-1]) + 1
     # topk_kernels["conv" + str(last)] = topk_kernels["conv" + str(last-1)] 
     # topk_kernels.pop(list(topk_kernels.keys())[0])
     model.topk_kernels = topk_kernels
 
-    print("delta_weights INFO: ")
-    print("NUM OF TRACKED COV LAYERS: ", len(list(delta_weights.keys())))
-    print("NUM OF TRACKED WEIGHTS CHANGES PER LAYER: ", len(delta_weights[list(delta_weights.keys())[0]]) )
+     
+     
+     
     avg_deltas = average_deltas(delta_weights, avg_deltas, device)
-    print("avg_deltas INFO: ", type(avg_deltas))
-    print("avg_deltas keys: ", list(avg_deltas.keys()))
+     
+     
 
     
     model.avg_deltas = avg_deltas
     
 
-    print("################################################")
+     
 
 
     
@@ -661,17 +652,17 @@ If it is BP we set the hebbian flag to false otherwise we set it to true.
 """
 
 def average_deltas(delta_weights, avg_deltas,  device):
-    #print(device)
+    # 
     summed_deltas = {}
-    #print(list(delta_weights.keys()))
-    #print(len(delta_weights[list(delta_weights.keys())[0]]))
+    # 
+    # 
     for k, v in delta_weights.items():
         res = torch.zeros(v[0].shape, device=device)
         for t in v:            
             res.add_(t)
             
         summed_deltas[k] = [len(v), res]
-        #print(summed_deltas[k][1][:5])
+        # 
 
     # Now we sum all the cells 
     for  k, v in summed_deltas.items():
@@ -681,7 +672,7 @@ def average_deltas(delta_weights, avg_deltas,  device):
         final_sum = torch.sum(channel_collapsed, (1,2))
         avg_tensor = final_sum / v[0]
         avg_deltas[k] = avg_tensor / max(avg_tensor) #normalize
-        #print(avg_deltas[k][:1])
+        # 
     
     
     return avg_deltas
@@ -696,7 +687,7 @@ def train_sup_hebb(model, loader, device, measures=None, criterion=None, blocks=
     """
     t = time.time()
     loss_acc = (not model.is_hebbian()) and (criterion is not None)
-    print("LOSS_ACC: ", loss_acc )
+     
     t = False
     i = 0
 
@@ -719,17 +710,13 @@ def train_sup_hebb(model, loader, device, measures=None, criterion=None, blocks=
     prev_dict = deepcopy(model.state_dict())
     prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k[7]) in blocks}
     activations_sum = {k: [] for k in prev_dict.keys() if int(k[7]) in blocks}
-    print("prev_dict.keys(): ", prev_dict.keys() )
-    print("activations_sum.keys(): ", prev_dict.keys() )
-
-    print("DEPTH: ", depth)
-    if "conv1" in activations: 
-        print("ACTIVATIONS SHAPE: ", activations["conv1"][0])
+     
+         
 
 
     with torch.no_grad():
         for inputs, target in loader:
-            # print(inputs.min(), inputs.max(), inputs.mean(), inputs.std())
+            #  
             ## 1. forward propagation
             inputs = inputs.float().to(device)
             output = model(inputs)
@@ -741,7 +728,7 @@ def train_sup_hebb(model, loader, device, measures=None, criterion=None, blocks=
 
             if loss_acc:
 
-                print("INSIDE LOSS_ACC OF train_sup_hebb")
+                 
                 target = target.to(device, non_blocking=True)
 
                 ## 2. loss calculation
@@ -791,7 +778,7 @@ def train_sup_hebb(model, loader, device, measures=None, criterion=None, blocks=
             iteration += 1
 
     # here we sum all the values of each activation map to obtain 1 value of activation per kernel instead of a map.
-    print("shape of activation_sum: ", activations_sum[list(activations_sum.keys())[0]][0].shape )
+     
 
 
     for k in list(activations_sum.keys()):
@@ -810,31 +797,31 @@ def train_sup_hebb(model, loader, device, measures=None, criterion=None, blocks=
     
     
                     K = round(len(activations_sum[k])*model.cl_hyper["top_k"]) # K takes 20% of the kernels
-                    print("activations_sum[k]" , len(activations_sum[k]))
+                     
                     topk_kernels["conv" + k[7]] = activations_sum[k][:K+1]
-                    print("activations_sum[k]: ", activations_sum[k][:10])
-                    print("topk_kernels len: ", len(list(topk_kernels.keys())))
-                    print("topk_kernels keys: ", list(topk_kernels.keys()))
-                    print("topk_kernels: ", topk_kernels)
-                    print("activations_sum[k] len: ", len(activations_sum[k]))
+                     
+                     
+                     
+                     
+                     
 
 
     
-    print("delta_weights INFO: ")
-    print("NUM OF TRACKED COV LAYERS: ", len(list(delta_weights.keys())))
-    print("NUM OF TRACKED WEIGHTS CHANGES PER LAYER: ", len(delta_weights[list(delta_weights.keys())[0]]) )
+     
+     
+     
     avg_deltas = average_deltas(delta_weights, avg_deltas, device)
-    print("avg_deltas INFO: ", type(avg_deltas))
-    print("avg_deltas keys: ", list(avg_deltas.keys()))
+     
+     
 
     
     model.avg_deltas = avg_deltas
     model.topk_kernels = topk_kernels
 
-    print("avg_deltas size: ", len(list(avg_deltas.keys())))
-    #print(f"num of averages for {layer_num} layer: ", avg_deltas[list(avg_deltas.keys())[0]].shape )
+     
+    # 
 
-    print("################################################")
+     
 
 
     
@@ -868,14 +855,14 @@ def train_sup(model, criterion, optimizer, loader, device, measures, learning_mo
     """
     if len(blocks) == 1:
         model.train(blocks=blocks)
-        #print(model.is_hebbian())
+        # 
         if model.get_block(blocks[0]).is_hebbian():
             measures, lr, info, convergence, R1 = train_sup_hebb(model, loader, device, measures, criterion, blocks=blocks)
         else:
             measures, lr = train_BP(model, criterion, optimizer, loader, device, measures)
     else:
         model.train(blocks=blocks)
-        print("learning_mode: ", learning_mode)
+         
         if learning_mode == 'HB':
             measures, lr, info, convergence, R1 = train_sup_hebb(model, loader, device, measures, criterion, blocks=blocks)
         else:
@@ -888,22 +875,22 @@ def evaluate_unsup(model, train_loader, test_loader, device, blocks):
     Unsupervised evaluation, only support MLP architecture
 
     """
-    print("INSIDE EVALUATE UNSUP")
-    #print(blocks)
+     
+    # 
     if model.get_block(blocks[-1]).arch == 'MLP':
         sub_model = model.sub_model(blocks)
         return evaluate_hebb(sub_model, train_loader, test_loader, device)
     else:
-        print("INSIDE EVALUATE UNSUP RETURNED 0,0")
+         
 
         return 0., 0.
 
 
 def evaluate_hebb(model, train_loader, test_loader, device):
     if train_loader.dataset.split == 'unlabeled':
-        print('Unalbeled dataset, cant perform unsupervised evaluation')
+         
         return 0, 0
-    print("INSIDE EVALUATE HEBB")
+     
 
     preactivations, winner_ids, neuron_labels, targets = infer_dataset(model, train_loader, device)
     acc_train = get_accuracy(model, winner_ids, targets, preactivations, neuron_labels, device)
@@ -930,7 +917,7 @@ def infer_dataset(model, loader, device):
     targets_lst = []
     winner_ids = []
     preactivations_lst = []
-    print("INSIDE INFER DATA")
+     
 
     wta_lst = []
     with torch.no_grad():
@@ -941,8 +928,8 @@ def infer_dataset(model, loader, device):
             if targets.nelement() != 0:
                 inputs = inputs.float().to(device, non_blocking=True)
                 preactivations, wta = model.foward_x_wta(inputs)
-                #print("WTA: ", wta)
-                #print("PREACTIVATIONS: ", preactivations)
+                # 
+                # 
                 preactivations_lst.append(preactivations)
                 wta_lst.append(wta)
                 targets_lst += targets.tolist()
@@ -972,36 +959,24 @@ def head_choser(model, criterion, loader, device):
             target = target.to(device, non_blocking=True)
             output = model(inputs)
 
+            tot_sum_tmp, indexes = torch.max(output.detach().clone() ,dim=1)
 
-            tot_sum_tmp, indexes = torch.max(torch.abs(output.detach().clone() ),dim=1)
-            # print("output.detach().clone(): ", output.data.detach().clone())
-            # print("output.data.max(1)[1]: ", output.data.max(1)[1])
-            tot_sum += torch.sum(torch.abs(tot_sum_tmp), dim=0)
-
-            # max_val, indexes = torch.max(output.detach().clone(),dim=1)
-            # tot_sum_tmp = torch.abs(output.detach().clone())
-            # for el in tot_sum_tmp:
-            #     if not el == max_val:
-            #         max_val -= el
-            # # print("output.detach().clone(): ", output.data.detach().clone())
-            # # print("output.data.max(1)[1]: ", output.data.max(1)[1])
-            # tot_sum += max_val
-
-            # max_val, indexes = torch.max(output.detach().clone(),dim=1)
-            # tot_sum_tmp = output.detach().clone()
-            # for el in tot_sum_tmp:
-            #     if not el == max_val:
-            #         max_val -= el
-            # # print("output.detach().clone(): ", output.data.detach().clone())
-            # # print("output.data.max(1)[1]: ", output.data.max(1)[1])
-            # tot_sum += max_val
+            top2_outputs, top_indexes = torch.topk(output.detach().clone(), 2, dim=1, largest=True, sorted=True)
+            top2_outputs = top2_outputs[:,1]
+            # print("top2_outputs: ", top2_outputs[:5])
+            # print("tot_sum_tmp: ", tot_sum_tmp[:5])       
+            # print("top2_outputs.shape: ", top2_outputs.shape)
+            # print("tot_sum_tmp.shape: ", tot_sum_tmp.shape)
+            tot_sum_tmp = torch.sub(tot_sum_tmp, top2_outputs)
+            # print("tot_sum_tmp.shape 2: ", tot_sum_tmp.shape)
+            # print("tot_sum_tmp 2: ", tot_sum_tmp[:5])       
 
 
+            tot_sum += torch.sum(tot_sum_tmp, dim=0)
 
-    #tot_sum_tmp, indexes = torch.max(torch.abs(output.detach().clone() ),dim=1)
     return tot_sum
 
-def evaluate_sup(model, criterion, loader, device):
+def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False):
     """
     Evaluate the model, returning loss and acc
     """
@@ -1010,59 +985,165 @@ def evaluate_sup(model, criterion, loader, device):
     acc_sum = 0
     n_inputs = 0
 
+    all_preds = []
+    all_targets = []
+
+     
     with torch.no_grad():
         for inputs, target in loader:
             ## 1. forward propagation
             inputs = inputs.float().to(device, non_blocking=True)
             target = target.to(device, non_blocking=True)
+                 
             output = model(inputs)
+
+            # print("target: ", torch.Tensor.tolist(target.cpu())[0])
+            # print(torch.sort(output[0]))
 
             ## 2. loss calculation
             loss = criterion(output, target)
             loss_sum += loss.clone().detach()
-
+                 
+                 
             ## 3. Accuracy assesment
             predict = output.data.max(1)[1]
+            # print("predicted target: ", torch.Tensor.tolist(predict.cpu())[0])
+            # print("#####################################################################")
             acc = predict.eq(target.data).sum()
             acc_sum += acc
             n_inputs += target.shape[0]
 
+            if return_confusion_matrix:
+                all_preds.append(predict.cpu())
+                all_targets.append(target.cpu())
+             
+    if return_confusion_matrix:
+        y_pred = torch.cat(all_preds).numpy()
+        y_true = torch.cat(all_targets).numpy()
+        cm = confusion_matrix(y_true, y_pred)
+        return loss_sum.cpu() / n_inputs, 100 * acc_sum.cpu() / n_inputs, cm
+     
 
     return loss_sum.cpu() / n_inputs, 100 * acc_sum.cpu() / n_inputs
 
+def shmh_fuser(heads):
+    weights = []
+    biases = []
+    head = {}
+    for h in heads:
+        keys = list(h.keys())
+        if keys[0] not in head.keys():
+            head[keys[0]] = []
+        if keys[1] not in head.keys():
+            head[keys[1]] = []
+        head[keys[0]].append(h[keys[0]])
+        head[keys[1]].append(h[keys[1]])
+    keys = list(head.keys())
+    head[keys[0]] = torch.cat(head[keys[0]], dim=0)
+    head[keys[1]] = torch.cat(head[keys[1]], dim=0)
+
+    return head
 
 def evaluate_sup_multihead(model, criterion, loader, device):
+
     """
     Evaluate the multihead model, returning the best loss and acc
     """
+    if POP_HEAD and not model.shmh: 
+        # print("model.heads: ", model.heads)
+        state_dict = model.state_dict()
+        chosen_head = model.heads[0]
+        keys = list(chosen_head.keys())
+        model.heads = model.heads[1:]
+
+        # print("#################### CHOSEN HEAD ###############################")
+        # print(len(model.heads), int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
+        # print(int(chosen_head[keys[0]].shape[0]), len(model.selected_classes), model.selected_classes)
+        # print("###################################################")
+
+        if not op.isdir(RESULT):
+            os.makedirs(RESULT)
+        if not op.isdir(op.join(RESULT, 'network')):
+            os.mkdir(op.join(RESULT, 'network'))
+            os.mkdir(op.join(RESULT, 'layer'))
+
+        folder_path = op.join(RESULT, 'network', model.model_name)
+        if not op.isdir(folder_path):
+            os.makedirs(op.join(folder_path, 'models'))
+        storing_path = op.join(folder_path, 'models')
+        torch.save({
+        'state_dict': model.state_dict(),
+        'config': model.config,
+        'avg_deltas': model.avg_deltas,
+        'topk_kernels': model.topk_kernels,
+        'epoch': 50, 
+        'heads': model.heads.copy(), 
+        'heads_thresh' : model.heads_thresh, 
+        'model_name': model.model_name
+    }, op.join(storing_path, "checkpoint.pth.tar"))
+
+        keys = list(chosen_head.keys())
+        state_dict[keys[0]] = chosen_head[keys[0]]
+        state_dict[keys[1]] = chosen_head[keys[1]]
+
+        # print("chosen_head: ", chosen_head)
+
+        model.load_state_dict(state_dict)
+
+        return evaluate_sup(model, criterion, loader, device)
+    else:
+        print("\n\n\nWARNING !!!! POP_HEAD AND SHMH ARE BOTH TRUE, THIS IS NOT SUPPORTED YET\n\n\n")
+    if model.shmh: 
+        state_dict = model.state_dict()
+        head = shmh_fuser(model.heads)
+        keys = list(head.keys())
+        state_dict[keys[0]] = head[keys[0]]
+        state_dict[keys[1]] = head[keys[1]]
+        model.load_state_dict(state_dict)
+        return evaluate_sup(model, criterion, loader, device)
+    
+
     heads_performance = {}
     head_num = 0
 
     for head in model.heads:
-        model.to(get_device())
+        # model.to(get_device())
         state_dict = model.state_dict()
         chosen_head = head
         keys = list(chosen_head.keys())
         state_dict[keys[0]] = chosen_head[keys[0]]
         state_dict[keys[1]] = chosen_head[keys[1]]
+        
+        # print("#################### CHOSEN HEAD ###############################")
+        # print(int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
+        # print(int(chosen_head[keys[0]].shape[0]), len(model.selected_classes), model.selected_classes)
+        # print("###################################################")
+
+        if int(chosen_head[keys[0]].shape[0]) != len(model.selected_classes):
+            heads_performance[head_num] = 0
+            head_num += 1
+            continue
         model.load_state_dict(state_dict)
         model.eval()
 
         tot_sum = head_choser(model, criterion, loader, device)
         heads_performance[head_num] = tot_sum
 
-        print("tot_sum: ", tot_sum, head_num)
+
         head_num += 1
+
     max_val = 0
     max_key = 0
+    # print("heads: ", heads_performance)
     for k, i in heads_performance.items():
         if i > max_val:
             max_val = i
             max_key = k
             
-    print("max_key :", max_key)
+     
 
     chosen_head = model.heads[max_key]
+    # print("chosen_head: ", max_key)
     if POP_HEAD: 
         chosen_head = model.heads[0]
         model.heads = model.heads[1:]
