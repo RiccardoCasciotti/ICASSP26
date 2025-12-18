@@ -9,10 +9,10 @@ import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462000765/casciott"
+    BASE_PATH="/scratch/project_462001198/casciott"
 data_candidate = f"{BASE_PATH}/Training"
 DATA = op.realpath(op.expanduser(data_candidate))
 RESULT = op.join(DATA, 'results', 'hebb', 'result')  # everything from multi_layer.py
@@ -397,7 +397,7 @@ def load_presets(name=None):
     Load blocks config from name of the models
 
     """
-    f = open(f'/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
+    f = open(f'/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/presets.json', "r")
     presets = json.load(f)
     if name is None:
         return list(presets['model'].keys())
@@ -438,7 +438,7 @@ def load_config_dataset(name=None, validation=True, cl=False):
     Load dataset config from name of the dataset
 
     """
-    f = open(f'/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/presets.json', "r")
+    f = open(f'/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/presets.json', "r")
     dataset = json.load(f)['dataset']
     if name is None:
         lst_dataset = []

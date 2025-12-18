@@ -7,10 +7,10 @@ from pathlib import Path
 
 
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
+    BASE_PATH="/projappl/project_462001198/casciott/ICASSP26"
 class SoundDS(Dataset):
     def __init__(self, df, data_path):
         self.df = df

@@ -11,10 +11,10 @@
 #SBATCH --error=job.err 
 #SBATCH --partition=small-g
 #SBATCH --time=00:05:00
-#SBATCH --account=project_462000765
+#SBATCH --account=project_462001198
 
 srun singularity exec \
-    --bind /project/project_462000765/casciott/DCASE25 \
-    --pwd  /project/project_462000765/casciott/DCASE25 \
+    --bind /project/project_462001198/casciott/ICASSP26 \
+    --pwd  /project/project_462001198/casciott/ICASSP26 \
     lumi_pytorch_rocm_demo.sif \
     python conda_pytorch_rocm/pytorch_singlegpu_gputest.py

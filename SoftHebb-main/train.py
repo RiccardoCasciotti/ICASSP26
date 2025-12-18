@@ -483,12 +483,12 @@ def run_sup(
             #     break
 
             # Early Stopping on acc
-            if max_acc_val == 0:
-                max_acc_val = acc_val
-            elif max_acc_val < acc_val: 
-                max_acc_val = acc_val
-            elif acc_val <= max_acc_val:
-                break
+            # if max_acc_val == 0:
+            #     max_acc_val = acc_val
+            # elif max_acc_val < acc_val: 
+            #     max_acc_val = acc_val
+            # elif acc_val <= max_acc_val:
+            #     break
 
     metrics["dataset_sup"] = dataset_config
     return metrics

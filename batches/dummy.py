@@ -24,8 +24,8 @@ transform_test = transforms.Compose([
 ])
 
 # Load CIFAR-100
-train_dataset = datasets.CIFAR100(root='/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/Training/data', train=True, download=False, transform=transform_train)
-test_dataset = datasets.CIFAR100(root='/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/Training/data', train=False, download=False, transform=transform_test)
+train_dataset = datasets.CIFAR100(root='/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/Training/data', train=True, download=False, transform=transform_train)
+test_dataset = datasets.CIFAR100(root='/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/Training/data', train=False, download=False, transform=transform_test)
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=4)

@@ -5,9 +5,9 @@ import uuid
 import shutil
 import torch
 
-TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
 SHMH = False
-SINGLE = True
+SINGLE = False
 
 classes_per_task = 2
 n_experiments = 5
@@ -32,7 +32,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "BASELINE_2_6SoftHebbImNet_ok"
+id = "test_run"
 folder_id = f"_{id}{n_tasks}tasks"
 
 

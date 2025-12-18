@@ -54,10 +54,10 @@ from ray.tune.schedulers import ASHAScheduler
 from functools import partial
 
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25//SoftHebb-main/"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26//SoftHebb-main/"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462000765/casciott/DCASE25"
+    BASE_PATH="/scratch/project_462001198/casciott/ICASSP26"
 
 print(BASE_PATH)
 

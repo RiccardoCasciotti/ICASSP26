@@ -2390,6 +2390,33 @@
         "zca_whitened": true
       }
     },
+    "URBANSOUND8K": {
+      "default": {
+        "name": "URBANSOUND8K",
+        "split": "train",
+        "channels": 1,
+        "out_channels": 10,
+        "width": 64,
+        "height": 276,
+        "n_mels": 64,
+        "n_fft": 1024,
+        "hop_len": 320,
+        "training_sample": 8000,
+        "nb_epoch": 100,
+        "print_freq": 10,
+        "batch_size": 32,
+        "augmentation": false,
+        "zca_whitened": false
+      },
+      "1": {
+        "nb_epoch": 1,
+        "print_freq": 50,
+        "batch_size": 10
+      },
+      "100": {
+        "nb_epoch": 100
+      }
+    },
     "ESC50": {
       "default": {
         "name": "ESC50",
@@ -2429,7 +2456,7 @@
         "nb_epoch": 50
       },
       "100": {
-        "nb_epoch": 100
+        "nb_epoch": 5
       }
     },
     "CIFAR100": {

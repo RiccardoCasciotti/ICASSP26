@@ -1,0 +1,23 @@
+
+Lmod is automatically replacing "craype-x86-rome" with "craype-x86-trento".
+
+-------------------------------------------------------------------------------
+There are messages associated with the following module(s):
+-------------------------------------------------------------------------------
+
+rocm/6.2.2:
+   This module is not installed the way it is intended by AMD. Hence some
+   parts of ROCm may be broken or offer slower than expected performance and
+   there is nothing the LUMI User Support Team can do about that. As the
+   module is also not an official HPE Cray module there is no guarantee that
+   it will integrate properly with HPE Cray PE modules or work correctly in
+   that environment. In fact, it is know to cause problems with the CCE
+   compilers prior to cce/18.0.0 due to link incompatibilities. Note that
+   hipSolver now requires SuiteSparse, and since that one uses BLAS and
+   LAPACK, it depends on the programming environment so is a separate module
+   that needs to be loaded if you use hipSolver.
+
+-------------------------------------------------------------------------------
+
+/opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/nn/modules/lazy.py:181: UserWarning: Lazy modules are a new feature under heavy development so changes to the API or functionality can happen at any moment.
+  warnings.warn('Lazy modules are a new feature under heavy development '

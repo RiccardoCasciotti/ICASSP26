@@ -42,10 +42,10 @@ import torch.nn as nn
 import numpy as np 
 
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462000765/casciott"
+    BASE_PATH="/scratch/project_462001198/casciott"
 
 warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description='Multi layer Hebbian Training Continual Learning  implementation')
@@ -442,7 +442,7 @@ if __name__ == '__main__':
                 'selected_classes': eval(params.selected_classes),
                 "evaluated_tasks": eval(params.evaluated_tasks), 
                 "shmh": shmh,
-                "SINGLE": True
+                "SINGLE": False
 
             }
          
@@ -469,7 +469,12 @@ if __name__ == '__main__':
 
         all_classes = np.arange(0, out_channels)
         
-        folds = 1
+        if "ESC50" in params.dataset_sup:
+            folds = 5
+        elif "URBANSOUND8K" in params.dataset_sup:
+            folds = 10
+        # folds = 1 ##############################################################################################################################
+
         dataset_sup_1 = dataset_sup_ground.copy()
         dataset_unsup_1 = dataset_unsup_ground.copy()
         results["performance_avg_folds"] = {}
@@ -517,7 +522,7 @@ if __name__ == '__main__':
             
                 # EVALUATION PHASE
                 params.continual_learning = False
-                params.resume = resume ################################################################################################################################
+                # params.resume = resume ################################################################################################################################
                 evaluate = True
                 if max(cl_hyper["evaluated_tasks"]) >= cl_hyper['n_tasks']:
                     cl_hyper["evaluated_tasks"] = list(range(cl_hyper['n_tasks']))
@@ -556,71 +561,7 @@ if __name__ == '__main__':
 
 
 
-    else:
-        cl_hyper = {
-                'training_mode': params.training_mode,
-                'cf_sol': params.cf_sol,
-                'head_sol': params.head_sol,
-                'top_k': params.top_k,
-                "topk_lock": params.topk_lock,
-                'high_lr': params.high_lr,
-                'low_lr':params.low_lr,
-                't_criteria': params.t_criteria,
-                'delta_w_interval': params.delta_w_interval,
-                'heads_basis_t': params.heads_basis_t,
-                "n_tasks": params.n_tasks, 
-                
-
-            }
-         
-        params.training_mode = cl_hyper["training_mode"]
-        params.cl_hyper = cl_hyper
-        # DATASET 1
-
-
-        resume = params.resume
-        skip =  params.skip_1
-        skip = False
-        dataset_sup_1 = load_config_dataset(params.dataset_sup_1, params.validation, params.continual_learning)
-
-
-        if not skip: 
-            params.continual_learning = False
-            params.resume = None
-            dataset_sup_1 = load_config_dataset(params.dataset_sup_1, params.validation, params.continual_learning)
-            dataset_unsup_1 = load_config_dataset(params.dataset_unsup_1, params.validation, params.continual_learning)
-            procedure(params, name_model, blocks,dataset_sup_1, dataset_unsup_1, False, results)
-        else: 
-            params.continual_learning = False
-            evaluate = True
-            dataset_sup_1 = load_config_dataset(params.dataset_sup_1, params.validation, params.continual_learning)
-            dataset_unsup_1 = load_config_dataset(params.dataset_unsup_1, params.validation, params.continual_learning)
-            procedure(params, name_model, blocks, dataset_sup_1, dataset_unsup_1, evaluate, results)
-
-        # DATASET 2
-
-        params.continual_learning = True
-        params.resume = resume
-        evaluate = False
-
-        dataset_sup_2 = load_config_dataset(params.dataset_sup_2, params.validation, params.continual_learning)
-        dataset_unsup_2 = load_config_dataset(params.dataset_unsup_2, params.validation, params.continual_learning)
-        dataset_sup_2["old_dataset_size"] = dataset_sup_1["width"]
-        dataset_unsup_2["old_dataset_size"] = dataset_unsup_1["width"]
-        
-        procedure(params, name_model, blocks,dataset_sup_2, dataset_unsup_2, evaluate, results)
-
-        # EVALUATION PHASE
-       
-        params.continual_learning = False
-        evaluate = True
-        procedure(params, name_model, blocks, dataset_sup_1, dataset_unsup_1, evaluate, results)
-        
-        results["model_name"] = name_model
-        # file = "MULTD_CL.json"
-        # save_results(results, file)
-        save_results_new(results, f"{params.parent_f_id}/MULTD_CL_{params.dataset_sup_1.split('_')[0] + '_' + params.dataset_sup_2.split('_')[0]  + '_' + folder_id}", name_model)
-command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
+    command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
 result = subprocess.run(command, shell=True, capture_output=False, text=True)
     
 print(result.stdout)

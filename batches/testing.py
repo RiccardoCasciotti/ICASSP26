@@ -100,11 +100,11 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
 # if result.stderr:
 #     print("Error:", result.stderr)
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
 
          # Apple Silicon GPU
 else:
-    BASE_PATH="/scratch/project_462000765/casciott"
+    BASE_PATH="/scratch/project_462001198/casciott"
 
 if not os.path.isdir(f"{BASE_PATH}/experiments"):
     os.mkdir(f"{BASE_PATH}/experiments")
@@ -115,9 +115,9 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
 if data_num == 1: 
     if torch.backends.mps.is_available():          # Apple Silicon GPU
         device= torch.device("mps")
-        command = f"cd /projappl/project_462000765/casciott/DCASE25/batches/classes_CL/continual_learning && ./{dataset}_apple.sh "
+        command = f"cd /projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning && ./{dataset}_apple.sh "
     else:
-        command = f"cd /projappl/project_462000765/casciott/DCASE25/batches/classes_CL/continual_learning && sbatch {dataset}.sh "  
+        command = f"cd /projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning && sbatch {dataset}.sh "  
 
     all_classes = list(range(10))
     if dataset == "C100":

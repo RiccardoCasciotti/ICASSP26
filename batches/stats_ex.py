@@ -8,10 +8,10 @@ import numpy as np
 from scipy.stats import wilcoxon, kruskal, ttest_rel
 
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26"
          # Apple Silicon GPU
 else:
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
+    BASE_PATH="/projappl/project_462001198/casciott/ICASSP26"
 
 def paired_t_test(accuracies_continual, accuracies_baseline):
     """

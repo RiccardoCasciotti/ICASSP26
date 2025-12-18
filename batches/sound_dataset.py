@@ -8,10 +8,10 @@ from pathlib import Path
 
 
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/projappl/project_462000765/casciott/DCASE25"
+    BASE_PATH="/projappl/project_462001198/casciott/ICASSP26"
 class SoundDS(Dataset):
     def __init__(self, df, data_path, pre_aug=False):
         self.df = df
@@ -75,10 +75,10 @@ def get_split(dataset, data_path, val_fold=2):
 
 #read the metadata file
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
          # Apple Silicon GPU
 else:
-    BASE_PATH="/scratch/project_462000765/casciott"
+    BASE_PATH="/scratch/project_462001198/casciott"
 fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
 fd = fd[["fold", "target", "filename"]]
 train, validation = get_split(fd, data_path=f"{BASE_PATH}/Training/data/ESC-50-master")

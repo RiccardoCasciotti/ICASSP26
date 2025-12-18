@@ -1,6 +1,6 @@
 import copy
 import random
-
+import h5py
 try:
     from utils import seed_init_fn, DATASET
 except:
@@ -22,10 +22,10 @@ from pathlib import Path
 
 torch.cuda.empty_cache()
 if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/DCASE25/SoftHebb-main"
+    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
          # Apple Silicon GPU
 elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462000765/casciott"
+    BASE_PATH="/scratch/project_462001198/casciott"
 
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=1.):
@@ -36,89 +36,15 @@ class AddGaussianNoise(object):
         return tensor + torch.randn(tensor.size(), device=tensor.device) * self.std + self.mean
 
 
-def imagenet_tf(width, height):
-    return transforms.Compose([
-        transforms.RandomResizedCrop((width, height)),
-        transforms.RandomResizedCrop((width, height)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                             std=[0.229, 0.224, 0.225]),
-    ])
-
-
-def imagenet_test(width, height):
-    return transforms.Compose([
-        transforms.Resize((width, height)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                             std=[0.229, 0.224, 0.225]),
-    ])
-
-
-def advanced_transform(width, height):
-    return transforms.Compose([
-        transforms.RandomApply([transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=20 / 360)],
-                               p=0.5),
-        transforms.RandomApply([transforms.ColorJitter(saturation=1)], p=0.5),
-        transforms.RandomHorizontalFlip(),
-        transforms.Pad(8),
-        transforms.RandomApply(
-            [transforms.Lambda(lambda x: TF.resize(x, (48 + random.randint(-6, 6), 48 + random.randint(-6, 6))))],
-            p=0.3),
-        transforms.RandomApply([transforms.RandomAffine(degrees=10, shear=10)], p=0.3),
-        transforms.CenterCrop(40),
-        transforms.RandomApply([transforms.RandomCrop((width, height))], p=0.5),
-        transforms.CenterCrop((width, height)),
-    ])
-
-
-def crop_flip(width, height):
-    return transforms.Compose(
-        [
-            transforms.RandomCrop(
-                (width, height), padding=4, padding_mode="reflect"
-            ),
-            transforms.RandomHorizontalFlip(p=0.5),
-            #transforms.ToTensor(),
-
-        ]
-    )
-
 
 def select_dataset(dataset_config, device, dataset_path):
     test_transform = None
     val_indices = None
+
     split = dataset_config["split"] if "split" in dataset_config else "train"
-    if dataset_config['name'] == 'CIFAR10':
-        dataset_class = FastCIFAR10
-        indices = list(range(50000))
-
-        if dataset_config['augmentation']:
-            dataset_train_class = AugFastCIFAR10
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = crop_flip(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = FastCIFAR10
-            #transform = None
-            transform=transforms.ToTensor()
-            test_transform=transforms.ToTensor()
-
-    elif dataset_config['name'] == 'CIFAR100':
-        dataset_class = FastCIFAR100
-        indices = list(range(50000))
-
-        if dataset_config['augmentation']:
-            dataset_train_class = AugFastCIFAR100
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = crop_flip(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = FastCIFAR100
-            transform = None
     
-    elif dataset_config['name'] == 'ESC50':
+    
+    if dataset_config['name'] == 'ESC50':
         dataset_class = ESC50
         indices = list(range(2000))
         dataset_path = f"{BASE_PATH}/Training/data/ESC-50-master"
@@ -131,117 +57,9 @@ def select_dataset(dataset_config, device, dataset_path):
         dataset_train_class = ESC50
         transform = None
 
-    elif dataset_config['name'] == 'MNIST':
-        dataset_class = FastMNIST
-        indices = list(range(60000))
+   
 
-        if dataset_config['augmentation']:
-            dataset_train_class = AugFastMNIST
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = crop_flip(dataset_config['width'], dataset_config['height'])
-            transform = AddGaussianNoise(std=dataset_config['noise_std'])
-        else:
-            dataset_train_class = FastMNIST
-            transform = None
-
-    elif dataset_config['name'] == 'FashionMNIST':
-        dataset_class = FastFashionMNIST
-        indices = list(range(60000))
-
-        if dataset_config['augmentation']:
-            dataset_train_class = AugFastFashionMNIST
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = crop_flip(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = FastFashionMNIST
-            transform = None
-
-    elif dataset_config['name'].startswith('ImageNette'):
-        device = 'cpu'
-        dataset_class = ImageNette
-        indices = list(range(9469))
-
-        if dataset_config['px'] == 'default':
-            dataset_path = '/home/username/.fastai/data/imagenette2'
-        elif dataset_config['px'] == 320:
-            dataset_path = '/home/username/.fastai/data/imagenette2-320'
-        else:
-            dataset_path = os.path.join(DATASET, 'imagenette2-160')  # '/home/username/.fastai/data/imagenette2-160'
-
-        if dataset_config['augmentation']:
-            dataset_train_class = ImageNette
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = imagenet_tf(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = ImageNette
-            transform = imagenet_test(dataset_config['width'], dataset_config['height'])
-        test_transform = imagenet_test(dataset_config['width'], dataset_config['height'])
-
-    elif dataset_config['name'].startswith('ImageNetV2'):
-        device = 'cpu'
-        dataset_class = ImageNetV2
-        indices = list(range(10000))
-
-        if dataset_config['name'][10:] == 'MatchedFrequency':
-            dataset_path = '/scratch/hrodriguez/workspace/data/imagenetv2-matched-frequency-format-val'
-        elif dataset_config['name'][10:] == 'Threshold07':
-            dataset_path = '/scratch/hrodriguez/workspace/data/imagenetv2-threshold0.7-format-val'
-        elif dataset_config['name'][10:] == 'TopImages':
-            dataset_path = '/scratch/hrodriguez/workspace/data/imagenetv2-top-images-format-val'
-        else:
-            raise ValueError
-
-        if dataset_config['augmentation']:
-            dataset_train_class = ImageNetV2
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = imagenet_tf(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = ImageNetV2
-            transform = imagenet_test(dataset_config['width'], dataset_config['height'])
-        test_transform = imagenet_test(dataset_config['width'], dataset_config['height'])
-
-    elif dataset_config['name'] == 'ImageNet':
-        device = 'cpu'
-        dataset_class = AugImageNet
-        indices = list(range(1000000))
-
-        dataset_path = '/scratch/datasets/ilsvrc12/'
-
-        if dataset_config['augmentation']:
-            dataset_train_class = AugImageNet
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = imagenet_tf(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = AugImageNet
-            transform = imagenet_test(dataset_config['width'], dataset_config['height'])
-        test_transform = imagenet_test(dataset_config['width'], dataset_config['height'])
-
-    elif dataset_config['name'] == 'STL10':
-        device = 'cpu'
-        dataset_class = FastSTL10
-        if split == 'train':
-            indices = list(range(5000))
-        elif split == 'unlabeled':
-            indices = list(range(100000))
-        else:
-            indices = list(range(105000))
-
-        if dataset_config['augmentation']:
-            dataset_train_class = AugFastSTL10
-            dataset_config['num_workers'] = 4
-            device = 'cpu'
-            transform = crop_flip(dataset_config['width'], dataset_config['height'])
-        else:
-            dataset_train_class = FastSTL10
-            transform = None
-    else:
-        raise ValueError
-
+    
     dataset_config['num_workers'] = 64
     return dataset_train_class, dataset_class, test_transform, transform, device, split, dataset_path
 
@@ -331,184 +149,48 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
                 train_split = classes_subset(dataset_config, train_split, selected_classes, device, True)
                 val_split = classes_subset(dataset_config, val_split, selected_classes, device, True)
 
-        train_loader = torch.utils.data.DataLoader(dataset=train_split,
-                                                batch_size=batch_size,
-                                                num_workers=dataset_config['num_workers'],
-                                                 
-        
-        )
-        val_loader = torch.utils.data.DataLoader(dataset=val_split,
-                                                batch_size=batch_size,
-                                                num_workers=dataset_config['num_workers'],
-                                                 
-        
-        )
-        test_loader = torch.utils.data.DataLoader(dataset=test_split,
-                                                  batch_size=batch_size,
-                                                  num_workers=dataset_config['num_workers'],
-                                                   )
-        return train_loader, val_loader, test_loader
-        
+    elif dataset_config["name"] == "URBANSOUND8K":
 
-        
-    dataset_train_class, dataset_class, test_transform, transform, device, split, dataset_path = select_dataset(
-        dataset_config, device, dataset_path)
-
-     
-    if dataset_config["continual_learning"] == True:
-        # 
-        old_dataset_size = dataset_config["old_dataset_size"]
-        ## 
-        # 
-
-        origin_dataset = dataset_train_class(
-        dataset_path,
-        split=split,
-        train=True,
-        #download=True,
-        download=not dataset_config['name'] in ['ImageNet'],  # TODO: make this depend on whether dataset exists or not
-        transform=transforms.Compose([transform,
-                                                    transforms.Resize((old_dataset_size,old_dataset_size)),  # image size int or tuple
-                                                    # Add more transforms here
-                                                    
-                                                    # convert to tensor at the end
-                                                    #transforms.ToTensor()
-                                                    ]), 
-        zca=dataset_config['zca_whitened'],
-        device=device,
-        train_class=dataset_config['training_class'],
-        )
-
-        # 
-        if not ('ImageNette' == dataset_config['name']):
-            origin_dataset = reshape_dataset(origin_dataset, old_dataset_size)
-        
-    else: 
-        origin_dataset = dataset_train_class(
-        dataset_path,
-        split=split,
-        train=True,
-        download=not dataset_config['name'] in ['ImageNet'],  # TODO: make this depend on whether dataset exists or not
-        #download=True,
-        transform=transform, 
-        zca=dataset_config['zca_whitened'],
-        device=device,
-        train_class=dataset_config['training_class'],
-        )
-    
-        #we need to load the model specified in model_name, see what is the image size accepted and 
-        # then resize the whole new dataset
-    
-    
-
-     
-
-
-    if dataset_config["continual_learning"] == True:
-
-        test_dataset = dataset_class(
-                dataset_path,
-                split="val" if dataset_config['name'] in ['ImageNet', 'ImageNette',
-                                                          'ImageNetV2MatchedFrequency'] else "test",
-                train=False,
-                zca=dataset_config['zca_whitened'],
-                transform=transforms.Compose([test_transform,
-                                                    transforms.Resize((old_dataset_size,old_dataset_size)),  # image size int or tuple
-                                                    # Add more transforms here
-                                                    #transforms.ToTensor(),  # convert to tensor at the end
-                                                    ]),
-                device=device,
-            )
-        if not ('ImageNette' == dataset_config['name']):
-            test_dataset = reshape_dataset(test_dataset, old_dataset_size)
-
-    else:
-        test_dataset = dataset_class(
-                dataset_path,
-                split="val" if dataset_config['name'] in ['ImageNet', 'ImageNette',
-                                                          'ImageNetV2MatchedFrequency'] else "test",
-                train=False,
-                zca=dataset_config['zca_whitened'],
-                transform=test_transform,
-                device=device,
-
-            )
-    
-    counter_dataset = dataset_train_class(
-            dataset_path,
-            download=not dataset_config['name'] in ['ImageNet'],  # TODO: make this depend on whether dataset exists or not
-            #download=True,
-            transform=transform, 
-            device=device,
-
-            )
-    indices = len(counter_dataset)
-    train_indices, val_indices = get_indices(dataset_config, indices)
-
-    if "n_classes" in dataset_config:
         selected_classes = dataset_config["selected_classes"]
-        test_dataset = classes_subset(dataset_config, test_dataset, selected_classes, device) 
-        origin_dataset = classes_subset(dataset_config, origin_dataset, selected_classes, device)
-        counter_dataset = classes_subset(dataset_config, counter_dataset, selected_classes, device) 
-        indices = len(counter_dataset)
-        train_indices, val_indices = get_indices(dataset_config, indices)
+        eval_fold = dataset_config["fold"]
+        data_train = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=False, eval_fold=eval_fold, debug=False)
+        data_train = class_cleaner(dataset_config, data_train, selected_classes)
+        train_split, val_split = torch.utils.data.random_split(data_train, [0.9, 0.1])
+        test_split = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=True, eval_fold=eval_fold, debug=False)
+        test_split = class_cleaner(dataset_config, test_split, selected_classes)
 
-        
-     
-
-    train_sampler = SubsetRandomSampler(train_indices, generator=g)
+    train_loader = torch.utils.data.DataLoader(dataset=train_split,
+                                            batch_size=batch_size,
+                                            num_workers=dataset_config['num_workers'],
+                                                
     
-     
-     
-     
-     
-    train_loader = torch.utils.data.DataLoader(dataset=origin_dataset,
+    )
+    val_loader = torch.utils.data.DataLoader(dataset=val_split,
+                                            batch_size=batch_size,
+                                            num_workers=dataset_config['num_workers'],
+                                                
+    
+    )
+    test_loader = torch.utils.data.DataLoader(dataset=test_split,
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
-                                                sampler=train_sampler, 
-    )
-
-    if val_indices is None:
-        test_loader = torch.utils.data.DataLoader(
-                dataset=test_dataset,
-                batch_size=batch_size if dataset_config['name'] in ['STL10', 'ImageNet', 'ImageNette',
-                                                                    'ImageNetV2MatchedFrequency', 'ImageNetV2TopImages',
-                                                                    'ImageNetV2Threshold07'] else 1000,
-                num_workers=dataset_config['num_workers'],
-                shuffle=dataset_config['shuffle'],
-
-            )
-    
-    else:
+                                                )
+    return train_loader, val_loader, test_loader
         
-        val_sampler = SubsetRandomSampler(val_indices)
-        test_loader = torch.utils.data.DataLoader(dataset=origin_dataset,
-                                                  batch_size=batch_size,
-                                                  num_workers=dataset_config['num_workers'],
-                                                  sampler=val_sampler)
-   
-    for batch in train_loader:
-        images, labels = batch
-         
-        break  # Print one batch and stop
-
-    return train_loader, test_loader
 
 def class_cleaner(dataset_config, dataset, selected_classes):
 # Cleans the classes so that it guarantees that there is first class with index 0 in the dataset, 
 # since it is required by torch. 
 
-    if dataset_config["name"] == "STL10":
-        targets = dataset.labels
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
+    
+    if dataset_config["name"] == "ESC50":
         targets = dataset.targets
-    elif  dataset_config["name"] == "ImageNette":
-        targets = torch.tensor(dataset.targets)
 
-        
+    elif dataset_config["name"] == "URBANSOUND8K":
+        targets = dataset.targets[:,0]
 
+    
     selected_classes.sort()
-    min_value = min(targets)
      
     for i in range(len(selected_classes)): 
         for j in range(len(targets)): 
@@ -516,16 +198,10 @@ def class_cleaner(dataset_config, dataset, selected_classes):
                 # 
             #    targets[j] =  i
             targets[targets==selected_classes[i]] = i
-    if dataset_config["name"] == "STL10":
-        dataset.labels = targets
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
-        dataset.targets = torch.tensor(targets, device=get_device())
-    elif dataset_config["name"] == "ImageNette": 
-        dataset.imgs = [dataset.imgs[0], targets.numpy()]
-        dataset.imgs = list(zip(*dataset.imgs))
-        dataset.targets = targets
-        dataset.samples = dataset.imgs
 
+    if dataset_config["name"] == "ESC50" or dataset_config["name"] == "URBANSOUND8K":
+        dataset.targets = torch.tensor(targets, device=get_device(), dtype=torch.long)
+    
 
         
 
@@ -559,139 +235,35 @@ def classes_subset(dataset_config, dataset,selected_classes, device, class_clean
     # I don't think it will work with ImageNette 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Creates a dataset made up of a subsets of classes indicated in the selected classes variable.
-    if dataset_config["name"] == "STL10":
-        T = dataset.labels.cpu().numpy()
+    
 
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50": 
+    if dataset_config["name"] == "ESC50": 
         T = dataset.targets.cpu().numpy()
-    elif dataset_config["name"] == "ImageNette":
-        T = np.array(dataset.targets)
 
 
     classes = torch.tensor(selected_classes)
     indices = (torch.tensor(T)[..., None] == classes).any(-1).nonzero(as_tuple=True)[0]
     indices = indices.tolist()
     T = list(T[indices])
-    if dataset_config["name"] == "ImageNette":
-        D, tmp = zip(*dataset.imgs)
-        D = np.array(D)
-        D = D[indices]
-        dataset.imgs = [D, T]
-                
-    else: 
-        D = dataset.data.detach().cpu().numpy()
-        D = list(D[indices])
-        dataset.data = D
-        dataset.data = torch.tensor(dataset.data, device=get_device())
+     
+    D = dataset.data.detach().cpu().numpy()
+    D = list(D[indices])
+    dataset.data = D
+    dataset.data = torch.tensor(dataset.data, device=get_device())
    
-    # if dataset_config["name"] == "STL10":
-    #     # print("TARGETS BEFORE SUB: ",dataset.labels[:20])
-    # elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50":
-    #     # print("TARGETS BEFORE SUB: ",dataset.targets[:20])
-    # elif dataset_config["name"] == "ImageNette":
-    #     # print("TARGETS BEFORE SUB: ",dataset.targets[:20])
-
-
-    if dataset_config["name"] == "STL10":
-        dataset.labels = torch.tensor(T, device=get_device())
-    elif dataset_config["name"] == "CIFAR10" or dataset_config["name"] == "CIFAR100" or dataset_config["name"] == "ESC50": 
-        dataset.targets = torch.tensor(T, device=get_device())
-    elif dataset_config["name"] == "ImageNette":
-        dataset.targets = T
     
 
-    # if dataset_config["name"] == "STL10":
-    #     # # print("TARGETS AFTER SUB: ", dataset.labels[:20])
-    # else:
-    #     # print("TARGETS AFTER SUB: ", dataset.targets[:20])
+
+    
+    if dataset_config["name"] == "ESC50": 
+        dataset.targets = torch.tensor(T, device=get_device())
+   
     
     if class_clean:
         dataset = class_cleaner(dataset_config ,dataset, selected_classes)
 
 
     return dataset
-
-def whitening_zca(x: torch.Tensor, transpose=True, dataset: str = "CIFAR10"):
-    path = op.join(DATASET, dataset + "_zca.pt")
-    zca = None
-    try:
-        zca = torch.load(path, map_location='cpu')['zca']
-    except:
-        pass
-
-    if zca is None:
-
-        if transpose:
-            x = x.copy().transpose(0, 3, 1, 2)
-
-        x = x.copy().reshape(x.shape[0], -1)
-
-        cov = np.cov(x, rowvar=False)
-
-        u, s, v = np.linalg.svd(cov)
-
-        SMOOTHING_CONST = 1e-1
-        zca = np.dot(u, np.dot(np.diag(1.0 / np.sqrt(s + SMOOTHING_CONST)), u.T))
-        zca = torch.from_numpy(zca).float()
-
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        torch.save({'zca': zca}, path)
-
-    return zca
-
-
-# *************************************************** Imagenet-10 ***************************************************
-
-class AugImageNet(ImageNet):
-    def __init__(self, *args, **kwargs):
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        train = kwargs.pop('train', True)
-        super().__init__(*args, **kwargs)
-
-
-class ImageNette(ImageFolder):
-
-    def __init__(self, root: str, split: str = 'train', download: Optional[str] = None, **kwargs: Any) -> None:
-        root = self.root = os.path.expanduser(root)
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        train = kwargs.pop('train', True)
-        assert split in ['val', 'train']
-        self.split = split
-
-        super(ImageNette, self).__init__(self.split_folder, **kwargs)
-
-    @property
-    def split_folder(self) -> str:
-        return os.path.join(self.root, self.split)
-
-    def extra_repr(self) -> str:
-        return "Split: {split}".format(**self.__dict__)
-
-
-class ImageNetV2(ImageFolder):
-
-    def __init__(self, root: str, split: str = 'train', download: Optional[str] = None, **kwargs: Any) -> None:
-        root = self.root = os.path.expanduser(root)
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        train = kwargs.pop('train', True)
-        assert split in ['test',
-                         'val']  # although it's called val i think it' really a test, we don't use it for model dev
-        self.split = split
-
-        super(ImageNetV2, self).__init__(self.split_folder, **kwargs)
-
-    @property
-    def split_folder(self) -> str:
-        return self.root
-
-    def extra_repr(self) -> str:
-        return "Split: {split}".format(**self.__dict__)
 
 # *************************************************** ESC50 ***************************************************
 
@@ -743,414 +315,77 @@ class ESC50(Dataset):
             spec = torchaudio.transforms.TimeMasking(time_mask_param=10)(spec)
 
         return (spec)
-# *************************************************** STL-10 ***************************************************
 
-class FastSTL10(STL10):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
+# *************************************************** URBANSOUND8K ***************************************************
+LABEL2ID_Urbansound8k = {0: "air_conditioner",
+1 : "scar_horn",
+2: "children_playing",
+3:"dog_bark",
+4 : "drilling",
+5 : "engine_idling",
+6 : "gun_shot",
+7 : "jackhammer",
+8 : "siren",
+9 : "street_music"}
 
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
+class Urbansound8k(Dataset):
+    def __init__(self, data_path, selected_classes=list(LABEL2ID_Urbansound8k.keys()), test=False, eval_fold=0, debug=False):
+        self.dataset = h5py.File(f'{data_path}/h5s/urbansound8k.h5', "r")
+        self.selected_classes=sorted(selected_classes)
+        self.task_indexes = self.__get_task_dataset_indexes_from_hd5__(test, eval_fold, debug)
 
-    def __init__(self, *args, **kwargs):
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        train = kwargs.pop('train', True)
-        super().__init__(*args, **kwargs)
+        np.random.shuffle(self.task_indexes)
+        self.data = self.dataset["mel_spectrogram"]
+        self.targets = self.dataset["labels_ids"]
+        
+        
+        self.start = 0
+        self.end = len(self.task_indexes)
 
+        # self.pos_weights = self.__class_imbalance_weights__()
 
-        mean = (0.4914, 0.48216, 0.44653)
-        std = (0.247, 0.2434, 0.2616)
+    def __len__(self):
+        return self.end-self.start
+    
+    def __getitem__(self, index):
+        t = self.targets[self.task_indexes[self.start+index]]
+        return torch.from_numpy(self.data[self.task_indexes[self.start+index]]).t().unsqueeze(0), t
 
+    def __class_imbalance_weights__(self):
+        N = self.__len__()
+        labels = np.stack([ self.__getitem__(i)[1] for i in range(N) ])  
+        pos_counts = labels.sum(axis=0)                                
+        neg_counts = N - pos_counts                                     
 
-        norm = transforms.Normalize(mean,  std)
+        pos_counts = np.where(pos_counts == 0, 1, pos_counts)
+        pos_weight = neg_counts / pos_counts                            
+        return torch.from_numpy(pos_weight)
 
-        self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
-        if train:
-            if not isinstance(train_class, str):
-                index_class = np.isin(self.labels, train_class)
-                self.data = self.data[index_class]
-                self.labels = np.array(self.labels)[index_class]
-                self.len = self.data.shape[0]
+    
+    def __get_task_dataset_indexes_from_hd5__(self, test=False, eval_fold =0, debug=False):
 
-        if zca:
-            self.data = (self.data - mean) / std
-            self.zca = whitening_zca(self.data, transpose=False, dataset=STL10)
-            zca_whitening = transforms.LinearTransformation(self.zca, torch.zeros(self.zca.size(1)))
-        self.data = torch.tensor(self.data, dtype=torch.float)
-
-        # self.data = torch.movedim(self.data, -1, 1)  # -> set dim to: (batch, channels, height, width)
-        # self.data = norm(self.data)
-        if zca:
-            self.data = zca_whitening(self.data)
-             
-
-        # self.data = self.data.to(device)  # Rescale to [0, 1]
-
-        # self.data = self.data.div_(CIFAR10_STD) #(NOT) Normalize to 0 centered with 1 std
-
-        self.labels = torch.tensor(self.labels, device=device)
-
-    def __getitem__(self, index: int):
-        """
-        Parameters
-        ----------
-        index : int
-            Index of the element to be returned
-
-        Returns
-        -------
-            tuple: (image, target) where target is the index of the target class
-        """
-        if self.labels is not None:
-            img, target = self.data[index], int(self.labels[index])
+        data = []
+        
+        if debug:
+            length = 2000
         else:
-            img, target = self.data[index], None
-
-        return img, target
-
-
-class AugFastSTL10(FastSTL10):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    def __getitem__(self, index: int):
-        """
-        Parameters
-        ----------
-        index : int
-            Index of the element to be returned
-
-        Returns
-        -------
-            tuple: (image, target) where target is the index of the target class
-        """
-
-        if self.labels is not None:
-            img, target = self.data[index], int(self.labels[index])
-        else:
-            img, target = self.data[index], None
-
-        if self.transform is not None:
-            img = self.transform(img)
-
-        return img, target
-
-
-# *************************************************** CIFAR-10 ***************************************************
-
-class FastCIFAR10(CIFAR10):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    def __init__(self, *args, **kwargs):
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        split = kwargs.pop('split', 'train')
-        super().__init__(*args, **kwargs)
-
-        self.split = split
-
-        mean = (0.4914, 0.48216, 0.44653)
-        std = (0.247, 0.2434, 0.2616)
-
-        norm = transforms.Normalize(mean, std)
-        # 
-        self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
-
-        if self.train:
-            if not isinstance(train_class, str):
-                index_class = np.isin(self.targets, train_class)
-                self.data = self.data[index_class]
-                self.targets = np.array(self.targets)[index_class]
-                self.len = self.data.shape[0]
-
-        if zca:
-            self.data = (self.data - mean) / std
-            self.zca = whitening_zca(self.data)
-            zca_whitening = transforms.LinearTransformation(self.zca, torch.zeros(self.zca.size(1)))
-        self.data = torch.tensor(self.data, dtype=torch.float)
-
-        self.data = torch.movedim(self.data, -1, 1)  # -> set dim to: (batch, channels, height, width)
-        # self.data = norm(self.data)
-        if zca:
-            self.data = zca_whitening(self.data)
-             
-
-        # self.data = self.data.to(device)  # Rescale to [0, 1]
-
-        # self.data = self.data.div_(CIFAR10_STD) #(NOT) Normalize to 0 centered with 1 std
-        #self.data = self.data.cpu().numpy()
-        self.targets = torch.tensor(self.targets, device=device)
-
-    def __getitem__(self, index: int):
-        """
-        Parameters
-        ----------
-        index : int
-            Index of the element to be returned
-
-        Returns
-        -------
-            tuple: (image, target) where target is the index of the target class
-        """
-        img = self.data[index]
-        target = self.targets[index]
-
-        return img, target
-
-
-class AugFastCIFAR10(FastCIFAR10):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    # def __getitem__(self, index: int):
-    #     """
-    #     Parameters
-    #     ----------
-    #     index : int
-    #         Index of the element to be returned
-
-    #     Returns
-    #     -------
-    #         tuple: (image, target) where target is the index of the target class
-    #     """
-    #     img = self.transform(self.data[index])
-    #     target = self.targets[index]
-
-    #     return img, target
-
-
-class FastCIFAR100(CIFAR100):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    def __init__(self, *args, **kwargs):
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        split = kwargs.pop('split', 'train')
-        super().__init__(*args, **kwargs)
-
-        self.split = split
-
-        mean = (0.4914, 0.48216, 0.44653)
-        std = (0.247, 0.2434, 0.2616)
-
-        norm = transforms.Normalize(mean, std)
-         
-        self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255)
-
-        if self.train:
-            if not isinstance(train_class, str):
-                index_class = np.isin(self.targets, train_class)
-                self.data = self.data[index_class]
-                self.targets = np.array(self.targets)[index_class]
-                self.len = self.data.shape[0]
-                # 
-
-        if zca:
-            self.data = (self.data - mean) / std
-            self.zca = whitening_zca(self.data)
-            zca_whitening = transforms.LinearTransformation(self.zca, torch.zeros(self.zca.size(1)))
-        self.data = torch.tensor(self.data, dtype=torch.float)
-
-        self.data = torch.movedim(self.data, -1, 1)  # -> set dim to: (batch, channels, height, width)
-        # self.data = norm(self.data)
-        if zca:
-            self.data = zca_whitening(self.data)
-             
-
-        # self.data = self.data.to(device)  # Rescale to [0, 1]
-
-        # self.data = self.data.div_(CIFAR10_STD) #(NOT) Normalize to 0 centered with 1 std
-
-        self.targets = torch.tensor(self.targets, device=device)
-
-    def __getitem__(self, index: int):
-        """
-        Parameters
-        ----------
-        index : int
-            Index of the element to be returned
-
-        Returns
-        -------
-            tuple: (image, target) where target is the index of the target class
-        """
-        img = self.data[index]
-        target = self.targets[index]
-
-        return img, target
-
-
-class AugFastCIFAR100(FastCIFAR100):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    def __getitem__(self, index: int):
-        """
-        Parameters
-        ----------
-        index : int
-            Index of the element to be returned
-
-        Returns
-        -------
-            tuple: (image, target) where target is the index of the target class
-        """
-        img = self.transform(self.data[index])
-        target = self.targets[index]
-
-        return img, target
-
-
-# ***************************************************  MNIST ***************************************************
-
-class FastMNIST(MNIST):
-    def __init__(self, *args, **kwargs):
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        split = kwargs.pop('split', 'train')
-        super().__init__(*args, **kwargs)
-
-        self.split = split
-
-        if self.train:
-            if not isinstance(train_class, str):
-                # 
-                self.targets = np.array(self.targets)
-                index_class = np.isin(self.targets, train_class)
-                self.data = self.data[index_class]
-                self.targets = self.targets[index_class]
-                self.len = self.data.shape[0]
-
-        # Scale data to [0,1]
-    #     self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255).unsqueeze(1)
-
-    #     self.targets = torch.tensor(self.targets, device=device)
-
-    #     # Normalize it with the usual MNIST mean and std
-    #     # self.data = self.data.sub_(0.1307).div_(0.3081)
-
-    #     # Put both data and targets on GPU in advance
-
-    # def __getitem__(self, index):
-    #     """
-    #     Args:
-    #         index (int): Index
-
-    #     Returns:
-    #         tuple: (image, target) where target is index of the target class.
-    #     """
-    #     img, target = self.data[index], self.targets[index]
-
-    #     return img, target
-
-
-class AugFastMNIST(FastMNIST):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    # def __getitem__(self, index: int):
-    #     """
-    #     Parameters
-    #     ----------
-    #     index : int
-    #         Index of the element to be returned
-
-    #     Returns
-    #     -------
-    #         tuple: (image, target) where target is the index of the target class
-    #     """
-    #     img = self.transform(self.data[index])
-    #     target = self.targets[index]
-
-    #     return img, target
-
-
-# ***************************************************  FashionMNIST ***************************************************
-
-class FastFashionMNIST(FashionMNIST):
-    def __init__(self, *args, **kwargs):
-        device = kwargs.pop('device', "cpu")
-        zca = kwargs.pop('zca', False)
-        train_class = kwargs.pop('train_class', 'all')
-        split = kwargs.pop('split', 'train')
-        super().__init__(*args, **kwargs)
-        self.split = split
-        if self.train:
-            if not isinstance(train_class, str):
-                # 
-                self.targets = np.array(self.targets)
-                index_class = np.isin(self.targets, train_class)
-                self.data = self.data[index_class]
-                self.targets = self.targets[index_class]
-                self.len = self.data.shape[0]
-
-        # Scale data to [0,1]
-    #     self.data = torch.tensor(self.data, dtype=torch.float, device=device).div_(255).unsqueeze(1)
-
-    #     self.targets = self.targets.to(device)
-
-    #     # Normalize it with the usual MNIST mean and std
-    #     # self.data = self.data.sub_(0.1307).div_(0.3081)
-
-    #     # Put both data and targets on GPU in advance
-
-    # def __getitem__(self, index):
-    #     """
-    #     Args:
-    #         index (int): Index
-
-    #     Returns:
-    #         tuple: (image, target) where target is index of the target class.
-    #     """
-    #     img, target = self.data[index], self.targets[index]
-
-    #     return img, target
-
-
-class AugFastFashionMNIST(FastFashionMNIST):
-    """
-    Improves performance of training on CIFAR10 by removing the PIL interface and pre-loading on the GPU (2-3x speedup).
-
-    Taken from https://github.com/y0ast/pytorch-snippets/tree/main/fast_mnist
-    """
-
-    # def __getitem__(self, index: int):
-    #     """
-    #     Parameters
-    #     ----------
-    #     index : int
-    #         Index of the element to be returned
-
-    #     Returns
-    #     -------
-    #         tuple: (image, target) where target is the index of the target class
-    #     """
-    #     img = self.transform(self.data[index])
-    #     target = self.targets[index]
-
-    #     return img, target
+            length = len(self.dataset["filenames"])
+        for i in range(length):
+            entry = self.dataset["one_hot_labels"][i]
+            res = np.any(entry[self.selected_classes])
+            fold_check = self.dataset["folds"][i] == eval_fold
+            if not test and res and not fold_check: 
+                data.append(i)
+            elif test and res and fold_check:
+                data.append(i)
+
+        return data    
+
+    def __del__(self):
+        try:
+            if hasattr(self, "dataset") and self.dataset:
+                self.dataset.close()
+        except Exception as e:
+                pass
+        
+        

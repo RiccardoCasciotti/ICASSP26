@@ -51,7 +51,7 @@ def plot_test_acc(plot_handles):
     plt.xlabel("Iterations")
     plt.ylabel("Test Accuracy")
     plt.ylim(0, 1)
-    plt.savefig("/projappl/project_462000765/casciott/DCASE25/SoftHebb-main/Elastic-Weight-Consolidation-master/Graph.png")
+    plt.savefig("/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/Elastic-Weight-Consolidation-master/Graph.png")
     # display.display(plt.gcf())
     # display.clear_output(wait=True)
 
