@@ -140,7 +140,7 @@ This is going to create independent batch jobs to run the experiments.
 
 ## 📊 Results
 
-- Validated on CIFAR-10 and CIFAR-100 datasets.
+- Validated on ESC-50 and URBANSOUND8K datasets.
 - Models tested for performance across varying tasks, layers, and class-per-task settings.
 - Outputs and plots saved in `SoftHebb-main/Tables/` and `SoftHebb-main/ppgraphs/`.
 
