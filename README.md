@@ -1,18 +1,22 @@
-
 ## 🧑‍🎓 Author
 
-Riccardo Casciotti  
-Master’s Thesis, Politecnico di Milano  
-Advisors: Prof. Alberto Antonietti, Prof. Alessandra Pedrocchi, Francesco De Santis
+Riccardo Casciotti, Tampere University 
+Co-Authors: Prof. Alberto Antonietti - Politecnico di Milano, Francesco De Santis - Politecnico di Milano, Prof. Annamaria Mesaros - Tampere University 
 
-## 📅 Academic Year
 
-2024–2025
+# INCREMENTAL LEARNING FOR AUDIO CLASSIFICATION WITH HEBBIAN DEEP NEURAL NETWORKS
 
-# 🧠 Brain-Inspired Continual Learning in Hebbian Deep Neural Networks
-
-A biologically inspired approach to overcome catastrophic forgetting in **Hebbian-based deep neural networks**, developed as part of Riccardo Casciotti’s Master's thesis in Computer Science and Engineering at Politecnico di Milano (2024–2025).
-
+The ability of humans for lifelong learning is an inspiration for
+deep learning methods and in particular for continual learning. In
+this work, we apply Hebbian learning, a biologically inspired learn-
+ing process, to sound classification. We propose a kernel plasticity
+approach that selectively modulates network kernels during incre-
+mental learning, acting on selected kernels to learn new informa-
+tion and on others to retain previous knowledge. Using the ESC-
+50 dataset, the proposed method achieves 76.3% overall accuracy
+over five incremental steps, outperforming a baseline without kernel
+plasticity (68.7%) and demonstrating significantly greater stability
+across tasks.
 ## 📄 Overview
 
 Modern Artificial Neural Networks (ANNs) still struggle with **catastrophic forgetting** — the tendency to forget previously learned tasks when learning new ones. Inspired by **Hebbian learning** and **neuromodulation** mechanisms found in the human brain, this project implements novel mechanisms within a biologically plausible architecture, **SoftHebb**, to mitigate forgetting in a **task-free continual learning** setup.
@@ -21,7 +25,7 @@ Modern Artificial Neural Networks (ANNs) still struggle with **catastrophic forg
 
 - Implement and test **neuromodulation-inspired plasticity** control mechanisms.
 - Apply a **multi-head architecture** to isolate task-specific learning at the classifier level.
-- Validate the model's performance on **incremental image classification tasks** using CIFAR-10 and CIFAR-100 datasets.
+- Validate the model's performance on **incremental sound classification tasks** using ESC-50.
 
 ## 🧪 Methods
 
@@ -41,23 +45,13 @@ A dopamine-inspired approach for selective weight update:
 - Each task has its own **head** (final classifier layer).
 - During inference, the model automatically selects the most appropriate head using an unsupervised scoring mechanism.
 
-## 📊 Experimental Setup
-
-- Benchmarked on **ESC-50** and **URBANSOUND8K**.
-- Task-based incremental learning:
-  - 5 tasks, where the first has 30 classes and the remaining four tasks have 5 classes each.
-
-### Models Compared:
-- `V-model`: Vanilla SoftHebb (no continual learning support)
-- `M-model`: Multi-head only
-- `KPM-model`: Combines multi-head and neuromodulation
-
 ## 📈 Key Results
 
 - The **KPM-model** outperforms all other variants in retaining earlier task performance.
 - It **balances memory retention and adaptability**, addressing catastrophic forgetting effectively.
 - Gains were most significant with 6-layer networks and moderate task complexity.
 - Models converge in **one unsupervised epoch**, offering **fast training** and **efficient learning**.
+
 
 # 📦 Setup Instructions
 ## 📁 Project Structure
@@ -126,37 +120,5 @@ cd batches
 python testing.py
 ```
 This is going to create independent batch jobs to run the experiments.
-
-## 📊 Results
-
-- Validated on ESC-50 and URBANSOUND8K datasets.
-- Models tested for performance across varying tasks, layers, and class-per-task settings.
-- Outputs and plots saved in `SoftHebb-main/Tables/` and `SoftHebb-main/ppgraphs/`.
-
-## 📊 Post-Experiment Analysis
-
-After experiments are completed, you can analyze and summarize the results using the following utilities:
-
-### `stats.py`
-This script computes and logs statistics on experimental results, such as average accuracy, p-values, and confidence intervals. It is particularly useful for comparing models across tasks.
-
-**Usage:**
-```bash
-cd batches
-python stats.py
-```
-
-### `latex_tables.py`
-This script generates LaTeX-formatted tables suitable for inclusion in academic papers. It reads performance metrics and outputs tables summarizing the results.
-
-**Usage:**
-```bash
-cd batches
-python latex_tables.py
-```
-You can then include the generated `.tex` file in your LaTeX documents for clean table presentation.
-
-
-
 
 ---
