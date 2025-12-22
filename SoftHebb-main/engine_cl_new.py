@@ -1014,8 +1014,8 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
             n_inputs += target.shape[0]
 
             if return_confusion_matrix:
-                all_preds.append(predict.cpu())
-                all_targets.append(target.cpu())
+                all_preds.append(predict.cpu().detach().clone())
+                all_targets.append(target.cpu().detach().clone())
              
     if return_confusion_matrix and not model.joint:
         y_pred = torch.cat(all_preds).numpy().tolist()
@@ -1023,6 +1023,7 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
         classes_offset = model.classes_offset
 
         if len(model.classes_offset) > 0:
+            print("INSIDE OFFSET")
             for i in range(len(y_pred)):
                 el_pred = y_pred[i]
                 el_true = y_true[i]
@@ -1057,17 +1058,17 @@ def shmh_fuser(heads):
 
     return head
 
-def evaluate_sup_multihead(model, criterion, loader, device):
+def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_matrix=False):
 
     """
     Evaluate the multihead model, returning the best loss and acc
     """
+    print("task_num: ", model.task_num)
     if POP_HEAD and not model.shmh: 
         # print("model.heads: ", model.heads)
         state_dict = model.state_dict()
-        chosen_head = model.heads[0]
+        chosen_head = model.heads[model.task_num]
         keys = list(chosen_head.keys())
-        model.heads = model.heads[1:]
 
         # print("#################### CHOSEN HEAD ###############################")
         # print(len(model.heads), int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
@@ -1103,7 +1104,7 @@ def evaluate_sup_multihead(model, criterion, loader, device):
 
         model.load_state_dict(state_dict)
 
-        return evaluate_sup(model, criterion, loader, device)
+        return evaluate_sup(model, criterion, loader, device, return_confusion_matrix=return_confusion_matrix)
     else:
         print("\n\n\nWARNING !!!! POP_HEAD AND SHMH ARE BOTH TRUE, THIS IS NOT SUPPORTED YET\n\n\n")
     if model.shmh: 

@@ -1,191 +1,15 @@
 import os
 import json
 import numpy as np
-import matplotlib.pyplot as plt
-from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, cl_hyper, parent_f_id, data_num, dataset2, id
-import torch
-import numpy as np
-from scipy.stats import wilcoxon, kruskal, ttest_rel
 
-if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/ICASSP26"
-         # Apple Silicon GPU
-else:
-    BASE_PATH="/projappl/project_462001198/casciott/ICASSP26"
-
-def paired_t_test(accuracies_continual, accuracies_baseline):
-    """
-    Perform a paired t-test between the continual learning solution and the baseline.
-    
-    Parameters:
-      accuracies_continual (array-like): Accuracies with continual learning active.
-      accuracies_baseline (array-like): Accuracies without continual learning.
-      
-    Returns:
-      t_stat (float): The t-statistic.
-      p_value (float): The p-value from the test.
-    """
-    t_stat, p_value = ttest_rel(accuracies_continual, accuracies_baseline)
-    return t_stat, p_value
-
-def bootstrap_confidence_interval(data, num_bootstrap=10000, confidence=0.95):
-    """
-    Compute the bootstrap confidence interval for the mean of the data.
-    
-    Parameters:
-      data (array-like): The data vector (e.g., accuracies from one condition).
-      num_bootstrap (int): Number of bootstrap samples (default 10,000).
-      confidence (float): Confidence level (default 0.95).
-      
-    Returns:
-      (lower, upper): Tuple with lower and upper bounds of the confidence interval.
-    """
-    data = np.array(data)
-    means = []
-    n = len(data)
-    for _ in range(num_bootstrap):
-        sample = np.random.choice(data, size=n, replace=True)
-        means.append(np.mean(sample))
-    lower = np.percentile(means, (1 - confidence) / 2 * 100)
-    upper = np.percentile(means, (confidence + (1 - confidence) / 2) * 100)
-    return lower, upper
-
-def bootstrap_difference_ci(accuracies_continual, accuracies_baseline, num_bootstrap=10000, confidence=0.95):
-    """
-    Compute the bootstrap confidence interval for the difference in means 
-    between the continual learning solution and the baseline.
-    
-    Parameters:
-      accuracies_continual (array-like): Accuracies with continual learning active.
-      accuracies_baseline (array-like): Accuracies without continual learning.
-      num_bootstrap (int): Number of bootstrap samples (default 10,000).
-      confidence (float): Confidence level (default 0.95).
-      
-    Returns:
-      (lower, upper): Tuple with lower and upper bounds of the confidence interval of the difference.
-    """
-    accuracies_continual = np.array(accuracies_continual)
-    accuracies_baseline = np.array(accuracies_baseline)
-    differences = []
-    n = len(accuracies_continual)
-    for _ in range(num_bootstrap):
-        indices = np.random.randint(0, n, n)
-        diff_sample = np.mean(accuracies_continual[indices]) - np.mean(accuracies_baseline[indices])
-        differences.append(diff_sample)
-    lower = np.percentile(differences, (1 - confidence) / 2 * 100)
-    upper = np.percentile(differences, (confidence + (1 - confidence) / 2) * 100)
-    return lower, upper
-
-def cohen_d_paired(accuracies_continual, accuracies_baseline):
-    """
-    Compute Cohen's d for paired samples (Cohen's dz).
-    
-    Parameters:
-    x (array-like): Accuracy scores of model 1 on the same dataset.
-    y (array-like): Accuracy scores of model 2 on the same dataset.
-    
-    Returns:
-    float: Cohen's dz (effect size for paired samples).
-    """
-    x = np.array(accuracies_continual)
-    y = np.array(accuracies_baseline)
-    
-    # Compute the differences
-    d = x - y
-    
-    # Mean of the differences
-    mean_d = np.mean(d)
-    
-    # Standard deviation of the differences
-    std_d = np.std(d, ddof=1)  # ddof=1 for sample standard deviation
-    
-    # Cohen's dz
-    if std_d == 0:
-        return 0  # Avoid division by zero; means are identical
-    d_z = mean_d / std_d
-    
-    return d_z
-
-
-    
-
-def create_boxplot_graph_runs(stats):
-    fig, axes = plt.subplots(n_tasks, n_tasks, figsize=(12, 10))
-    axes = axes.flatten()
-    
-    for idx, res in enumerate(stats):
-        ax = axes[idx]
-        performances = res['performances']
-        
-        r_keys = sorted(performances.keys(), key=lambda r: int(r[1:]))
-        test_accs = [performances[r]['test_acc'] for r in r_keys]
-        std_accs = [performances[r]['std_test_acc'] for r in r_keys]
-        
-        ax.boxplot([test_accs], vert=True, patch_artist=True)
-        ax.set_title(f"cf_sol={res['cl_hyper']['cf_sol']}, head_sol={res['cl_hyper']['head_sol']}")
-        ax.set_xticklabels(["Test Accuracy"])
-        ax.set_ylabel("Accuracy")
-        
-    plt.suptitle("Boxplot of Standard Deviations for Different Configurations of Training")
-    plt.tight_layout()
-    if data_num == 1:
-        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_STD-runs", bbox_inches='tight')
-    else: 
-        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_STD-runs", bbox_inches='tight')
-
-    plt.close()
-
-def create_boxplot_graph_eval(stats):
-   
-    fig, axes = plt.subplots(1, n_tasks, figsize=(70, 10))
-    axes = axes.flatten()
-    keys = stats[0]["eval_raw_stats"].keys()
-    index = 0
-    for eval_k in keys: 
-        evals = []
-        labels = []
-        for i in range(len(stats)):
-            evals.append(stats[i]["eval_raw_stats"][eval_k])
-            labels.append(f"cf_sol={stats[i]['cl_hyper']['cf_sol']},\nhead_sol={stats[i]['cl_hyper']['head_sol']}")
-        
-        ax = axes[index]
-        ax.boxplot(evals, vert=True, patch_artist=True)
-        ax.set_xticklabels(labels)
-        ax.set_title(eval_k)
-        ax.set_ylabel("Accuracy")
-        index += 1
-
-        
-    plt.suptitle("Boxplot of Standard Deviations for Different Configurations of evaluation")
-    plt.tight_layout()
-    if data_num == 1:
-        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/TASKS_CL_{dataset+ folder_id}/TASKS_CL_{dataset+ folder_id}_STD-eval", bbox_inches='tight')
-    else:
-        plt.savefig(f"{BASE_PATH}/SoftHebb-main/{parent_f_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}/MULTD_CL_{dataset + '_' + dataset2  + '_' + folder_id}_STD-eval", bbox_inches='tight')
-
-    plt.close()
-
-
-
-def wilcoxon_signed_rank_test(model1_accuracies, model2_accuracies):
-    """
-    Perform the Wilcoxon Signed-Rank Test to compare two versions of the same model.
-    
-    Parameters:
-        model1_accuracies (list or np.array): Accuracy values of the first model version.
-        model2_accuracies (list or np.array): Accuracy values of the second model version.
-    
-    Returns:
-        T-statistic and p-value
-    """
-    T_statistic, p_value = wilcoxon(model1_accuracies, model2_accuracies)
-    return T_statistic, p_value
 
 
 # Function to compute average accuracy and standard deviation
 def average_behavior(path):
    
     statistics = {"KPM": {}, "M": {}}
+    exp_num = 0
+    name = None
 
     for root, dirs, files in os.walk(path, topdown=False):
         for file in files:
@@ -195,181 +19,42 @@ def average_behavior(path):
                 json_obj = json.load(f)
                 if json_obj["cl_hyper"]["cf_sol"] == True and json_obj["cl_hyper"]["head_sol"] == True:
                     cl_key = "KPM"
+                    exp_num += 1
                 elif json_obj["cl_hyper"]["cf_sol"] == False and json_obj["cl_hyper"]["head_sol"] == True:
                     cl_key = "M"
-                statistics[cl_key]
-                for fold_key in json_obj.keys():
-                    if "FOLD" in fold_key:
-                        if fold_key not in statistics[cl_key]:
-                            statistics[cl_key][fold_key] = {}
+                else:
+                    print(json_obj["cl_hyper"]["head_sol"], json_obj["cl_hyper"]["cf_sol"])
+                    
+                    continue
+                
+                for eval in json_obj["performance_avg_folds"].keys():
+                    if eval not in statistics[cl_key]:
+                        statistics[cl_key][eval] = 0
+                    statistics[cl_key][eval] += json_obj["performance_avg_folds"][eval]
+                
 
-                        for run_key in json_obj[fold_key].keys():
-                            if "R" in run_key:
-                                if run_key not in statistics[cl_key][fold_key]:
-                                    statistics[cl_key][fold_key][run_key] = {"train_acc":[], "val_acc": []}
-                                statistics[cl_key][fold_key][run_key]["train_acc"].append(json_obj[fold_key][run_key]["train_acc"])
-                                statistics[cl_key][fold_key][run_key]["val_acc"].append(json_obj[fold_key][run_key]["val_acc"])
-                            elif "eval" in run_key:
-                                if run_key not in statistics[cl_key][fold_key]:
-                                    statistics[cl_key][fold_key][run_key] = {"test_acc":[]}
-                                statistics[cl_key][fold_key][run_key]["test_acc"].append(json_obj[fold_key][run_key]["test_acc"])
+    for model_key in statistics.keys():
+        for eval_key in statistics[model_key].keys():
+            statistics[model_key][eval_key] = statistics[model_key][eval_key]/exp_num
+    print(exp_num, statistics)
     # print(json.dumps(statistics))
     return statistics
 
 
 
-def accuracy_per_fold(statistics):
-    """
-    Accuracy grouped per fold, so every fold will have a list of accuracies for the runs and a list of accuracies for the evaluations
-    """
-    data = {"KPM": {}, "M": {}}
-
-    for model_key in statistics.keys():
-        for fold_key in statistics[model_key].keys():
-
-            if fold_key not in data[model_key]:
-                data[model_key][fold_key] = {}
-            
-            for run_key in statistics[model_key][fold_key].keys():
-                runs = "RUNS"
-                evals = "EVALS"
-                if "R" in run_key:
-                    if runs not in data[model_key][fold_key]:
-                        data[model_key][fold_key][runs] = {"train_acc":[], "val_acc": []}
-                    data[model_key][fold_key][runs]["train_acc"] += statistics[model_key][fold_key][run_key]["train_acc"]
-                    data[model_key][fold_key][runs]["val_acc"] += statistics[model_key][fold_key][run_key]["val_acc"]
-                if "eval" in run_key:
-                    if evals not in data[model_key][fold_key]:
-                        data[model_key][fold_key][evals] = {"test_acc":[]}
-                    data[model_key][fold_key][evals]["test_acc"] += statistics[model_key][fold_key][run_key]["test_acc"]
-    print(json.dumps(data))
-    return data
-
-def accuracy_per_run(statistics):
-    data = {"KPM": {}, "M": {}}
-    for model_key in data.keys():
-        print(statistics[list(statistics.keys())[0]].keys())
-        for run_key in statistics[model_key][list(statistics[model_key].keys())[0]].keys():
-            print(run_key)
-            if "R" in run_key:
-                data[model_key][run_key] = {"train_acc":[], "val_acc": []}
-            elif "eval" in run_key:
-                data[model_key][run_key] = {"test_acc":[]}
-            for fold_key in statistics[model_key].keys():
-                if "R" in run_key:
-                    data[model_key][run_key]["train_acc"] += statistics[model_key][fold_key][run_key]["train_acc"]
-                    data[model_key][run_key]["val_acc"] += statistics[model_key][fold_key][run_key]["val_acc"]
-                elif "eval" in run_key:
-                    data[model_key][run_key]["test_acc"] += statistics[model_key][fold_key][run_key]["test_acc"]
-    
-    return data
-
-def graph_per_run(data, id, n_folds):
-   
-    plt.figure(figsize=(15, 7))
-    plt.rcParams.update({'font.size': 20})
-    plt.box(False)
-
-    for model_key in data.keys():
-        label = model_key
-        x_labels = list(data[model_key].keys())
-        x_values_val = []
-        x_values_test = []
-        x_values_train = []
-        for run_key in data[model_key].keys():
-            
-            for test_key in data[model_key][run_key].keys():
-                final_value = 0
-
-                for elem in data[model_key][run_key][test_key]:
-                    final_value += elem
-                total = len(data[model_key][run_key][test_key])
-                final_value = final_value/total
-
-                if "val" in test_key:
-                    x_values_val.append(final_value)
-                elif "test" in test_key:
-                    x_values_test.append(final_value)
-                elif "train" in test_key:
-                    x_values_train.append(final_value)
-                
-
-
-        line, = plt.plot(x_labels, x_values_val+x_values_test, marker='.', label=label + " val", markersize=15)
-        plt.plot(x_labels, x_values_train+x_values_test, marker='.', c=line.get_color(), alpha=0.6, label=label + " train", markersize=15)
-
-    plt.xlabel('Training-Evaluation on Task #', fontsize=25)
-    plt.ylabel('Test Accuracy', fontsize=25)
-    #plt.plot([0, len(x_labels)-1], [100/classes_per_task, 100/classes_per_task], ':', lw=2, color="#ff0000", label="chance limit")
-
-    plt.title(f"{dataset}, {n_tasks} tasks per experiment, on {total//n_folds} experiments averaged accross all folds")
-    p_values = ""
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    
-    plt.savefig(f"{BASE_PATH}/SoftHebb-main/graphs/{id}_1.png")
-
-def graph_per_fold(data, id, n_folds):
-    plt.figure(figsize=(15, 7))
-    plt.rcParams.update({'font.size': 20})
-    plt.box(False)
-    for model_key in data.keys():
-        label = model_key
-        x_labels = list(data[model_key].keys())
-        x_values_val = []
-        x_values_test = []
-        x_values_train = []
-
-        for fold_key in data[model_key].keys():
-
-            for run_key in data[model_key][fold_key].keys():
-                final_value = 0
-
-                for perf_key in data[model_key][fold_key][run_key].keys():
-
-                    for elem in data[model_key][fold_key][run_key][perf_key]:
-                        final_value += elem
-
-                    total = len(data[model_key][fold_key][run_key][perf_key])
-                    final_value = final_value/total
-
-                    if "val" in perf_key:
-                        x_values_val.append(final_value)
-                    elif "test" in perf_key:
-                        x_values_test.append(final_value)
-                    elif "train" in perf_key:
-                        x_values_train.append(final_value)
-                
-
-
-        line, = plt.plot(x_labels, x_values_test, marker='.', label=label + " test", markersize=15, ls="")
-        plt.plot(x_labels, x_values_train, marker='.', c=line.get_color(), alpha=0.3, label=label + " train", markersize=15, ls="")
-        plt.plot(x_labels, x_values_val, marker='.', c=line.get_color(), alpha=0.6, label=label + " val", markersize=15, ls="")
-
-    plt.xlabel('Training-Evaluation on Task #', fontsize=25)
-    plt.ylabel('Test Accuracy', fontsize=25)
-    #plt.plot([0, len(x_labels)-1], [100/classes_per_task, 100/classes_per_task], ':', lw=2, color="#ff0000", label="chance limit")
-
-    plt.title(f"{dataset}, {n_tasks} tasks per experiment, on {total//n_folds} experiments averaged accross all runs")
-    p_values = ""
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    
-    plt.savefig(f"{BASE_PATH}/SoftHebb-main/graphs/{id}_2.png")
-
-
 
 dataset = "ESC50"
-path = "/scratch/project_462001198/casciott/experiments/EXP_ESC50_50C/TASKS_CL_ESC50_CL_2_6SoftHebbImNet_ok5tasks"
+path = "/scratch/project_462001198/casciott/experiments/EXP_URBANSOUND8K_10C/TASKS_CL_URBANSOUND8K__second_run_5tasks"
 id = path.split("/")[-1]
 statistics = average_behavior(path)
-n_folds = len(statistics[list(statistics.keys())[0]].keys())
-acc_per_fold = accuracy_per_fold(statistics)
-acc_per_run = accuracy_per_run(statistics)
-graph_per_run(acc_per_run, id, n_folds)
-graph_per_fold(acc_per_fold, id, n_folds)
+with open(f"{path}/report.json", "w") as f:
+    json.dump(statistics, f, indent=4)
+
+# n_folds = len(statistics[list(statistics.keys())[0]].keys())
+# acc_per_fold = accuracy_per_fold(statistics)
+# acc_per_run = accuracy_per_run(statistics)
+# graph_per_run(acc_per_run, id, n_folds)
+# graph_per_fold(acc_per_fold, id, n_folds)
 # sols = [(False, False), (True, False), (False, True),(True, True)]
 # stats = []
 # counter = 0

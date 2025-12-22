@@ -21,6 +21,3 @@ rocm/6.2.2:
 
 /opt/conda/envs/conda_container_env/lib/python3.12/site-packages/torch/nn/modules/lazy.py:181: UserWarning: Lazy modules are a new feature under heavy development so changes to the API or functionality can happen at any moment.
   warnings.warn('Lazy modules are a new feature under heavy development '
-srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
-slurmstepd: error: *** STEP 15416543.0 ON nid005867 CANCELLED AT 2025-12-18T09:18:17 DUE TO TIME LIMIT ***
-slurmstepd: error: *** JOB 15416543 ON nid005867 CANCELLED AT 2025-12-18T09:18:17 DUE TO TIME LIMIT ***

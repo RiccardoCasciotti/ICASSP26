@@ -5,7 +5,7 @@
 #SBATCH --nodes=1                    # 1 node
 #SBATCH --ntasks-per-node=1         # 32 tasks per node
 #SBATCH --cpus-per-task=2
-#SBATCH --time=8:00:00               # time limits: 1/2 hour
+#SBATCH --time=24:00:00               # time limits: 1/2 hour
 #SBATCH --mem=128G
 #SBATCH --error=URBANSOUND8K/job.err            # standard error file
 #SBATCH --output=URBANSOUND8K/job.out           # standard output file
