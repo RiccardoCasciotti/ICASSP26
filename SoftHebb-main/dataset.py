@@ -12,7 +12,6 @@ import torch
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
 from torchvision import datasets, transforms
 import torchvision.transforms.functional as TF
-from torchvision.datasets import CIFAR10, CIFAR100, MNIST, FashionMNIST, STL10, ImageNet, ImageFolder
 from typing import Optional, Any
 from utils import load_presets, get_device
 import torchaudio
@@ -48,12 +47,6 @@ def select_dataset(dataset_config, device, dataset_path):
         dataset_class = ESC50
         indices = list(range(2000))
         dataset_path = f"{BASE_PATH}/Training/data/ESC-50-master"
-        # if dataset_config['augmentation']:
-        #     dataset_train_class = AugFastCIFAR100
-        #     dataset_config['num_workers'] = 4
-        #     device = 'cpu'
-        #     transform = crop_flip(dataset_config['width'], dataset_config['height'])
-    
         dataset_train_class = ESC50
         transform = None
 
