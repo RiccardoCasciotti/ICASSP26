@@ -1,4 +1,4 @@
-# neuromodAI
+
 ## 🧑‍🎓 Author
 
 Riccardo Casciotti  
@@ -43,16 +43,13 @@ A dopamine-inspired approach for selective weight update:
 
 ## 📊 Experimental Setup
 
-- Benchmarked on **CIFAR-10** and **CIFAR-100**.
+- Benchmarked on **ESC-50** and **URBANSOUND8K**.
 - Task-based incremental learning:
-  - Varying number of tasks (2 to 10).
-  - Varying network depths (3 to 11 layers).
-  - Varying number of classes per task.
+  - 5 tasks, where the first has 30 classes and the remaining four tasks have 5 classes each.
 
 ### Models Compared:
 - `V-model`: Vanilla SoftHebb (no continual learning support)
 - `M-model`: Multi-head only
-- `KP-model`: Kernel plasticity neuromodulation only
 - `KPM-model`: Combines multi-head and neuromodulation
 
 ## 📈 Key Results
@@ -61,14 +58,6 @@ A dopamine-inspired approach for selective weight update:
 - It **balances memory retention and adaptability**, addressing catastrophic forgetting effectively.
 - Gains were most significant with 6-layer networks and moderate task complexity.
 - Models converge in **one unsupervised epoch**, offering **fast training** and **efficient learning**.
-
-## 📚 References
-
-1. Adrien Journé et al. _Hebbian Deep Learning Without Feedback_.
-2. Alex Krizhevsky. _Learning Multiple Layers of Features from Tiny Images_.
-3. Arjun Magotra, Juntae Kim. _Neuromodulated Dopamine Plastic Networks..._
-4. Liyuan Wang et al. _A Comprehensive Survey of Continual Learning_.
-
 
 # 📦 Setup Instructions
 ## 📁 Project Structure
