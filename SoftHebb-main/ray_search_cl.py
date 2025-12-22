@@ -1,28 +1,3 @@
-#This file contains the implementation of the continual learnign methods necessary
-
-#First thing we need to be able to train a model, save it and retrieve it to train it and test it on another 
-#dataset. To train it we can simply use the multi_layer.py file, here we retrieve the model and train it on another dataset.
-#The training for the unsupervised part is performed by setting the number of epochs to 1 directly in the learning
-#rate scheduler. For the supervised part it is set to nb_epoch value which is specified in the preset.json. 
-#The files are going to be saved inside the Training folder with path 
-# neuromodAI/SoftHebb-main/Training/results/hebb/result/network/2SoftHebbCnnCIFAR/models/checkpoint.pth.tar 
-# we need to add a command which allows us to specify the different datasets and also a flag which tells us if we are performing continual leanring or not.
-# at this point we have to see decide the size of the training images: we could start with a dataset which is bigger and the second one smaller
-# so we need to either upscale it or downscale it. 
-
-
-# In order to train the best models on a new dataset and then evaluate them on the first one I have to skip the first training
-# and go directly to the second one, how should I do so? With a flag --skip-1.
-# Ok so when doing continual learning with the best models we need to set the skip-1 flag to true. 
-# 
-
-############################################################
-
-"""
-RAY_SEARCH_CL.py can be used only to train a model either on all the classes of a dataset or on a subset of classes of the dataset.
-The reason being no results can be gathered of the best model if continual learning is implemented and it is easier to do it separately.
-So first you find the best model with ray search and then load it with continual_learning.py
-"""
 
 import argparse
 import os

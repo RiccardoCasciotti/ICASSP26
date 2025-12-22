@@ -483,22 +483,7 @@ class HebbHardConv2d(nn.Module):
              # print("topk_mask ", topk_mask.cpu())
              # print("not_topk_mask ", not_topk_mask.cpu())
             self.temp = 3
-        ######################################################################
-        # return_mask = torch.zeros(len(lower_lr_mask)).to(device)
-        # topk_rule_break_num = int(torch.sum((lower_lr_mask==-1).type(torch.uint8), dim=0))
-
-        # start = round(self.cl_hyper["top_k"]*len(not_topk_mask)*len(self.heads))%len(not_topk_mask)
-        # end = round(self.cl_hyper["top_k"]*len(not_topk_mask) + self.cl_hyper["top_k"]*len(not_topk_mask)*len(self.heads))%len(not_topk_mask)
-        # if end < start: 
-        #     indices = not_topk_mask.nonzero()[0:topk_rule_break_num]
-        # else:
-        #     indices = not_topk_mask.nonzero()[start:end]
-        # #print(indices.flatten().tolist(), start, end)
-        # neuro_indexes = random.sample(indices.flatten().tolist(), topk_rule_break_num)
-        # #print(indices, topk_rule_break_num, neuro_indexes)
-        # return_mask[neuro_indexes] = 1
-        # not_topk_mask=return_mask.type(torch.uint8)
-        ######################################################################
+    
         return not_topk_mask
 
     def update(self) -> None:
