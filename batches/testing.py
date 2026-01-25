@@ -143,7 +143,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                   
                 result = subprocess.check_output(
                     command1,
-                    shell=False,
+                    shell=True,
                     cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/",
                 )
               
