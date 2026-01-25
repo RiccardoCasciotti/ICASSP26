@@ -177,7 +177,7 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
             
 
 if data_num == 1: 
-    command = f"sbatch {dataset}.sh "  
+    command = f"bash -lc sbatch {dataset}.sh "  
 
     if dataset == "ESC50":  
         all_classes = list(range(50))
