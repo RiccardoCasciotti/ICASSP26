@@ -175,7 +175,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
                                                 )
-    print(classes_offset)
+    print("classes_offset:", classes_offset)
     return train_loader, val_loader, test_loader, classes_offset
 
 def class_cleaner(dataset_config, dataset, selected_classes):
