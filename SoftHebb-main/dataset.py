@@ -150,7 +150,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
                 train_split, classes_offset = classes_subset(dataset_config, train_split, selected_classes, device, True)
                 val_split, _ = classes_subset(dataset_config, val_split, selected_classes, device, True)
     elif dataset_config["name"] == "URBANSOUND8K":
-
+        print("INSIDE CORRECT:")
         selected_classes = dataset_config["selected_classes"]
         eval_fold = dataset_config["fold"]
         data_train = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=False, eval_fold=eval_fold, debug=False)
