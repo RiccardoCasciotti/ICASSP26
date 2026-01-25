@@ -178,7 +178,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     # print("model.heads: ", model.heads)
     # here we obtain the activations of all the layers (which are convolutional layers)
     
-    for layer in model.children():
+    # for layer in model.children():
          
         
          
