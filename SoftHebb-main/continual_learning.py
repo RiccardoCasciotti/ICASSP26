@@ -590,24 +590,24 @@ if __name__ == '__main__':
                     task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
                     evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
                     
-                    # JOINT
-                    print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
+                    # # JOINT
+                    # print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
 
-                    selected_classes = list(itertools.chain(*(cl_hyper["selected_classes"][:task_num+1])))     ### collapse all the lists into 1
-                    dataset_sup_x["joint"] = True
-                    dataset_unsup_x["joint"] = True
-                    params.resume = False
-                    dataset_unsup_x["fold"] = fold + 1
-                    dataset_sup_x["fold"] = fold + 1
-                    dataset_sup_x["n_classes"] = len(selected_classes)
-                    dataset_unsup_x["n_classes"] = len(selected_classes)
-                    dataset_sup_x["out_channels"] = len(selected_classes)
-                    dataset_unsup_x["out_channels"] = len(selected_classes)
-                    task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=False, task_num=task_num)
-                    dataset_sup_x["eval"] = True
-                    params.resume = True
-                    procedure(params, name_model+"joint", blocks, dataset_sup_x, dataset_unsup_x, True, results, task_num=task_num)
-                    dataset_sup_x["eval"] = False
+                    # selected_classes = list(itertools.chain(*(cl_hyper["selected_classes"][:task_num+1])))     ### collapse all the lists into 1
+                    # dataset_sup_x["joint"] = True
+                    # dataset_unsup_x["joint"] = True
+                    # params.resume = False
+                    # dataset_unsup_x["fold"] = fold + 1
+                    # dataset_sup_x["fold"] = fold + 1
+                    # dataset_sup_x["n_classes"] = len(selected_classes)
+                    # dataset_unsup_x["n_classes"] = len(selected_classes)
+                    # dataset_sup_x["out_channels"] = len(selected_classes)
+                    # dataset_unsup_x["out_channels"] = len(selected_classes)
+                    # task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=False, task_num=task_num)
+                    # dataset_sup_x["eval"] = True
+                    # params.resume = True
+                    # procedure(params, name_model+"joint", blocks, dataset_sup_x, dataset_unsup_x, True, results, task_num=task_num)
+                    # dataset_sup_x["eval"] = False
                     ###############################
                 # EVALUATION PHASE
 
