@@ -18,7 +18,6 @@
 
 import argparse
 import ast
-import itertools
 import os
 import subprocess
 import sys
@@ -163,21 +162,16 @@ parser.add_argument('--shmh', default="False",   ###################
 results = {"count": 0}
 
 
-def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_config, train_config, gpu_id, evaluate, results, cl_hyper, task_num = -1):
+def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_config, train_config, gpu_id, evaluate, results, cl_hyper):
     device = get_device()
-
-    model = load_layers(blocks, name_model, resume, dataset_sup_config=dataset_sup_config, batch_size=list(train_config.values())[-1]["batch_size"], cl_hyper=cl_hyper, task_num=task_num, eval=dataset_sup_config["eval"])
+    model = load_layers(blocks, name_model, resume, dataset_sup_config=dataset_sup_config, batch_size=list(train_config.values())[-1]["batch_size"], cl_hyper=cl_hyper)
     # if torch.cuda.is_available() and torch.cuda.device_count() > 1:
     #     model = torch.nn.DataParallel(model)
     model = model.to(device)
-    model.task_num = task_num
-    model.joint = dataset_sup_config["joint"]
-    model.name_model = name_model
-    model.fold_num = dataset_sup_config["fold"]
+
     depth = 0
     # print("model.heads: ", model.heads)
     # here we obtain the activations of all the layers (which are convolutional layers)
-    
     for layer in model.children():
          
         
@@ -200,21 +194,19 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     test_acc = 0
     dataset_sup_config["SINGLE"] = cl_hyper["SINGLE"]
     for id, config in train_config.items():
-        train_loader, val_loader, test_loader, classes_offset = make_data_loaders(dataset_sup_config, config['batch_size'], device)
-        model.classes_offset = classes_offset
+        train_loader, val_loader, test_loader = make_data_loaders(dataset_sup_config, config['batch_size'], device)
+
 
         if evaluate:
             
             if config['mode'] == 'supervised' or config['mode'] == 'hybrid': ## WATCH OUT EVAL LOGGING WORKS ONLY WITH 1 SUPERVISED LAYER
                 criterion = nn.CrossEntropyLoss()
                 result = {}
-                task_cf = None
-                if cl_hyper["head_sol"] and not model.joint:
-                    res = evaluate_sup_multihead(model, criterion, test_loader, device, return_confusion_matrix=True) ##################################
+
+                if cl_hyper["head_sol"]:
+                    res = evaluate_sup_multihead(model, criterion, test_loader, device)
                     test_loss = res[0]
                     test_acc = res[1]
-                    if len(res) == 3:
-                        task_cf = res[2]
                 else: 
                     test_loss, test_acc= evaluate_sup(model, criterion, test_loader, device)
                     # cm, test_loss, test_acc= evaluate_sup(model, criterion, test_loader, device)
@@ -235,38 +227,11 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     results["cl_hyper"] = cl_hyper
                     
                 
-                results["FOLD_#"+str(dataset_sup_config["fold"])][f"eval_{task_num}"] = metrics.copy()
-                
+                results["FOLD_#"+str(dataset_sup_config["fold"])][f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] = metrics.copy()
+                if f"eval_{results['count']%results['cl_hyper']['n_tasks']}" not in results["performance_avg_folds"].keys():
+                    results["performance_avg_folds"][f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] = 0
+                results["performance_avg_folds"][f"eval_{results['count']%results['cl_hyper']['n_tasks']}"] += metrics["test_acc"]
                 results["count"] += 1
-
-                # ACCURACY MATRIX
-                if not dataset_sup_config["joint"] :
-                    if task_num not in results["accuracy_matrix"]:
-                        results["accuracy_matrix"][task_num] = {}
-                    if f"FOLD_#{dataset_sup_config["fold"]}" not in results["accuracy_matrix"][task_num]:
-                        results["accuracy_matrix"][task_num][f"FOLD_#{dataset_sup_config["fold"]}"] = []
-                    if len(results["accuracy_matrix"][task_num][f"FOLD_#{dataset_sup_config["fold"]}"]) < cl_hyper["n_tasks"]:
-                        results["accuracy_matrix"][task_num][f"FOLD_#{dataset_sup_config["fold"]}"].append(test_acc.item())
-
-                ############################
-
-                # JOINT
-                if dataset_sup_config["joint"]:
-                    if f"FOLD_#{dataset_sup_config["fold"]}" not in results["joint"]:
-                        results["joint"][f"FOLD_#{dataset_sup_config["fold"]}"] = []
-                    results["joint"][f"FOLD_#{dataset_sup_config["fold"]}"].append(test_acc.item())
-                ##############
-
-                # CONFUSION MATRIX
-
-                if task_cf is not None and not model.joint:
-                    if f"FOLD_#{dataset_sup_config["fold"]}" not in results["confusion_matrix"]:
-                        results["confusion_matrix"][f"FOLD_#{dataset_sup_config["fold"]}"] = {}
-                    if f"T{task_num}" not in results["confusion_matrix"][f"FOLD_#{dataset_sup_config["fold"]}"]:
-                        results["confusion_matrix"][f"FOLD_#{dataset_sup_config["fold"]}"][f"T{task_num}"] = {}
-                    results["confusion_matrix"][f"FOLD_#{dataset_sup_config["fold"]}"][f"T{task_num}"] = task_cf
-                #############
-
         else:
             if config['mode'] == 'unsupervised':
                 run_unsup(
@@ -300,40 +265,38 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     train_loader=train_loader,
                     val_loader=val_loader
                 )
-                if not dataset_sup_config["joint"]:
-                    result["dataset_sup"] = dataset_sup_config.copy()
-                    result["dataset_unsup"] = dataset_unsup_config.copy()
-                    result["train_config"] = train_config.copy()
-                    print("RESULT: ", result)
-                    results["FOLD_#"+str(dataset_sup_config["fold"])]["R" + str(results["count"])] = result.copy()
-                    
-                    results["count"] += 1
-            # else:
-            #     result = run_hybrid(
-            #         config['nb_epoch'],
-            #         config['print_freq'],
-            #         config['batch_size'],
-            #         config['lr'],
-            #         name_model,
-            #         dataset_sup_config,
-            #         model,
-            #         device,
-            #         log.sup[id],
-            #         blocks=config['blocks'],
-            #         save=save,
-            #         train_loader=train_loader,
-            #         val_loader=val_loader
-            #     )
-            #     result["dataset_sup"] = dataset_sup_config.copy()
-            #     result["dataset_unsup"] = dataset_unsup_config.copy()
-            #     result["train_config"] = train_config.copy()
-            #     print("RESULT: ", result)
-            #     results["R" + str(results["count"])] = result.copy()
-            #     print(f"IN R" + str(results["count"]) + ": ", results)
-            #     results["count"] += 1
+                result["dataset_sup"] = dataset_sup_config.copy()
+                result["dataset_unsup"] = dataset_unsup_config.copy()
+                result["train_config"] = train_config.copy()
+                print("RESULT: ", result)
+                results["FOLD_#"+str(dataset_sup_config["fold"])]["R" + str(results["count"])] = result.copy()
+                 
+                results["count"] += 1
+            else:
+                result = run_hybrid(
+                    config['nb_epoch'],
+                    config['print_freq'],
+                    config['batch_size'],
+                    config['lr'],
+                    name_model,
+                    dataset_sup_config,
+                    model,
+                    device,
+                    log.sup[id],
+                    blocks=config['blocks'],
+                    save=save,
+                    train_loader=train_loader,
+                    val_loader=val_loader
+                )
+                result["dataset_sup"] = dataset_sup_config.copy()
+                result["dataset_unsup"] = dataset_unsup_config.copy()
+                result["train_config"] = train_config.copy()
+                print("RESULT: ", result)
+                results["R" + str(results["count"])] = result.copy()
+                print(f"IN R" + str(results["count"]) + ": ", results)
+                results["count"] += 1
     if "model_config" not in results.keys():
         results["model_config"] = blocks
-    print("first heads: ", len(model.heads))
       
 def plot_confusion_matrix(cm, path, name, class_names=None, normalize=False, title="Confusion Matrix"):
 
@@ -359,7 +322,7 @@ def plot_confusion_matrix(cm, path, name, class_names=None, normalize=False, tit
     plt.savefig(file)
 
 
-def procedure(params, name_model, blocks, dataset_sup_config, dataset_unsup_config, evaluate, results, task_num):
+def procedure(params, name_model, blocks, dataset_sup_config, dataset_unsup_config, evaluate, results):
     # 
     if params.seed is not None:
         dataset_sup_config['seed'] = params.seed
@@ -374,8 +337,33 @@ def procedure(params, name_model, blocks, dataset_sup_config, dataset_unsup_conf
                                    params.training_blocks)
     
     main(blocks, name_model, params.resume, params.save, dataset_sup_config, dataset_unsup_config, train_config,
-          params.gpu_id, evaluate, results, cl_hyper=params.cl_hyper, task_num=task_num)
+          params.gpu_id, evaluate, results, cl_hyper=params.cl_hyper)
 
+def save_results(results, file):
+    print("results: ", results)
+    with open(file, 'a+') as f:
+        try:
+            f.seek(0)
+            old = json.load(f)
+        except json.JSONDecodeError:
+            old = {}
+    with open(file, 'r+') as f:
+        try:
+            old = json.load(f)
+        except json.JSONDecodeError:
+            old = {}
+        
+        if old.get("T1") is None:
+            old["T1"] = results
+        else: 
+            last_key = list(old.keys())[-1]
+            new_key = "T" + str(int(last_key[1:]) + 1)
+            old[new_key] = results
+
+        f.seek(0)
+        f.truncate() 
+
+        json.dump(old, f, indent=4)
 
 def save_results_new(results, path, name):
     print("results: ", results)
@@ -396,7 +384,7 @@ def random_n_classes(all_classes, n_classes):
     all_classes = np.delete(all_classes, classes)
     return all_classes, selected_classes
 
-def task_training(params, name_model, blocks, selected_classes, dataset_sup, dataset_unsup, continual_learning, resume, task_num):
+def task_training(params, name_model, blocks, selected_classes, dataset_sup, dataset_unsup, continual_learning, resume):
     #all_classes, selected_classes = random_n_classes(all_classes, n_classes)
                 
     # selected_classes = selected_classes.tolist()
@@ -409,37 +397,7 @@ def task_training(params, name_model, blocks, selected_classes, dataset_sup, dat
     params.continual_learning = continual_learning
     params.resume = resume
     evaluate = False
-    procedure(params, name_model, blocks, dataset_sup, dataset_unsup, evaluate, results, task_num)
-
-
-def evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper):
-# EVALUATION PHASE
-    params.continual_learning = False
-    params.resume = resume ################################################################################################################################
-    evaluate = True
-    if max(cl_hyper["evaluated_tasks"]) >= cl_hyper['n_tasks']:
-        cl_hyper["evaluated_tasks"] = list(range(cl_hyper['n_tasks']))
-    for task_num in cl_hyper["evaluated_tasks"]:
-        print("################################## EVALUATION OF TASK " + str(task_num)+ " ############################################")
-
-        selected_classes = cl_hyper["selected_classes"][task_num]
-
-        dataset_sup_x = dataset_sup_ground.copy()
-        dataset_unsup_x = dataset_unsup_ground.copy()
-
-        dataset_sup_x["selected_classes"] = selected_classes
-        dataset_unsup_x["selected_classes"] = selected_classes
-
-        dataset_unsup_x["fold"] = fold + 1
-        dataset_sup_x["fold"] = fold + 1
-        
-        dataset_sup_x["n_classes"] = len(selected_classes)
-        dataset_unsup_x["n_classes"] = len(selected_classes)
-
-        dataset_sup_x["out_channels"] = len(selected_classes)
-        dataset_unsup_x["out_channels"] = len(selected_classes)
-
-        procedure(params, name_model, blocks, dataset_sup_x, dataset_unsup_x, evaluate, results, task_num=task_num)
+    procedure(params, name_model, blocks, dataset_sup, dataset_unsup, evaluate, results)
 
 if __name__ == '__main__':
 
@@ -454,6 +412,9 @@ if __name__ == '__main__':
     classes_per_task = params.classes_per_task
     resume = params.resume
     shmh = params.shmh
+   
+     
+
     
     
     if classes_per_task != None and (params.dataset_sup_2 != None or params.dataset_sup_1 != None):
@@ -506,30 +467,17 @@ if __name__ == '__main__':
         dataset_sup_ground["out_channels"] = classes_per_task
         dataset_unsup_ground["out_channels"] = classes_per_task
 
-        dataset_sup_ground["joint"] = False
-        dataset_unsup_ground["joint"] = False
-
-        dataset_sup_ground["eval"] = False
-        dataset_unsup_ground["eval"] = False
-
         all_classes = np.arange(0, out_channels)
         
         if "ESC50" in params.dataset_sup:
             folds = 5
         elif "URBANSOUND8K" in params.dataset_sup:
             folds = 10
-        # folds = 1 ##############################################################################################################################
+        folds = 2 ##############################################################################################################################
 
         dataset_sup_1 = dataset_sup_ground.copy()
         dataset_unsup_1 = dataset_unsup_ground.copy()
-
-        dataset_sup_1["joint"] = False
-        dataset_unsup_1["joint"] = False
-
         results["performance_avg_folds"] = {}
-        results["accuracy_matrix"] = {}
-        results["joint"] = {}
-        results["confusion_matrix"] = {}
         if out_channels >=  classes_per_task or shmh:
             for fold in range(folds):
                 
@@ -551,9 +499,8 @@ if __name__ == '__main__':
                 dataset_unsup_1["out_channels"] = len(selected_classes)
 
 
-                task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=None, task_num=0)
-                evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
-                
+                task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=None)
+
     
                 
                 for task_num in range(1, cl_hyper["n_tasks"]):
@@ -563,63 +510,49 @@ if __name__ == '__main__':
                     print("Selected Classes for the Task: ", selected_classes)
                     dataset_sup_x = dataset_sup_ground.copy()
                     dataset_unsup_x = dataset_unsup_ground.copy()
-
-                    dataset_sup_x["joint"] = False
-                    dataset_unsup_x["joint"] = False
-
-                    dataset_sup_x["eval"] = False
-                    dataset_unsup_x["eval"] = False
-
                     dataset_unsup_x["fold"] = fold + 1
                     dataset_sup_x["fold"] = fold + 1
                     dataset_sup_x["n_classes"] = len(selected_classes)
                     dataset_unsup_x["n_classes"] = len(selected_classes)
                     dataset_sup_x["out_channels"] = len(selected_classes)
                     dataset_unsup_x["out_channels"] = len(selected_classes)
-
-                    params.continual_learning = True
-                    params.resume = resume
-
-                    task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
-                    evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
                     
-                    # JOINT
-                    print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
+                    task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume)
 
-                    selected_classes = list(itertools.chain(*(cl_hyper["selected_classes"][:task_num+1])))     ### collapse all the lists into 1
-                    dataset_sup_x["joint"] = True
-                    dataset_unsup_x["joint"] = True
-                    params.resume = False
+            
+                # EVALUATION PHASE
+                params.continual_learning = False
+                # params.resume = resume ################################################################################################################################
+                evaluate = True
+                if max(cl_hyper["evaluated_tasks"]) >= cl_hyper['n_tasks']:
+                    cl_hyper["evaluated_tasks"] = list(range(cl_hyper['n_tasks']))
+                for task_num in cl_hyper["evaluated_tasks"]:
+                    print("################################## EVALUATION OF TASK " + str(task_num)+ " ############################################")
+
+                    selected_classes = cl_hyper["selected_classes"][task_num]
+                    dataset_sup_x = dataset_sup_ground.copy()
+                    dataset_unsup_x = dataset_unsup_ground.copy()
+                    dataset_sup_x["selected_classes"] = selected_classes
+                    dataset_unsup_x["selected_classes"] = selected_classes
                     dataset_unsup_x["fold"] = fold + 1
                     dataset_sup_x["fold"] = fold + 1
-                    dataset_sup_x["n_classes"] = len(selected_classes)
-                    dataset_unsup_x["n_classes"] = len(selected_classes)
-                    dataset_sup_x["out_channels"] = len(selected_classes)
-                    dataset_unsup_x["out_channels"] = len(selected_classes)
-                    task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=False, task_num=task_num)
-                    dataset_sup_x["eval"] = True
-                    params.resume = True
-                    procedure(params, name_model+"joint", blocks, dataset_sup_x, dataset_unsup_x, True, results, task_num=task_num)
-                    dataset_sup_x["eval"] = False
-                    ###############################
-                # EVALUATION PHASE
-
-                evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
-
-
+                    if shmh:
+                        dataset_sup_x["n_classes"] = out_channels
+                        dataset_unsup_x["n_classes"] = out_channels
+                        dataset_sup_x["out_channels"] = out_channels
+                        dataset_unsup_x["out_channels"] = out_channels
+                    else:
+                        dataset_sup_x["n_classes"] = len(selected_classes)
+                        dataset_unsup_x["n_classes"] = len(selected_classes)
+                        dataset_sup_x["out_channels"] = len(selected_classes)
+                        dataset_unsup_x["out_channels"] = len(selected_classes)
+                    procedure(params, name_model, blocks, dataset_sup_x, dataset_unsup_x, evaluate, results)
                 results["count"] = 0
                 command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
                 res = subprocess.run(command, shell=True, capture_output=False, text=True)
             results["model_name"] = name_model
-
-            for task_num in range(0, cl_hyper["n_tasks"]):
-                for fold_num in range(folds):
-                    
-                    if f"eval_{task_num}" not in results["performance_avg_folds"].keys():
-                            results["performance_avg_folds"][f"eval_{task_num}"] = 0
-                    results["performance_avg_folds"][f"eval_{task_num}"] += results[f"FOLD_#{fold_num+1}"][f"eval_{task_num}"]["test_acc"]
-                results["performance_avg_folds"][f"eval_{task_num}"] = results["performance_avg_folds"][f"eval_{task_num}"]/folds
-
+            for k, v in results["performance_avg_folds"].items():
+                results["performance_avg_folds"][k] = v/folds
             save_results_new(results, f"{params.parent_f_id}/TASKS_CL_{params.dataset_sup.split('_')[0] +  folder_id}", name_model)
             
    
@@ -634,4 +567,3 @@ result = subprocess.run(command, shell=True, capture_output=False, text=True)
 print(result.stdout)
 if result.stderr:
     print("Error:", result.stderr)
-
