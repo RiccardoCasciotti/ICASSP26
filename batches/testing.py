@@ -107,6 +107,8 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
     lr = lrs[2]
     mode = modes[1]
     cl_hyper["SINGLE"] = SINGLE
+
+    f = open("/projappl/project_462001198/casciott/ICASSP26/batches/configs.txt", "w")
     
     for sol in sols:
         cl_hyper['cf_sol'] = sol[0]
