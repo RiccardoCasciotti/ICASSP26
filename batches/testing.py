@@ -108,7 +108,8 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
     mode = modes[1]
     cl_hyper["SINGLE"] = SINGLE
 
-    f = open("/projappl/project_462001198/casciott/ICASSP26/batches/configs.txt", "w")
+    f = open("/projappl/project_462001198/casciott/ICASSP26/batches/configs.sh", "w")
+    f.write("#!/bin/bash\n")
     
     for sol in sols:
         cl_hyper['cf_sol'] = sol[0]
@@ -143,21 +144,21 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
 
                 )
                   
-                result = subprocess.check_output(
-                    command1,
-                    shell=True,
-                    cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/",
-                )
+                # result = subprocess.check_output(
+                #     command1,
+                #     shell=True,
+                #     cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/",
+                # )
               
                 # result = subprocess.run(command1, shell=False, capture_output=False, text=True, )
-                print("out: ", result)
-                
+                f.write(f'{command1}\n')
+                   
         
         if TEST:
             print("!!!! WARNING: BREAK OPERATION IS ON IN TESTING")
             break
             
-
+    f.close() 
 
 
 # command = f"rm -rf -d /leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/Training/results/hebb/result/network && mkdir /leonardo_work/{USER}/rcasciot/neuromodAI/SoftHebb-main/Training/results/hebb/result/network"
@@ -179,8 +180,8 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
             
 
 if data_num == 1: 
-    command = f'sbatch {dataset}.sh ' 
-    os.environ["PATH"] = "/usr/bin:" + os.environ["PATH"]
+    command = f'cd /projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/ && sbatch {dataset}.sh ' 
+    
 
     if dataset == "ESC50":  
         all_classes = list(range(50))
