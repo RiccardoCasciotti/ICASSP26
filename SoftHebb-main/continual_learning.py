@@ -588,7 +588,8 @@ if __name__ == '__main__':
                     params.resume = resume
 
                     task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
-                    evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+                    # This evaluates all the tasks after training on a new task, needed to create the accuracy matrix.
+                    # evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
                     
                     # # JOINT
                     # print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
