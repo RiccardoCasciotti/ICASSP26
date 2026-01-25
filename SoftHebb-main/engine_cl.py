@@ -222,7 +222,7 @@ def getActivation(name):
   # the hook signature
   def hook(model, input, output):
     
-    activations[name] = torch.sum(output.detach().clone(), dim=0)
+    activations[name] = torch.sum(output.detach().cpu(), dim=0)
     
     # ACTIVATIONS SHAPE:  torch.Size([10, 96, 32, 32]), where 10 is the batch size
     # what we have to do is sum all the activations to get 1 single kernel and we do this during all the training. At the end 

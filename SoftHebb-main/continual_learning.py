@@ -178,20 +178,20 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     # print("model.heads: ", model.heads)
     # here we obtain the activations of all the layers (which are convolutional layers)
     
-    # for layer in model.children():
+    for layer in model.children():
          
         
          
-	# # check for convolutional layer
-    #     for subl in layer.children():
-                 
-    #         for subsubl in subl.children():
-                 
-    #             if subsubl._get_name().__eq__("HebbSoftKrotovConv2d"):
-    #                 subsubl.register_forward_hook(getActivation("conv"+str(depth)))
-    #             if subsubl._get_name().__eq__("Linear"):
-    #                 subsubl.register_forward_hook(getActivation("linear"+str(depth)))
-    #         depth += 1
+	# check for convolutional layer
+        for subl in layer.children():
+                    
+            for subsubl in subl.children():
+                    
+                if subsubl._get_name().__eq__("HebbSoftKrotovConv2d"):
+                    subsubl.register_forward_hook(getActivation("conv"+str(depth)))
+                if subsubl._get_name().__eq__("Linear"):
+                    subsubl.register_forward_hook(getActivation("linear"+str(depth)))
+            depth += 1
     
     
     
