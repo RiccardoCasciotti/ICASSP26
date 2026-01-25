@@ -10,7 +10,7 @@ import shlex
 import subprocess
 import random
 import numpy as np
-TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
 SHMH = False
 SINGLE = False
 
@@ -25,7 +25,7 @@ evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
-dataset="ESC50"
+dataset="URBANSOUND8K"
 dataset2 = "C10"
 
 if dataset == "ESC50":
@@ -177,7 +177,7 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
             
 
 if data_num == 1: 
-    command = f'sbatch {dataset}.sh' 
+    command = f'sbatch {dataset}.sh ' 
     os.environ["PATH"] = "/usr/bin:" + os.environ["PATH"]
 
     if dataset == "ESC50":  
