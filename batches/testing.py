@@ -143,36 +143,14 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                   
                 result = subprocess.check_output(
                     command1,
-                    shell=True,
+                    shell=False,
                     cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/",
                 )
               
                 # result = subprocess.run(command1, shell=False, capture_output=False, text=True, )
                 print("out: ", result)
                 
-        else: 
-            command1 = (
-                command +
-                f"{cl_hyper['training_mode']} "
-                f"{cl_hyper['cf_sol']} "
-                f"{cl_hyper['head_sol']} "
-                f"{cl_hyper['top_k']} "
-                f"{cl_hyper['high_lr']} "
-                f"{cl_hyper['low_lr']} "
-                f"{cl_hyper['t_criteria']} "
-                f"{cl_hyper['delta_w_interval']} "
-                f"{cl_hyper['heads_basis_t']} "
-                f"{cl_hyper['topk_lock']} "
-                f"{folder_id} "
-                f"{parent_f_id} "
-                
-            )
-            
-            result = subprocess.run(command1, shell=True, capture_output=False, text=False)
-            
-            print(result.stdout)
-            if result.stderr:
-                print("Error:", result.stderr)
+        
         if TEST:
             print("!!!! WARNING: BREAK OPERATION IS ON IN TESTING")
             break
