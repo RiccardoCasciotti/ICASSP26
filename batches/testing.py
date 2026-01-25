@@ -15,7 +15,7 @@ SHMH = False
 SINGLE = False
 
 classes_per_task = 2
-n_experiments = 1
+n_experiments = 5
 n_tasks = 5
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
@@ -33,18 +33,13 @@ if dataset == "ESC50":
     n_tasks = 5
     if SINGLE:
         n_tasks = 1
-elif dataset == "URBANSOUND8K":
-    
-    classes_per_task = 10
-    n_tasks = 5
-    if SINGLE:
-        n_tasks = 1
 
+    
 if TEST: 
     n_experiments = 1
     n_tasks = 2
 
-id = "_test_run_"
+id = "_final_run_urban"
 folder_id = f"_{id}{n_tasks}tasks"
 
 
@@ -91,8 +86,7 @@ def folder_check(path):
     print(f"{BASE_PATH}" + path)
     return os.path.isdir("{BASE_PATH}/" + path)
 def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, classes=[]):
-    modes = ["successive", "consecutive", "simultaneous"]
-    lrs = [(0.0, 1.0), (2000, 1.0), (0.2, 0.8)]
+    
     if TEST:
         sols = [(True, True)]
     else: 
@@ -102,10 +96,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
             sols = [(False, False)]
         else:
             sols = [(False, True), (True, True)]
-    topks = [0.1, 0.2, 0.5, 0.7, 0.85, 0.9, 1.0]
-    delta_w_intervals = [20, 100, 300]
-    lr = lrs[2]
-    mode = modes[1]
+
     cl_hyper["SINGLE"] = SINGLE
 
     f = open("/projappl/project_462001198/casciott/ICASSP26/batches/configs.sh", "w")
