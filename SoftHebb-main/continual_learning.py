@@ -18,6 +18,7 @@
 
 import argparse
 import ast
+import gc
 import itertools
 import os
 import subprocess
@@ -177,7 +178,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     depth = 0
     # print("model.heads: ", model.heads)
     # here we obtain the activations of all the layers (which are convolutional layers)
-    
+    handles = []
     for layer in model.children():
          
         
@@ -188,9 +189,9 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
             for subsubl in subl.children():
                     
                 if subsubl._get_name().__eq__("HebbSoftKrotovConv2d"):
-                    subsubl.register_forward_hook(getActivation("conv"+str(depth)))
+                    handles.append(subsubl.register_forward_hook(getActivation("conv"+str(depth))))
                 if subsubl._get_name().__eq__("Linear"):
-                    subsubl.register_forward_hook(getActivation("linear"+str(depth)))
+                    handles.append(subsubl.register_forward_hook(getActivation("linear"+str(depth))))
             depth += 1
     
     
@@ -334,6 +335,12 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     if "model_config" not in results.keys():
         results["model_config"] = blocks
     print("first heads: ", len(model.heads))
+    for h in handles:
+        h.remove()
+    handles.clear()
+    del model
+    gc.collect()
+    torch.cuda.empty_cache()
       
 def plot_confusion_matrix(cm, path, name, class_names=None, normalize=False, title="Confusion Matrix"):
 
