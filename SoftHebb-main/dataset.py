@@ -132,6 +132,7 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         seed_init_fn(dataset_config['seed'])
         g.manual_seed(dataset_config['seed'] % 2 ** 32)
 
+    print("INSIDE:", dataset_config["name"])
     if dataset_config["name"] == "ESC50":
         classes_offset = []
         fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
