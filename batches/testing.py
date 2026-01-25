@@ -1,12 +1,90 @@
-
+import json
+import os
+import subprocess
+import uuid
+import shutil
+import torch
 import json
 import os
 import shlex
 import subprocess
 import random
-import torch
 import numpy as np
-from t_hyper import classes_per_task, n_experiments, n_tasks, dataset, evaluated_tasks, folder_id, data_num, dataset2, cl_hyper, TEST, parent_f_id, SHMH, SINGLE
+TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+SHMH = False
+SINGLE = False
+
+classes_per_task = 2
+n_experiments = 1
+n_tasks = 5
+
+evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
+#neuromodAI/SoftHebb-main/experiments/EXP_C100_4C/TASKS_CL_CIFAR100_d3_6tasks
+#neuromodAI/SoftHebb-main/experiments/EXP_C100_2C/TASKS_CL_CIFAR100_c1_big_6tasks
+
+    
+
+data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
+dataset="ESC50"
+dataset2 = "C10"
+
+if dataset == "ESC50":
+    classes_per_task = 50
+    n_tasks = 5
+    if SINGLE:
+        n_tasks = 1
+elif dataset == "URBANSOUND8K":
+    
+    classes_per_task = 10
+    n_tasks = 5
+    if SINGLE:
+        n_tasks = 1
+
+if TEST: 
+    n_experiments = 1
+    n_tasks = 2
+
+id = "_test_run_"
+folder_id = f"_{id}{n_tasks}tasks"
+
+
+if data_num == 1:
+    parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
+else:
+    parent_f_id = f"experiments/EXP_{dataset}_{dataset2}"
+
+
+# C100, C10, STL10, IMG, ESC50
+
+cl_hyper = {
+                    'training_mode': 'consecutive',
+                    'top_k': 0.6,
+                    'topk_lock': False,
+                    'high_lr': 0.15,
+                    'low_lr': 0.9,
+                    't_criteria': 'activations', # KSE or activations
+                    'delta_w_interval': 5,
+                    'heads_basis_t': 0.90,
+                    'n_tasks': n_tasks, 
+                    'classes_per_task': classes_per_task
+                }
+
+# for root, dirs, files in os.walk("/leonardo_work/IscrC_CATASTRO/rcasciot/neuromodAI/SoftHebb-main/experiments/EXP_C10_2C/TASKS_CL_CIFAR10_a1_8tasks", topdown=False):
+#         for file in files:
+#             if ".json" not in file:
+#                 continue
+#             with open(os.path.join(root, file), "r") as f:
+#                 json_obj = json.load(f)
+                
+                
+#                # print(dataset, json_obj["R0"]['dataset_sup']["name"])
+#                 if "b4" not in list(json_obj["model_config"].keys()): 
+#                     result = subprocess.run(f"rm -rf /leonardo_work/IscrC_CATASTRO/rcasciot/neuromodAI/SoftHebb-main/experiments/EXP_C10_2C/TASKS_CL_CIFAR10_a1_8tasks/{file}", shell=True, capture_output=False, text=True)
+#                     print(result.stdout)
+#                     if result.stderr:
+#                         print("Error:", result.stderr)
+                    
+
 
 def folder_check(path):
     print(os.path.exists(f"{BASE_PATH}/" + path))
@@ -15,7 +93,10 @@ def folder_check(path):
 def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, classes=[]):
     modes = ["successive", "consecutive", "simultaneous"]
     lrs = [(0.0, 1.0), (2000, 1.0), (0.2, 0.8)]
-    sols = [(True, True), (False, True), (False, False),  (True, False)]
+    if TEST:
+        sols = [(True, True)]
+    else: 
+        sols = [(True, True), (False, True)]
     if dataset == "ESC50":
         if SINGLE:
             sols = [(False, False)]
@@ -59,10 +140,14 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                     f"{SHMH}"
 
                 )
-                result = subprocess.run(command1, shell=True, capture_output=False, text=True)
-                print(result.stdout)
-                if result.stderr:
-                    print("Error:", result.stderr)
+                command1 = shlex.split(command1)  
+                result = subprocess.check_output(
+                command1, cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/").strip()
+        
+              
+                # result = subprocess.run(command1, shell=False, capture_output=False, text=True, )
+                print("out: ", result)
+                
         else: 
             command1 = (
                 command +
@@ -81,7 +166,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                 
             )
             
-            result = subprocess.run(command1, shell=True, capture_output=False, text=True)
+            result = subprocess.run(command1, shell=True, capture_output=False, text=False)
             
             print(result.stdout)
             if result.stderr:
@@ -99,12 +184,11 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
 # print(result.stdout)
 # if result.stderr:
 #     print("Error:", result.stderr)
-if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
+
+   
 
          # Apple Silicon GPU
-else:
-    BASE_PATH="/scratch/project_462001198/casciott"
+BASE_PATH="/scratch/project_462001198/casciott"
 
 if not os.path.isdir(f"{BASE_PATH}/experiments"):
     os.mkdir(f"{BASE_PATH}/experiments")
@@ -113,40 +197,16 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
             
 
 if data_num == 1: 
-    if torch.backends.mps.is_available():          # Apple Silicon GPU
-        device= torch.device("mps")
-        command = f"cd /projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning && ./{dataset}_apple.sh "
-    else:
-        command = f"cd /projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning && sbatch {dataset}.sh "  
+    command = f"sbatch {dataset}.sh "  
 
-    all_classes = list(range(10))
-    if dataset == "C100":
-        all_classes = list(range(100))
-    elif dataset == "ESC50":  
+    if dataset == "ESC50":  
         all_classes = list(range(50))
         all_classes_ordered = all_classes.copy()
+    elif dataset == "URBANSOUND8K":
+        all_classes = list(range(10))
+        all_classes_ordered = all_classes.copy()
     classes = []
-    if dataset != "ESC50":
-        if n_tasks*classes_per_task > len(all_classes):
-            for i in range(n_experiments):
-                task_classes = []
-                for j in range(n_tasks):
-                    task_classes.append(random.sample(all_classes, classes_per_task))
-                classes.append(task_classes)
-        else:
-            for i in range(n_experiments):
-                classes.append(random.sample(all_classes, classes_per_task*n_tasks))   
-        if len(classes) > n_experiments:
-            selected_classes = classes[:n_experiments]
-        else: 
-            n_experiments = len(classes)
-            selected_classes = classes
-        final = []
-        #print("selected_classes: ", selected_classes)
-        for el in selected_classes: 
-            new = np.asarray(el)
-            final.append(new.reshape(n_tasks,classes_per_task).tolist())
-
+    
     if dataset == "ESC50": 
         for i in range(n_experiments):
             task_classes = []
@@ -156,49 +216,31 @@ if data_num == 1:
                 task_classes.append(all_classes[i:i+5])
             classes.append(task_classes)
         final = classes
+    elif dataset == "URBANSOUND8K":
+        for i in range(n_experiments):
+            task_classes = []
+            random.shuffle(all_classes)
+            task_classes.append(all_classes[:2])
+            for i in range(2, 10, 2):
+                task_classes.append(all_classes[i:i+2])
+            classes.append(task_classes)
+        final = classes
+    print(n_experiments)
     if SINGLE:
         final = [[all_classes_ordered]]
         #  final = [[[21, 31, 2, 20, 34, 22, 16, 43, 42, 40, 45, 36, 33, 1, 12, 24, 28, 15, 26, 9, 44, 27, 32, 6, 47, 19, 5, 4, 46, 18], [8, 35, 29, 48, 13], [3, 0, 25, 7, 30], [49, 11, 14, 23, 37], [17, 10, 41, 38, 39]]]
     print("final: ", final)
-    if dataset == "C100": 
-        dataset1 = "CIFAR100"
-    elif dataset == "C10": 
-        dataset1 = "CIFAR10"
-    elif dataset == "IMG": 
-        dataset1 = "ImageNette"
-    elif dataset == "STL10": 
-        dataset1 = "STL10"
-    elif dataset == "ESC50": 
+   
+    if dataset == "ESC50": 
         dataset1 = "ESC50"
+    elif dataset == "URBANSOUND8K":
+        dataset1 = "URBANSOUND8K"
     if folder_check(f"{parent_f_id}/TASKS_CL_{dataset1 +  folder_id}"):
         res = input(f"!!!! WARNING A FOLDER NAMED 'TASKS_CL_{ dataset +  folder_id}' already exits, press Y to continue anyways or N to abort: ")
         if res == "Y":
             execute_bash_command(evaluated_tasks, n_tasks, command, final)
     else:
         execute_bash_command(evaluated_tasks, n_tasks, command, final)
-else: 
-    command = f"cd {BASE_PATH}/batches/full_datasets_CL && sbatch {dataset}_{dataset2}.sh "
-    if dataset == "C100": 
-        dataset1 = "CIFAR100"
-    elif dataset == "C10": 
-        dataset1 = "CIFAR10"
-    elif dataset == "IMG": 
-        dataset1 = "ImageNette"
-    elif dataset == "STL10": 
-        dataset1 = "STL10"
-    if dataset2 == "C100": 
-        d2 = "CIFAR100"
-    elif dataset2 == "C10": 
-        d2 = "CIFAR10"
-    elif dataset2 == "IMG": 
-        d2 = "ImageNette"
-    elif dataset2 == "STL10": 
-        d2 = "STL10"
-    if folder_check(f"{parent_f_id}/MULTD_CL_{dataset1 + '_' + folder_id + '_' + d2}"):
-        res = input(f"!!!! WARNING A FOLDER NAMED 'MULTD_CL_{dataset1 + '_' + folder_id + '_' + d2}' already exits, press Y to continue anyways or N to abort: ")
-        if res == "Y":
-            execute_bash_command(evaluated_tasks=evaluated_tasks, n_tasks=n_tasks, command=command)
-    else: 
-        execute_bash_command(evaluated_tasks=evaluated_tasks, n_tasks=n_tasks, command=command)
+
 
 
