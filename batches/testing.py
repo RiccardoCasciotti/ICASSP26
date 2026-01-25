@@ -137,7 +137,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                     f"{cl_hyper['topk_lock']} "
                     f"{folder_id} "
                     f"{parent_f_id} "
-                    f"{SHMH}" + '"'
+                    f"{SHMH}"
 
                 )
                   
@@ -177,7 +177,7 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
             
 
 if data_num == 1: 
-    command = f'bash -lc "sbatch {dataset}.sh' 
+    command = f'sbatch {dataset}.sh' 
 
     if dataset == "ESC50":  
         all_classes = list(range(50))
