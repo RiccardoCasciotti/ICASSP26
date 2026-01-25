@@ -140,10 +140,12 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
                     f"{SHMH}"
 
                 )
-                command1 = shlex.split(command1)  
+                  
                 result = subprocess.check_output(
-                command1, cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/").strip()
-        
+                    command1,
+                    shell=True,
+                    cwd="/projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/",
+                )
               
                 # result = subprocess.run(command1, shell=False, capture_output=False, text=True, )
                 print("out: ", result)
