@@ -190,7 +190,6 @@ def class_cleaner(dataset_config, dataset, selected_classes):
     elif dataset_config["name"] == "URBANSOUND8K":
         targets = dataset.targets[:,0]
 
-    
     selected_classes.sort()
 
     classes_offset = [] 

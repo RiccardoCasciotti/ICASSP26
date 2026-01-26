@@ -10,7 +10,7 @@ import shlex
 import subprocess
 import random
 import numpy as np
-TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
 SHMH = False
 SINGLE = False
 
@@ -18,7 +18,7 @@ classes_per_task = 2
 n_experiments = 1
 n_tasks = 5
 
-evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
+evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_4C/TASKS_CL_CIFAR100_d3_6tasks
 #neuromodAI/SoftHebb-main/experiments/EXP_C100_2C/TASKS_CL_CIFAR100_c1_big_6tasks
 
@@ -37,7 +37,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "_final2_run_urban"
+id = "_test_run"
 folder_id = f"_{id}{n_tasks}tasks"
 
 
