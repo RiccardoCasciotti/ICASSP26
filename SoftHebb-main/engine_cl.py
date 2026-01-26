@@ -31,9 +31,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     t = time.time()
     model = model.to(device)
    
-    # if model.esc50:
-    #     non_relevant_heads = list(set(range(50)) - set(model.selected_classes))
-
+    
      
     DEVICE = get_device()
 
@@ -43,16 +41,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
         inputs = inputs.float().to(device, non_blocking=True)
         # 
         target = target.to(device, non_blocking=True)
-        # if model.esc50:
-        #     prev_dict = deepcopy(model.state_dict())
-        #     prev_bias = {k: v for k, v in prev_dict.items() if "layer.bias" in k and int(k.split(".")[1]) in model.train_blocks}
-        #     prev_weights = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in model.train_blocks}
-
-        #     prev_bias_els = np.array(prev_bias[list(prev_bias.keys())[-1]].clone().detach().cpu())
-        #     prev_weights_els = np.array(prev_weights[list(prev_weights.keys())[-1]].clone().detach().cpu())
-
-
-
+    
         output = model(inputs)
         #  
 
@@ -63,65 +52,8 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        # if model.esc50:
+    
             
-        #     state_dict = deepcopy(model.state_dict())
-            
-            
-        #     # print("prev_weights_els: ", prev_weights_els)
-        #     linear_weights = np.array(state_dict[list(prev_weights.keys())[-1]].clone().detach().cpu())
-            
-        #     linear_weights[non_relevant_heads] = prev_weights_els[non_relevant_heads]
-        #     # print("linear_weights: ", linear_weights)
-        #     linear_bias = np.array(state_dict[list(prev_bias.keys())[-1]].clone().detach().cpu())
-        #     linear_bias[non_relevant_heads] = prev_bias_els[non_relevant_heads]
-
-        #     state_dict[list(prev_weights.keys())[-1]] = torch.tensor(linear_weights, device=DEVICE)
-        #     state_dict[list(prev_bias.keys())[-1]] = torch.tensor(linear_bias, device=DEVICE)
-            
-        #     model.load_state_dict(state_dict)
-            # print("prev_dict 0: ", prev_dict[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[0])
-            # print("curr_dict 0 : ", model.state_dict()[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[0])
-
-            # print("prev_dict 1: ", prev_dict[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[1])
-            # print("curr_dict 1 : ", model.state_dict()[list(prev_weights.keys())[-1]].clone().detach().cpu().tolist()[1])
-
-
-        #          
-        #          
-        ###################################################################################
-
-        # if layer_num == -1:
-        #         prev_dict, layer_num = get_layer(model, depth, prev_dict)
-            
-        # # I store the activations of every batch
-        # activations_sum.append(activations["linear" + str(layer_num)].cpu())
-
-        # #remember that we are workng with batches, so you need to multiply interval by the batch size
-        # if iteration % interval == 0: 
-
-        #     delta_weights = get_delta_weights(model, device, layer_num, depth, prev_dict, delta_weights)
-            
-        #     
-        #     #['blocks.0.operations.0.running_mean', 'blocks.0.operations.0.running_var', 'blocks.0.operations.0.num_batches_tracked', 'blocks.0.layer.weight', 'blocks.1.operations.0.running_mean', 'blocks.1.operations.0.running_var', 'blocks.1.operations.0.num_batches_tracked', 'blocks.1.layer.weight', 'blocks.2.operations.0.running_mean', 'blocks.2.operations.0.running_var', 'blocks.2.operations.0.num_batches_tracked', 'blocks.2.layer.weight', 'blocks.3.layer.weight', 'blocks.3.layer.bias']
-        #     prev_dict = {k: v for k, v in prev_dict.items() if str(layer_num) + ".layer.weight" in k and str(depth) in k}     
-
-                
-            
-        # iteration += 1
-        ###################################################################################
-        # Calculate the average weight change per neuron
-        # Average change per row (neuron)
-        # curr_weights = model.blocks[-1].layer.weight.detach().clone()
-        # delta_weight = torch.abs(curr_weights - prev_weights)
-        # avg_weight_change_per_neuron = torch.mean(delta_weight, dim=1)
-
-        # # Forward pass again to compute activations
-        # activations = output.detach().clone()  # Detach activations for analysis
-        # # 
-        # # Compute the importance of neurons based on average activation values
-        # avg_activation_per_neuron = torch.mean(activations, dim=0) 
-
         ## 4. Accuracy assessment
         predict = output.data.max(1)[1]
 
@@ -133,100 +65,22 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
         measures.step(target.shape[0], loss.clone().detach().cpu(), acc.cpu(), convergence, R1, model.get_lr())
 
     
-    #here we have to dive deeper on the sign of the weights... should we consider abs value once we summed all the cells in the kernel
-    # or at the beginning before doing the sum? Or maybe not consider abs values at all... ?
-    # final_sum = activations_sum[0]
-    # for i in range(1, len(activations_sum)):
-    #    final_sum += activations_sum[i]
     
-    # # here we sum all the values of each activation map to obtain 1 value of activation per kernel instead of a map.ù
-    #  
-    # final_sum = torch.sum(final_sum, dim=0)
-    # #final_sum = torch.sum(final_sum, dim=1)
-
-    # # now we create a semantic dictionary associated with each activation, using the index of the kernel as key and the activation
-    # # sum as value. Then we sort them, to consider only the first top k.
-    # final_sum = {k:v for k, v in enumerate(final_sum)}
     
-    # final_sum = sorted(final_sum.items(), key = lambda item : item[1], reverse=True)
-    # final_sum = list(dict(final_sum))
-
-    # K = round(len(final_sum)*0.3) # K takes 20% of the kernels
-    #  
-    # acts["conv" + str(layer_num)] = final_sum[:K+1]
-    #  
-    #  
-    #  
-    #  
-    #  
-
-
-    #  
-    #  
-    #  
-    # avg_deltas = average_deltas(delta_weights, avg_deltas, device)
-    #  
-    #  
-
-    
-    # model.avg_deltas = avg_deltas
-    # model.acts = acts
-
-    #  
-    #  
-
-    #  
     t_criteria = model.cl_hyper["t_criteria"]
     topk_kernels = model.topk_kernels
     num_blocks = len(topk_kernels) + 1
-     
-    # if t_criteria == "KSE":
-    #     weights = deepcopy(model.state_dict())
-    #     weights = {int(k[7]): v for k, v in weights.items() if ".layer.weight" in k} 
-    #     kse_indicators = compute_kse_indicator(weights)
-    #      
-    #      
-    #     for layer in kse_indicators.keys():
-    #          
-    #          
-    #         if layer== (num_blocks-1):
-    #              
-    #             kernels = {k:v for k, v in enumerate(kse_indicators[layer])}
-    #             kernels = sorted(kernels.items(), key = lambda item : item[1], reverse=True)
-    #             kernels = list(dict(kernels))Y
-    #             K = round(len(kernels)*model.cl_hyper["top_k"]) # K takes 20% of the kernels
-    #             topk_kernels["conv" + str(layer)] = kernels[:K+1]
-    #              
-    # model.topk_kernels = topk_kernels
-    #  
-    # for k,v in topk_kernels.items():
-
-    #      
-
+    
         
     return measures, optimizer.param_groups[0]['lr']
-
-"""
-The first thing we do is check if the model is hebbian or not (basically if it is we set the loss accuracy to False).
-Then we tell torch not to calculate any gradient because we don't need any for unsupervised hebbian. 
-We don't get inside the if loss_acc clause why???
-model.is_hebbian() returns true if the last block of the model is hebbian or not and checks if the criterion is not none.
-The criterion can be something like ... ??? criterion seems to be none always, just like measures. 
-So are they both to be defined??? 
-
-
-"""
 
 
 def getActivation(name):
   # the hook signature
   def hook(model, input, output):
     
-    activations[name] = torch.sum(output.detach().cpu(), dim=0)
-    
-    # ACTIVATIONS SHAPE:  torch.Size([10, 96, 32, 32]), where 10 is the batch size
-    # what we have to do is sum all the activations to get 1 single kernel and we do this during all the training. At the end 
-    # we create the semantic dictionary
+    activations[name] = torch.sum(output.detach().clone(), dim=0)
+
      
   return hook
 
@@ -590,67 +444,6 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
 
     return measures, model.get_lr(), info, convergence, R1
 
-""" 
-Again we set the gradient to zero.
-There is still the problem with the criterion which looks like to be always none and not defined anywhere.
-We then load the input to the device and calculate the output.
-
-The model.blocks.plasticity function allow to calculate the weight change vector which is done only the last layer. 
-why??
-Let's reason a little bit, we have to update the weights, now this could either be something which dpenedds on the type of
-ùoperations that we are performing or it could be something which derives from the nature of the input itself. Could it be that 
-since we are working with networks which have at most one hebbian layer??? I don't understand, this need to be investigated 
-a bit more. 
-
-Here we don't have the same issue we have for the unsupervised learning where we never get into the if loss_acc clause 
-because the criterion and the measures are never passed. In this case the criterion passed is  criterion = nn.CrossEntropyLoss()
-and the measures is   log_batch = log.new_log_batch() which is defined in run_sup() and needs to be investigated.
-There is the possibility of entering the clause but I don't understand how we manage to do it: 
-the model is supposed to be not hebbian to calculate the loss... right, but if all the models we 
-consider are hebbian then what? this is train sup hebbian function... wth it doesn't make sense. 
-Let's try and analyze it: 
-to enter the if clause we need to not be hebbian, which is set through the flag is_hebbian, which is set to true
-if  when we read the preset flag in the object contained in the preset.json we read anyhing but MLP. Then we need
-to have a criterion which is not none and we aldready saw that when we call it the object passed is the 
-cross entropy loss criteria. So we just need to understand when the flag for hebbian is set to false. Like what is 
-the role of this function because from my initial understanding it was to train the hebbian learning in a 
-supervised manner, which kindd of doesn't make sense because if we are working with an hebbian network where
-should we utilize the feedback given from the supervised approach? This is used only in the case the model is not hebbian, 
-So now the question becomes when is the model not hebbian??
-The is_hebbian function returns true by checking only the last block. If the last block has the hebbian flag set to true
-then is_hebbian return  true, then when is the last layer set to hebbian? We check if the preset is field is either soft or BP. 
-If it is BP we set the hebbian flag to false otherwise we set it to true. 
-
-"2SoftMlpMNIST": {
-      "b0": {
-        "arch": "MLP",
-        "preset": "soft-c2000-t12-lr0.045-r35-v1",
-        "operation": "flatten",
-        "activation": "softmax_5",
-        "num": 0,
-        "batch_norm": false
-      },
-      "b1": {
-        "arch": "MLP",
-        "operation": "",
-        "preset": "BP-c10",      ------------------------------------> we check this field here 
-        "dropout": 0,
-        "num": 1
-      }
-
-      Ok so we got how the whole thing works, but then why are we just using 1 block?? 
-      By this I mean that if the check is done on the last block only and this block is hebbian because we dont get in the
-      if then we must be using only one block not considerign the second one which is always using back prop for classification.
-
-    UPDATE: when we call this train_sup_hebb the is_hebbian is set to false... almost looks like it splits the model down in
-    two parts when we have to train the hebbian part we call the run_unsup and when train the classificator we call run_sup, 
-    which is why the length of blocks is just one... the classificator block is always one! Ok so the division is done in ray search when we
-    check in the config if the mode is unsupervised or supervised. 
-
-
-
-"""
-
 def average_deltas(delta_weights, avg_deltas,  device):
     # 
     summed_deltas = {}
@@ -800,32 +593,11 @@ def train_sup_hebb(model, loader, device, measures=None, criterion=None, blocks=
                      
                     topk_kernels["conv" + k[7]] = activations_sum[k][:K+1]
                      
-                     
-                     
-                     
-                     
-
-
-    
-     
-     
      
     avg_deltas = average_deltas(delta_weights, avg_deltas, device)
-     
-     
-
-    
+      
     model.avg_deltas = avg_deltas
     model.topk_kernels = topk_kernels
-
-     
-    # 
-
-     
-
-
-    
-    
 
     info = model.radius()
     convergence, R1 = model.convergence()
@@ -841,12 +613,7 @@ def train_unsup(model, loader, device,
     _, lr, info, convergence, R1 = train_hebb(model, loader, device, blocks=blocks)
     return lr, info, convergence, R1
 
-"""
-This function performs the training of the supervised learning part of the model.
-The first thing we do is check if the number of blocks is = 1, but why??? 
-Then we check if the first block is hebbian, if so we use train_sup_hebb().
-otherwise it can be hybrid ( which implies tht there are more than just one block ) or simply the classical Back Prop.
-"""
+
 def train_sup(model, criterion, optimizer, loader, device, measures, learning_mode, blocks=[]):
     """
     train hybrid model.
@@ -900,18 +667,6 @@ def evaluate_hebb(model, train_loader, test_loader, device):
     return float(acc_train.cpu()), float(acc_test.cpu())
 
 
-"""
-we take the model and call eval to turn off batch normalization layers, dropout and so on 
-because we need to put the model in inference mode. 
-We then take all the labels ( targets ).
-Then we load all the input to the gpu setting the non blocking flag to true: 
-the non_blocking flag is used in data transfer operations between CPU and GPU memory. 
-When this flag is set to True, it allows the transfer to be asynchronous, meaning it does not 
-block the execution of the program while waiting for the data transfer to complete.
-
-After that we take the preactivations and the wta from the forward_x_wta
-wta: are th
-"""
 def infer_dataset(model, loader, device):
     model.eval()
     targets_lst = []
@@ -1014,8 +769,8 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
             n_inputs += target.shape[0]
 
             if return_confusion_matrix:
-                all_preds.append(predict.cpu().detach().clone())
-                all_targets.append(target.cpu().detach().clone())
+                all_preds.append(predict.cpu())
+                all_targets.append(target.cpu())
              
     if return_confusion_matrix and not model.joint:
         y_pred = torch.cat(all_preds).numpy().tolist()
@@ -1023,7 +778,6 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
         classes_offset = model.classes_offset
 
         if len(model.classes_offset) > 0:
-            print("INSIDE OFFSET")
             for i in range(len(y_pred)):
                 el_pred = y_pred[i]
                 el_true = y_true[i]
@@ -1058,17 +812,17 @@ def shmh_fuser(heads):
 
     return head
 
-def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_matrix=False):
+def evaluate_sup_multihead(model, criterion, loader, device):
 
     """
     Evaluate the multihead model, returning the best loss and acc
     """
-    print("task_num: ", model.task_num)
     if POP_HEAD and not model.shmh: 
         # print("model.heads: ", model.heads)
         state_dict = model.state_dict()
-        chosen_head = model.heads[model.task_num]
+        chosen_head = model.heads[0]
         keys = list(chosen_head.keys())
+        model.heads = model.heads[1:]
 
         # print("#################### CHOSEN HEAD ###############################")
         # print(len(model.heads), int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
@@ -1104,7 +858,7 @@ def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_ma
 
         model.load_state_dict(state_dict)
 
-        return evaluate_sup(model, criterion, loader, device, return_confusion_matrix=return_confusion_matrix)
+        return evaluate_sup(model, criterion, loader, device)
     else:
         print("\n\n\nWARNING !!!! POP_HEAD AND SHMH ARE BOTH TRUE, THIS IS NOT SUPPORTED YET\n\n\n")
     if model.shmh: 
@@ -1209,19 +963,7 @@ def get_accuracy(model, winner_ids, targets, preactivations, neuron_labels, devi
     n_samples = preactivations.shape[0]
     # if not model.ensemble:
     predlabels = torch.FloatTensor([neuron_labels[i] for i in winner_ids]).to(device)
-    '''
-    else:
-        if model.test_uses_softmax:
-            soft_acts = activation(preactivations, model.t_invert, model.activation_fn, dim=1, power=model.power, normalize=True)
-            winner_ensembles = [
-                np.argmax([np.sum(np.where(neuron_labels == ensemble, soft_acts[sample], np.asarray(0))) for
-                           ensemble in range(10)]) for sample in range(n_samples)]
-        else:
-            winner_ensembles = [
-                np.argmax([np.sum(np.where(neuron_labels == ensemble, preactivations[sample], np.asarray(0))) for
-                           ensemble in range(10)]) for sample in range(n_samples)]
-        predlabels = winner_ensembles
-    '''
+    
     correct_pred = predlabels == targets
     n_correct = correct_pred.sum()
     accuracy = n_correct / len(targets)

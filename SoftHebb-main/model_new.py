@@ -30,7 +30,7 @@ def load(path, map_location):
     return torch.load(path, **kwargs)
 
 
-def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}):
+def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}, task_num=-1, eval=False):
     """
     Create Model and load state if resume
     """
@@ -68,7 +68,7 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
                         state_dict2[key] = value
                 if cl_hyper["head_sol"] and dataset_sup_config is not None and batch_size is not None:
                     #call best_head
-                    model.to(get_device())
+                    
                     chosen_head = best_head(model, state_dict2, dataset_sup_config, batch_size)
                     keys = list(chosen_head.keys())
                     state_dict2[keys[0]] = chosen_head[keys[0]]
@@ -77,13 +77,18 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             else:
                 if cl_hyper["head_sol"] and dataset_sup_config is not None and batch_size is not None:
                     #call best_head
-                    model = model.to(get_device())
-                    # chosen_head = best_head(model, state_dict, dataset_sup_config, batch_size)
-                    keys = list(state_dict2.keys())
-                    chosen_head = { keys[-1]:state_dict2[keys[-1]], keys[-2]: state_dict2[keys[-2]]}
-                    keys = list(chosen_head.keys())
-                    state_dict[keys[0]] = chosen_head[keys[0]]
-                    state_dict[keys[1]] = chosen_head[keys[1]]
+                    
+                    if not eval:
+                        # chosen_head = best_head(model, state_dict, dataset_sup_config, batch_size)
+                        keys = list(state_dict2.keys())
+                        chosen_head = { keys[-1]:state_dict2[keys[-1]], keys[-2]: state_dict2[keys[-2]]}
+                        keys = list(chosen_head.keys())
+                        
+                        if len(model.heads) == 1 and task_num == 1:
+                            model.heads += [chosen_head, chosen_head, chosen_head, chosen_head]
+
+                        state_dict[keys[0]] = chosen_head[keys[0]]
+                        state_dict[keys[1]] = chosen_head[keys[1]]
                 # elif op.isfile(model_path):
                 #     chosen_head = best_head(model, state_dict2, dataset_sup_config, batch_size)
                 #     keys = list(chosen_head.keys())
@@ -101,6 +106,7 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             print('\n', 'Model %s not found' % model_name)
             
             model = MultiLayer(params, cl_hyper=cl_hyper)
+            
         print('\n')
     else:
         # print("BOOOOOOOH")
@@ -192,6 +198,17 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
         storing_path = op.join(folder_path, 'models')
 
      
+     
+    
+    
+    
+        
+    
+
+    # 
+     
+     
+     
     torch.save({
         'state_dict': model.state_dict(),
         'config': model.config,
@@ -215,6 +232,9 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
             'state_dict': block.state_dict(),
             'epoch': epoch
         }, op.join(folder_path, filename))
+
+
+
 
 
 

@@ -12,7 +12,6 @@ import torch
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
 from torchvision import datasets, transforms
 import torchvision.transforms.functional as TF
-from torchvision.datasets import CIFAR10, CIFAR100, MNIST, FashionMNIST, STL10, ImageNet, ImageFolder
 from typing import Optional, Any
 from utils import load_presets, get_device
 import torchaudio
@@ -48,12 +47,6 @@ def select_dataset(dataset_config, device, dataset_path):
         dataset_class = ESC50
         indices = list(range(2000))
         dataset_path = f"{BASE_PATH}/Training/data/ESC-50-master"
-        # if dataset_config['augmentation']:
-        #     dataset_train_class = AugFastCIFAR100
-        #     dataset_config['num_workers'] = 4
-        #     device = 'cpu'
-        #     transform = crop_flip(dataset_config['width'], dataset_config['height'])
-    
         dataset_train_class = ESC50
         transform = None
 
@@ -132,33 +125,32 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         seed_init_fn(dataset_config['seed'])
         g.manual_seed(dataset_config['seed'] % 2 ** 32)
 
-    print("INSIDE:", dataset_config["name"])
     if dataset_config["name"] == "ESC50":
-        classes_offset = []
         fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
         fd = fd[["fold", "target", "filename"]]
         train_split, val_split, test_split = get_split(fd, dataset_config=dataset_config, data_path=f"{BASE_PATH}/Training/data/ESC-50-master", test_fold=dataset_config["fold"])
         if "n_classes" in dataset_config:
             selected_classes = dataset_config["selected_classes"]
             if dataset_config["shmh"] or dataset_config["SINGLE"]:
-                test_split, classes_offset = classes_subset(dataset_config, test_split, selected_classes, device, False) 
+                test_split = classes_subset(dataset_config, test_split, selected_classes, device, False) 
             else: 
-                test_split, classes_offset = classes_subset(dataset_config, test_split, selected_classes, device, True)
+                test_split = classes_subset(dataset_config, test_split, selected_classes, device, True)
             if dataset_config["SINGLE"]:
                 train_split = classes_subset(dataset_config, train_split, selected_classes, device, False)
                 val_split = classes_subset(dataset_config, val_split, selected_classes, device, False)
             else:
-                train_split, classes_offset = classes_subset(dataset_config, train_split, selected_classes, device, True)
-                val_split, _ = classes_subset(dataset_config, val_split, selected_classes, device, True)
+                train_split = classes_subset(dataset_config, train_split, selected_classes, device, True)
+                val_split = classes_subset(dataset_config, val_split, selected_classes, device, True)
+
     elif dataset_config["name"] == "URBANSOUND8K":
-        print("INSIDE CORRECT:")
+
         selected_classes = dataset_config["selected_classes"]
         eval_fold = dataset_config["fold"]
         data_train = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=False, eval_fold=eval_fold, debug=False)
-        data_train, classes_offset= class_cleaner(dataset_config, data_train, selected_classes)
+        data_train = class_cleaner(dataset_config, data_train, selected_classes)
         train_split, val_split = torch.utils.data.random_split(data_train, [0.9, 0.1])
         test_split = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=True, eval_fold=eval_fold, debug=False)
-        test_split, classes_offset = class_cleaner(dataset_config, test_split, selected_classes)
+        test_split = class_cleaner(dataset_config, test_split, selected_classes)
 
     train_loader = torch.utils.data.DataLoader(dataset=train_split,
                                             batch_size=batch_size,
@@ -176,8 +168,8 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
                                                 batch_size=batch_size,
                                                 num_workers=dataset_config['num_workers'],
                                                 )
-    print("classes_offset:", classes_offset)
-    return train_loader, val_loader, test_loader, classes_offset
+    return train_loader, val_loader, test_loader
+        
 
 def class_cleaner(dataset_config, dataset, selected_classes):
 # Cleans the classes so that it guarantees that there is first class with index 0 in the dataset, 
@@ -190,16 +182,16 @@ def class_cleaner(dataset_config, dataset, selected_classes):
     elif dataset_config["name"] == "URBANSOUND8K":
         targets = dataset.targets[:,0]
 
+    
     selected_classes.sort()
-
-    classes_offset = [] 
+     
     for i in range(len(selected_classes)): 
         for j in range(len(targets)): 
             #if  targets[j] == selected_classes[i]: 
                 # 
             #    targets[j] =  i
             targets[targets==selected_classes[i]] = i
-        classes_offset.append(selected_classes[i]-i)
+
     if dataset_config["name"] == "ESC50" or dataset_config["name"] == "URBANSOUND8K":
         dataset.targets = torch.tensor(targets, device=get_device(), dtype=torch.long)
     
@@ -229,7 +221,7 @@ def class_cleaner(dataset_config, dataset, selected_classes):
     # print("------------------------")
     
 
-    return dataset, classes_offset
+    return dataset
 
 def classes_subset(dataset_config, dataset,selected_classes, device, class_clean=True):
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -259,12 +251,12 @@ def classes_subset(dataset_config, dataset,selected_classes, device, class_clean
     if dataset_config["name"] == "ESC50": 
         dataset.targets = torch.tensor(T, device=get_device())
    
-    classes_offset = []
+    
     if class_clean:
-        dataset, classes_offset = class_cleaner(dataset_config ,dataset, selected_classes)
+        dataset = class_cleaner(dataset_config ,dataset, selected_classes)
 
 
-    return dataset, classes_offset
+    return dataset
 
 # *************************************************** ESC50 ***************************************************
 
