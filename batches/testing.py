@@ -15,7 +15,7 @@ SHMH = False
 SINGLE = False
 
 classes_per_task = 2
-n_experiments = 5
+n_experiments = 1
 n_tasks = 5
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
@@ -25,12 +25,10 @@ evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ]
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
-dataset="URBANSOUND8K"
+dataset="ESC50"
 dataset2 = "C10"
 
 if dataset == "ESC50":
-    classes_per_task = 50
-    n_tasks = 5
     if SINGLE:
         n_tasks = 1
 
@@ -39,7 +37,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "_final_run_urban"
+id = "_final2_run_urban"
 folder_id = f"_{id}{n_tasks}tasks"
 
 

@@ -199,7 +199,7 @@ def wrap_as_avalanche_classification(ds: Dataset, targets: List[int], task_id: i
 # ----------------------------
 def get_unique_folds(data_path: str) -> List[int]:
     # Keep your behavior (two folds)
-    return [1, 2]
+    return [1, 2, 3, 4, 5]
 
 
 def aligned_targets_global(ds: Esc50) -> np.ndarray:
@@ -643,6 +643,7 @@ def main():
 
     ap.add_argument("--log_class_hists", action="store_true")
 
+############################################################################################################################################################
     ap.add_argument(
         "--tasks",
         type=str,
@@ -653,7 +654,7 @@ def main():
     args = ap.parse_args()
     tasks = parse_tasks(args.tasks)
 
-    folds = get_unique_folds(args.data_path)
+    folds = get_unique_folds(args.data_path) ################################################################################################################
     if len(folds) < 2:
         raise RuntimeError(f"Found folds={folds}. Expected multiple folds in H5 'folds' dataset.")
 
