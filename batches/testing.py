@@ -10,7 +10,7 @@ import shlex
 import subprocess
 import random
 import numpy as np
-TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
 SHMH = False
 SINGLE = False
 
@@ -37,7 +37,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "_test_run"
+id = "_test_full_run"
 folder_id = f"_{id}{n_tasks}tasks"
 
 
