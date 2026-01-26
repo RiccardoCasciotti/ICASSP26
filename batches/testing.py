@@ -15,7 +15,7 @@ SHMH = False
 SINGLE = False
 
 classes_per_task = 2
-n_experiments = 1
+n_experiments = 4
 n_tasks = 5
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
