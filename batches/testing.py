@@ -37,7 +37,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "_test_full_run"
+id = "_full_run2"
 folder_id = f"_{id}{n_tasks}tasks"
 
 
