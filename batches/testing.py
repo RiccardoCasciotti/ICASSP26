@@ -25,7 +25,7 @@ evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     
 
 data_num = 1 # set to 2 to use in multi dataset CL mode, otherwise to 1 for tasks from the same dataset.
-dataset="ESC50"
+dataset="URBANSOUND8K"
 dataset2 = "C10"
 
 if dataset == "ESC50":
