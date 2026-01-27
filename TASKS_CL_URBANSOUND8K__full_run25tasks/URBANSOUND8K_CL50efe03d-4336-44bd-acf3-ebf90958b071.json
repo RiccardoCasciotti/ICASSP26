@@ -1,0 +1,5979 @@
+{
+    "count": 0,
+    "performance_avg_folds": {
+        "eval_0": 73.73526573181152,
+        "eval_1": 92.17578582763672,
+        "eval_2": 84.15820922851563,
+        "eval_3": 76.007958984375,
+        "eval_4": 97.1879493713379
+    },
+    "FOLD_#1": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.20454972982406616,
+            "val_acc": 98.88888549804688,
+            "convergence": 4.002462387084961,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 4.787069797515869,
+            "val_acc": 97.22222137451172,
+            "convergence": 4.005611419677734,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.6148539781570435,
+            "val_acc": 98.33333587646484,
+            "convergence": 4.008210182189941,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.4523630142211914,
+            "val_acc": 99.4186019897461,
+            "convergence": 4.009880542755127,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.010430812835693,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 1,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 14.328919410705566,
+            "test_acc": 87.0,
+            "convergence": 3.999781370162964,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "fold": 1,
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "fold": 1
+            }
+        },
+        "eval_1": {
+            "test_loss": 21.29880142211914,
+            "test_acc": 93.87754821777344,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 81.93609619140625,
+            "test_acc": 77.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 58.807456970214844,
+            "test_acc": 89.32038879394531,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 4.472360134124756,
+            "test_acc": 94.36619567871094,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "model_config": {
+        "b0": {
+            "arch": "CNN",
+            "preset": "softkrotov-c48-k5-p2-s1-d1-b0-t1.1-lr0.008",
+            "operation": "batchnorm2d",
+            "num": 0,
+            "batch_norm": false,
+            "pool": {
+                "type": "max",
+                "kernel_size": 4,
+                "stride": 2,
+                "padding": 1
+            },
+            "activation": {
+                "function": "triangle",
+                "param": 0.7
+            },
+            "resume": null,
+            "layer": {
+                "arch": "CNN",
+                "nb_train": null,
+                "lr": 0.008,
+                "adaptive": true,
+                "lr_sup": 0.001,
+                "speed": 10,
+                "lr_div": 96,
+                "lebesgue_p": 4,
+                "padding_mode": "reflect",
+                "pre_triangle": false,
+                "ranking_param": 3,
+                "delta": 2,
+                "t_invert": 1.1,
+                "groups": 1,
+                "stride": 1,
+                "dilation": 1,
+                "beta": 1,
+                "power": 4.5,
+                "padding": 2,
+                "weight_init": "normal",
+                "weight_init_range": 1.6990442448471226,
+                "weight_init_offset": 0,
+                "mask_thsd": 0,
+                "radius": 5,
+                "power_lr": 0.75,
+                "weight_decay": 0,
+                "soft_activation_fn": "exp",
+                "hebbian": true,
+                "resume": null,
+                "add_bias": false,
+                "normalize_inp": false,
+                "lr_decay": "exp",
+                "seed": 2,
+                "softness": "softkrotov",
+                "out_channels": 48,
+                "kernel_size": 5,
+                "in_channels": 1,
+                "lr_scheduler": {
+                    "lr": 0.008,
+                    "adaptive": true,
+                    "nb_epochs": 1,
+                    "ratio": 0.00125,
+                    "speed": 10,
+                    "div": 96,
+                    "decay": "exp",
+                    "power_lr": 0.75
+                }
+            }
+        },
+        "b1": {
+            "arch": "CNN",
+            "preset": "softkrotov-c192-k3-p1-s1-d1-b0-t0.7-lr0.001",
+            "operation": "batchnorm2d",
+            "num": 1,
+            "batch_norm": false,
+            "pool": {
+                "type": "max",
+                "kernel_size": 4,
+                "stride": 2,
+                "padding": 1
+            },
+            "activation": {
+                "function": "triangle",
+                "param": 0.7
+            },
+            "resume": null,
+            "layer": {
+                "arch": "CNN",
+                "nb_train": null,
+                "lr": 0.001,
+                "adaptive": true,
+                "lr_sup": 0.001,
+                "speed": 10,
+                "lr_div": 96,
+                "lebesgue_p": 4,
+                "padding_mode": "reflect",
+                "pre_triangle": false,
+                "ranking_param": 3,
+                "delta": 2,
+                "t_invert": 0.7,
+                "groups": 1,
+                "stride": 1,
+                "dilation": 1,
+                "beta": 1,
+                "power": 4.5,
+                "padding": 1,
+                "weight_init": "normal",
+                "weight_init_range": 0.8333333333333334,
+                "weight_init_offset": 0,
+                "mask_thsd": 0,
+                "radius": 5,
+                "power_lr": 0.75,
+                "weight_decay": 0,
+                "soft_activation_fn": "exp",
+                "hebbian": true,
+                "resume": null,
+                "add_bias": false,
+                "normalize_inp": false,
+                "lr_decay": "exp",
+                "seed": 2,
+                "softness": "softkrotov",
+                "out_channels": 192,
+                "kernel_size": 3,
+                "in_channels": 48,
+                "lr_scheduler": {
+                    "lr": 0.001,
+                    "adaptive": true,
+                    "nb_epochs": 1,
+                    "ratio": 0.00125,
+                    "speed": 10,
+                    "div": 96,
+                    "decay": "exp",
+                    "power_lr": 0.75
+                }
+            }
+        },
+        "b2": {
+            "arch": "CNN",
+            "preset": "softkrotov-c768-k3-p1-s1-d1-b0-t0.5-lr0.001",
+            "operation": "batchnorm2d",
+            "num": 2,
+            "batch_norm": false,
+            "pool": {
+                "type": "max",
+                "kernel_size": 4,
+                "stride": 2,
+                "padding": 1
+            },
+            "activation": {
+                "function": "triangle",
+                "param": 0.7
+            },
+            "resume": null,
+            "layer": {
+                "arch": "CNN",
+                "nb_train": null,
+                "lr": 0.001,
+                "adaptive": true,
+                "lr_sup": 0.001,
+                "speed": 10,
+                "lr_div": 96,
+                "lebesgue_p": 4,
+                "padding_mode": "reflect",
+                "pre_triangle": false,
+                "ranking_param": 3,
+                "delta": 2,
+                "t_invert": 0.5,
+                "groups": 1,
+                "stride": 1,
+                "dilation": 1,
+                "beta": 1,
+                "power": 4.5,
+                "padding": 1,
+                "weight_init": "normal",
+                "weight_init_range": 0.5892556509887896,
+                "weight_init_offset": 0,
+                "mask_thsd": 0,
+                "radius": 5,
+                "power_lr": 0.75,
+                "weight_decay": 0,
+                "soft_activation_fn": "exp",
+                "hebbian": true,
+                "resume": null,
+                "add_bias": false,
+                "normalize_inp": false,
+                "lr_decay": "exp",
+                "seed": 2,
+                "softness": "softkrotov",
+                "out_channels": 768,
+                "kernel_size": 3,
+                "in_channels": 192,
+                "lr_scheduler": {
+                    "lr": 0.001,
+                    "adaptive": true,
+                    "nb_epochs": 1,
+                    "ratio": 0.00125,
+                    "speed": 10,
+                    "div": 96,
+                    "decay": "exp",
+                    "power_lr": 0.75
+                }
+            }
+        },
+        "b3": {
+            "arch": "CNN",
+            "preset": "softkrotov-c3072-k3-p1-s1-d1-b0-t0.4-lr0.001",
+            "operation": "batchnorm2d",
+            "num": 3,
+            "batch_norm": false,
+            "pool": {
+                "type": "max",
+                "kernel_size": 4,
+                "stride": 2,
+                "padding": 1
+            },
+            "activation": {
+                "function": "triangle",
+                "param": 1.4
+            },
+            "resume": null,
+            "layer": {
+                "arch": "CNN",
+                "nb_train": null,
+                "lr": 0.001,
+                "adaptive": true,
+                "lr_sup": 0.001,
+                "speed": 10,
+                "lr_div": 96,
+                "lebesgue_p": 4,
+                "padding_mode": "reflect",
+                "pre_triangle": false,
+                "ranking_param": 3,
+                "delta": 2,
+                "t_invert": 0.4,
+                "groups": 1,
+                "stride": 1,
+                "dilation": 1,
+                "beta": 1,
+                "power": 4.5,
+                "padding": 1,
+                "weight_init": "normal",
+                "weight_init_range": 0.4166666666666667,
+                "weight_init_offset": 0,
+                "mask_thsd": 0,
+                "radius": 5,
+                "power_lr": 0.75,
+                "weight_decay": 0,
+                "soft_activation_fn": "exp",
+                "hebbian": true,
+                "resume": null,
+                "add_bias": false,
+                "normalize_inp": false,
+                "lr_decay": "exp",
+                "seed": 2,
+                "softness": "softkrotov",
+                "out_channels": 3072,
+                "kernel_size": 3,
+                "in_channels": 768,
+                "lr_scheduler": {
+                    "lr": 0.001,
+                    "adaptive": true,
+                    "nb_epochs": 1,
+                    "ratio": 0.00125,
+                    "speed": 10,
+                    "div": 96,
+                    "decay": "exp",
+                    "power_lr": 0.75
+                }
+            }
+        },
+        "b4": {
+            "arch": "CNN",
+            "preset": "softkrotov-c12288-k3-p1-s1-d1-b0-t0.25-lr0.001",
+            "operation": "batchnorm2d",
+            "num": 4,
+            "batch_norm": false,
+            "pool": {
+                "type": "avg",
+                "kernel_size": 2,
+                "stride": 2,
+                "padding": 0
+            },
+            "activation": {
+                "function": "triangle",
+                "param": 1.0
+            },
+            "resume": null,
+            "layer": {
+                "arch": "CNN",
+                "nb_train": null,
+                "lr": 0.001,
+                "adaptive": true,
+                "lr_sup": 0.001,
+                "speed": 10,
+                "lr_div": 96,
+                "lebesgue_p": 4,
+                "padding_mode": "reflect",
+                "pre_triangle": false,
+                "ranking_param": 3,
+                "delta": 2,
+                "t_invert": 0.25,
+                "groups": 1,
+                "stride": 1,
+                "dilation": 1,
+                "beta": 1,
+                "power": 4.5,
+                "padding": 1,
+                "weight_init": "normal",
+                "weight_init_range": 0.2946278254943948,
+                "weight_init_offset": 0,
+                "mask_thsd": 0,
+                "radius": 5,
+                "power_lr": 0.75,
+                "weight_decay": 0,
+                "soft_activation_fn": "exp",
+                "hebbian": true,
+                "resume": null,
+                "add_bias": false,
+                "normalize_inp": false,
+                "lr_decay": "exp",
+                "seed": 2,
+                "softness": "softkrotov",
+                "out_channels": 12288,
+                "kernel_size": 3,
+                "in_channels": 3072,
+                "lr_scheduler": {
+                    "lr": 0.001,
+                    "adaptive": true,
+                    "nb_epochs": 1,
+                    "ratio": 0.00125,
+                    "speed": 10,
+                    "div": 96,
+                    "decay": "exp",
+                    "power_lr": 0.75
+                }
+            }
+        },
+        "b5": {
+            "arch": "MLP",
+            "preset": "BP-c1000",
+            "operation": "flatten",
+            "num": 5,
+            "att_dropout": null,
+            "dropout": 0.3,
+            "layer": {
+                "arch": "MLP",
+                "lr": 5e-05,
+                "adaptive": true,
+                "lr_sup": 0.001,
+                "speed": 3,
+                "lr_div": 100,
+                "lebesgue_p": 4,
+                "t_invert": 10,
+                "beta": 0.01,
+                "power": 4.5,
+                "ranking_param": 3,
+                "delta": 0.1,
+                "hebbian": false,
+                "add_bias": false,
+                "normalize_inp": false,
+                "lr_decay": "exp",
+                "seed": 2,
+                "lr_bias": 300,
+                "softness": "soft",
+                "soft_activation_fn": "exp",
+                "plasticity": "SoftHebb",
+                "metric_mode": "unsupervised",
+                "weight_init": "positive",
+                "weight_init_range": 0.7101371040421871,
+                "weight_init_offset": 0,
+                "weight_decay": 0,
+                "radius": 10,
+                "power_lr": 0.2,
+                "out_channels": 2,
+                "in_channels": 196608,
+                "old_channels": 12288,
+                "lr_scheduler": {
+                    "decay": "cste",
+                    "lr": 0.1
+                }
+            },
+            "pool": null,
+            "activation": null
+        }
+    },
+    "cl_hyper": {
+        "training_mode": "consecutive",
+        "cf_sol": true,
+        "head_sol": true,
+        "top_k": 0.6,
+        "topk_lock": false,
+        "high_lr": 0.15,
+        "low_lr": 0.9,
+        "t_criteria": "activations",
+        "delta_w_interval": 5.0,
+        "heads_basis_t": 0.9859967747625233,
+        "classes_per_task": 2,
+        "n_tasks": 5,
+        "selected_classes": [
+            [
+                0,
+                2
+            ],
+            [
+                3,
+                5
+            ],
+            [
+                4,
+                9
+            ],
+            [
+                7,
+                8
+            ],
+            [
+                1,
+                6
+            ]
+        ],
+        "evaluated_tasks": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ],
+        "shmh": false,
+        "SINGLE": false
+    },
+    "FOLD_#2": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.431461811065674,
+            "val_acc": 96.66666412353516,
+            "convergence": 4.00197696685791,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 3.055586814880371,
+            "val_acc": 98.33333587646484,
+            "convergence": 4.004097938537598,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.13966310024261475,
+            "val_acc": 99.44444274902344,
+            "convergence": 4.00659704208374,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.4022238254547119,
+            "val_acc": 99.41520690917969,
+            "convergence": 4.008227348327637,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.008889675140381,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 2,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 38.66313171386719,
+            "test_acc": 60.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 13.785782814025879,
+            "test_acc": 96.5,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 20.164220809936523,
+            "test_acc": 89.5,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 73.5569839477539,
+            "test_acc": 73.459716796875,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.3943316340446472,
+            "test_acc": 97.40259552001953,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#3": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.001563549041748,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 6.944908142089844,
+            "val_acc": 97.20670318603516,
+            "convergence": 4.003527641296387,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.1734032779932022,
+            "val_acc": 98.88888549804688,
+            "convergence": 4.005613803863525,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.007142066955566,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.9938560128211975,
+            "val_acc": 97.22222137451172,
+            "convergence": 4.007740020751953,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 3,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 98.42694091796875,
+            "test_acc": 53.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 12.633307456970215,
+            "test_acc": 93.2367172241211,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 75.9466781616211,
+            "test_acc": 77.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 121.90069580078125,
+            "test_acc": 69.03765869140625,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.0,
+            "test_acc": 100.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#4": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 3.7199881076812744,
+            "val_acc": 96.11111450195312,
+            "convergence": 4.001593589782715,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 3.434267282485962,
+            "val_acc": 97.76536560058594,
+            "convergence": 4.003468990325928,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0003862839366775006,
+            "train_acc": 99.99382781982422,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.005836009979248,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.8398298621177673,
+            "val_acc": 99.39024353027344,
+            "convergence": 4.007091522216797,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.07743879407644272,
+            "val_acc": 98.57142639160156,
+            "convergence": 4.0076398849487305,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 4,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 75.54013061523438,
+            "test_acc": 55.5,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 9.139669418334961,
+            "test_acc": 96.13526916503906,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 47.659847259521484,
+            "test_acc": 85.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 133.24264526367188,
+            "test_acc": 54.195804595947266,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 1.5765902996063232,
+            "test_acc": 94.8453598022461,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#5": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 4.126188278198242,
+            "val_acc": 96.66666412353516,
+            "convergence": 4.001436233520508,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.0511212348937988,
+            "val_acc": 98.88268280029297,
+            "convergence": 4.0033440589904785,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.447767049074173,
+            "val_acc": 99.44444274902344,
+            "convergence": 4.0056586265563965,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.007202625274658,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.007682800292969,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 5,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 4.038874626159668,
+            "test_acc": 92.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 28.81978416442871,
+            "test_acc": 90.33816528320312,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 44.67530822753906,
+            "test_acc": 83.58209228515625,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 31.925722122192383,
+            "test_acc": 91.62303924560547,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.9527987241744995,
+            "test_acc": 97.10144805908203,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#6": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 6.773251056671143,
+            "val_acc": 96.11111450195312,
+            "convergence": 4.001609802246094,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.2077014446258545,
+            "val_acc": 98.88268280029297,
+            "convergence": 4.003451347351074,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.6492003202438354,
+            "val_acc": 99.44444274902344,
+            "convergence": 4.005861759185791,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.714052677154541,
+            "val_acc": 98.87640380859375,
+            "convergence": 4.007402420043945,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.008075714111328,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 6,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 10.546263694763184,
+            "test_acc": 85.5,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 18.896142959594727,
+            "test_acc": 87.9227066040039,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 41.783973693847656,
+            "test_acc": 86.5,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 102.85559844970703,
+            "test_acc": 76.76056671142578,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.21867288649082184,
+            "test_acc": 97.29729461669922,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#7": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.39753833413124084,
+            "val_acc": 99.44444274902344,
+            "convergence": 4.001599311828613,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 6.371137619018555,
+            "val_acc": 96.6480484008789,
+            "convergence": 4.003324508666992,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.2821868658065796,
+            "val_acc": 98.88888549804688,
+            "convergence": 4.005765914916992,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.007272243499756,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.9458825588226318,
+            "val_acc": 98.61111450195312,
+            "convergence": 4.0078043937683105,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 7,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 2.07513689994812,
+            "test_acc": 92.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 10.108875274658203,
+            "test_acc": 91.26213836669922,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 27.815391540527344,
+            "test_acc": 88.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 131.66067504882812,
+            "test_acc": 73.2026138305664,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 9.398204803466797,
+            "test_acc": 92.40505981445312,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#8": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.2389378547668457,
+            "val_acc": 97.77777862548828,
+            "convergence": 4.001481056213379,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.5331830978393555,
+            "val_acc": 97.79005432128906,
+            "convergence": 4.003351211547852,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.0,
+            "val_acc": 100.0,
+            "convergence": 4.005634307861328,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.21965689957141876,
+            "val_acc": 99.43502807617188,
+            "convergence": 4.00708532333374,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0005581271834671497,
+            "train_acc": 99.98505401611328,
+            "val_loss": 0.44630324840545654,
+            "val_acc": 98.64865112304688,
+            "convergence": 4.007781028747559,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 8,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 91.29907989501953,
+            "test_acc": 61.352657318115234,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 20.224966049194336,
+            "test_acc": 89.36170196533203,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 50.469669342041016,
+            "test_acc": 81.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 267.97283935546875,
+            "test_acc": 56.9620246887207,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.0,
+            "test_acc": 100.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#9": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.346234917640686,
+            "val_acc": 98.33333587646484,
+            "convergence": 4.001484394073486,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 4.246103286743164,
+            "val_acc": 96.6850814819336,
+            "convergence": 4.003318786621094,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0008945026202127337,
+            "train_acc": 99.99382781982422,
+            "val_loss": 4.74812126159668,
+            "val_acc": 98.33333587646484,
+            "convergence": 4.005496978759766,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.4136638641357422,
+            "val_acc": 98.86363983154297,
+            "convergence": 4.0071306228637695,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.816714286804199,
+            "val_acc": 98.64865112304688,
+            "convergence": 4.007713317871094,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 9,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 17.065784454345703,
+            "test_acc": 86.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 39.125099182128906,
+            "test_acc": 85.71428680419922,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 48.554805755615234,
+            "test_acc": 85.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 14.857894897460938,
+            "test_acc": 94.51219177246094,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.0,
+            "test_acc": 100.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "FOLD_#10": {
+        "R0": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.468997985124588,
+            "val_acc": 98.33333587646484,
+            "convergence": 4.001451015472412,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    0,
+                    2
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    0,
+                    2
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R1": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 2.5662829875946045,
+            "val_acc": 98.33333587646484,
+            "convergence": 4.003194808959961,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    3,
+                    5
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    3,
+                    5
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R2": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 0.9481906294822693,
+            "val_acc": 98.88888549804688,
+            "convergence": 4.005475997924805,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    4,
+                    9
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    4,
+                    9
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R3": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 5.39099645614624,
+            "val_acc": 98.85713958740234,
+            "convergence": 4.0068464279174805,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    7,
+                    8
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    7,
+                    8
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "R4": {
+            "train_loss": 0.0,
+            "train_acc": 100.0,
+            "val_loss": 1.0848037004470825,
+            "val_acc": 98.63013458251953,
+            "convergence": 4.007454872131348,
+            "R1": 0,
+            "dataset_sup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 100,
+                "print_freq": 10,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    1,
+                    6
+                ],
+                "SINGLE": false
+            },
+            "dataset_unsup": {
+                "name": "URBANSOUND8K",
+                "noise_std": 0,
+                "channels": 1,
+                "width": 64,
+                "height": 276,
+                "validation_split": 0.2,
+                "training_sample": 8000,
+                "testing_sample": 10000,
+                "out_channels": 2,
+                "num_workers": 0,
+                "seed": 0,
+                "shuffle": true,
+                "batch_size": 10,
+                "augmentation": false,
+                "zca_whitened": false,
+                "training_class": "all",
+                "split": "train",
+                "n_mels": 64,
+                "n_fft": 1024,
+                "hop_len": 320,
+                "nb_epoch": 1,
+                "print_freq": 50,
+                "validation": false,
+                "continual_learning": true,
+                "old_dataset_size": 64,
+                "n_classes": 2,
+                "shmh": false,
+                "fold": 10,
+                "selected_classes": [
+                    1,
+                    6
+                ]
+            },
+            "train_config": {
+                "t0": {
+                    "blocks": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "mode": "unsupervised",
+                    "batch_size": 10,
+                    "nb_epoch": 1,
+                    "print_freq": 50,
+                    "lr": 0.001
+                },
+                "t1": {
+                    "blocks": [
+                        5
+                    ],
+                    "mode": "supervised",
+                    "batch_size": 10,
+                    "nb_epoch": 100,
+                    "print_freq": 10,
+                    "lr": 0.001
+                }
+            }
+        },
+        "eval_0": {
+            "test_loss": 36.695701599121094,
+            "test_acc": 65.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_1": {
+            "test_loss": 1.3016014099121094,
+            "test_acc": 97.4093246459961,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_2": {
+            "test_loss": 28.737415313720703,
+            "test_acc": 89.0,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_3": {
+            "test_loss": 91.81990051269531,
+            "test_acc": 81.00558471679688,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        },
+        "eval_4": {
+            "test_loss": 0.06704643368721008,
+            "test_acc": 98.46154022216797,
+            "convergence": 3.999781370162964,
+            "R1": 0
+        }
+    },
+    "model_name": "URBANSOUND8K_CL50efe03d-4336-44bd-acf3-ebf90958b071"
+}
