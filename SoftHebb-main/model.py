@@ -15,7 +15,6 @@ from dataset import make_data_loaders
 from utils import get_device
 import numpy
 
-BASED_ON_EVAL = False # should be always kept to False at all times.
 
 def load(path, map_location):
     """
