@@ -10,7 +10,7 @@ import shlex
 import subprocess
 import random
 import numpy as np
-TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
 SHMH = False
 SINGLE = False
 
