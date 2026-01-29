@@ -30,7 +30,7 @@ def load(path, map_location):
     return torch.load(path, **kwargs)
 
 
-def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}):
+def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}, task_num=-1, eval=False):
     """
     Create Model and load state if resume
     """
@@ -42,68 +42,34 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             model_path = model_path_override
 
         if op.isfile(model_path):
-            checkpoint =  load(model_path, get_device())  # , map_location=device)
-            state_dict = checkpoint['state_dict']
-            #params2 = checkpoint['config']
-            params2 = params
-            print("params: ", params)
-            print("params2: ", params2)
-            if resume == 'without_classifier':
-                classifier_key = list(params.keys())[-1]
-                params2[classifier_key] = params[classifier_key]
+            checkpoint =  load(model_path, get_device())
+            state_dict_old = checkpoint['state_dict']
 
             cl_hyper["heads_basis_t"]=float(checkpoint["heads_thresh"])
-            model = MultiLayer(params2, topk_kernels=checkpoint["topk_kernels"], avg_deltas=checkpoint["avg_deltas"], heads=checkpoint["heads"], cl_hyper=cl_hyper)
-            
-
-
-            state_dict2 = model.state_dict()
+            model = MultiLayer(params, topk_kernels=checkpoint["topk_kernels"], avg_deltas=checkpoint["avg_deltas"], heads=checkpoint["heads"], cl_hyper=cl_hyper)
+        
+            state_dict_new = model.state_dict()
             model.model_name = checkpoint['model_name']
 
-            if resume == 'without_classifier':
-                for key, value in state_dict.items():
-                    if resume == 'without_classifier' and str(params[classifier_key]['num']) in key:
-                        continue
-                    if key in state_dict2:
-                        state_dict2[key] = value
-                if cl_hyper["head_sol"] and dataset_sup_config is not None and batch_size is not None:
-                    #call best_head
-                    model.to(get_device())
-                    chosen_head = best_head(model, state_dict2, dataset_sup_config, batch_size)
+            if cl_hyper["head_sol"] and dataset_sup_config is not None and batch_size is not None:                
+                if not eval:
+                    keys = list(state_dict_new.keys())
+                    chosen_head = { keys[-1]:state_dict_new[keys[-1]], keys[-2]: state_dict_new[keys[-2]]}
                     keys = list(chosen_head.keys())
-                    state_dict2[keys[0]] = chosen_head[keys[0]]
-                    state_dict2[keys[1]] = chosen_head[keys[1]]
-                model.load_state_dict(state_dict2)
-            else:
-                if cl_hyper["head_sol"] and dataset_sup_config is not None and batch_size is not None:
-                    #call best_head
-                    model = model.to(get_device())
-                    # chosen_head = best_head(model, state_dict, dataset_sup_config, batch_size)
-                    keys = list(state_dict2.keys())
-                    chosen_head = { keys[-1]:state_dict2[keys[-1]], keys[-2]: state_dict2[keys[-2]]}
-                    keys = list(chosen_head.keys())
-                    state_dict[keys[0]] = chosen_head[keys[0]]
-                    state_dict[keys[1]] = chosen_head[keys[1]]
-                # elif op.isfile(model_path):
-                #     chosen_head = best_head(model, state_dict2, dataset_sup_config, batch_size)
-                #     keys = list(chosen_head.keys())
-                #     state_dict[keys[0]] = state_dict2[keys[0]]
-                #     state_dict[keys[1]] = state_dict2[keys[1]]
-                print("INSIDE THE CORRECT")
+                    
+                    if len(model.heads) == 1 and task_num == 1:
+                        model.heads += [chosen_head, chosen_head, chosen_head, chosen_head]
 
-                model.load_state_dict(state_dict)
-            # log.from_dict(checkpoint['measures'])
-            starting_epoch = 0  # checkpoint['epoch']
+                    state_dict_old[keys[0]] = chosen_head[keys[0]]
+                    state_dict_old[keys[1]] = chosen_head[keys[1]]
+
+                model.load_state_dict(state_dict_old)
             print('\n', 'Model %s loaded successfuly with best perf' % (model_name))
-            # shutil.rmtree(op.join(RESULT, params.folder_name, 'figures'))
-            # os.mkdir(op.join(RESULT, params.folder_name, 'figures'))
         else:
             print('\n', 'Model %s not found' % model_name)
-            
             model = MultiLayer(params, cl_hyper=cl_hyper)
         print('\n')
     else:
-        # print("BOOOOOOOH")
         model = MultiLayer(params, cl_hyper=cl_hyper, heads=[])
 
     if verbose:
@@ -112,65 +78,6 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
     model.selected_classes = dataset_sup_config["selected_classes"]
     model.shmh = dataset_sup_config["shmh"]
     return model
-
-def best_head(model, state_dict, dataset_sup_config, batch_size): 
-# Evaluates all the heads in the model and returns the best one, if none is found, 
-# meaning we don't reach the threshold for the accuracy, we return a newly initialized head.
-    keys = list(state_dict.keys())
-    chosen_head = { keys[-1]:state_dict[keys[-1]], keys[-2]: state_dict[keys[-2]]}
-    chosen_acc = 0
-    device = get_device()
-    avg_acc = 0
-
-    if BASED_ON_EVAL: # if this is on then we picj the head doing an evaluation on the dataset and then choosing the best one
-
-        initial_state = state_dict
-        criterion = nn.CrossEntropyLoss()
-        train_loader, val_loader, test_loader = make_data_loaders(dataset_sup_config, batch_size, device)
-        for head in model.heads: 
-            keys = list(head.keys())
-            if keys[0] in state_dict and keys[1]  in state_dict:
-                state_dict[keys[0]] = head[keys[0]]
-                state_dict[keys[1]] = head[keys[1]]
-            model.load_state_dict(state_dict)
-            loss_test, acc_test = evaluate_sup(model, criterion, test_loader, device)
-            acc_test = acc_test/100
-            avg_acc += acc_test
-             
-            if acc_test > chosen_acc: 
-                chosen_head = head
-                chosen_acc = acc_test
-                 
-    else: 
-        # here we create a new head everytime we see a task
-        chosen_head = chosen_head
-    # with the following solution we create a head using the logits as a score instead of the evaluation. 
-    # else:
-    #     criterion = nn.CrossEntropyLoss()
-    #     train_loader, test_loader = make_data_loaders(dataset_sup_config, batch_size, device)
-    #     heads_performance = {}
-    #     head_num = 0
-    #     for head in model.heads: 
-    #         keys = list(head.keys())
-    #         if keys[0] in state_dict and keys[1]  in state_dict:
-    #             state_dict[keys[0]] = head[keys[0]]
-    #             state_dict[keys[1]] = head[keys[1]]
-    #         model.load_state_dict(state_dict)
-    #         tot_sum = head_choser(model, criterion, test_loader, device)
-    #         heads_performance[head_num] = tot_sum
-    #          
-    #         head_num += 1
-    #     max_val = 0
-    #     max_key = 0
-    #     for k, i in heads_performance.items():
-    #         if i > max_val:
-    #             max_val = i
-    #             max_key = k
-    #      
-    #     chosen_head = model.heads[max_key]
-    
-    return chosen_head
-
 
 
 def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar', storing_path=None):
@@ -190,7 +97,6 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
         if not op.isdir(folder_path):
             os.makedirs(op.join(folder_path, 'models'))
         storing_path = op.join(folder_path, 'models')
-
      
     torch.save({
         'state_dict': model.state_dict(),
@@ -217,7 +123,6 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
         }, op.join(folder_path, filename))
 
 
-
 class MultiLayer(nn.Module):
     """
        MultiLayer Network created from list of preset blocks
@@ -238,31 +143,18 @@ class MultiLayer(nn.Module):
         self.heads_thresh = cl_hyper["heads_basis_t"]
         self.cl_hyper = cl_hyper
         
-        # if os.path.exists(file_path_d):
-        #     with open('avg_deltas.p', 'rb') as pfile:
-        #         avg_deltas = pickle.load(pfile)
-        
-        # if os.path.exists(file_path_act):
-        #     with open('activations.p', 'rb') as pfile:
-        #         topk_layer = pickle.load(pfile)
-        ########################################################
+
 
         self.config = blocks_params
         layer_num = 0
         avg_deltas_layer = None
         topk_layer = None
         depth = len(blocks_params)-1
-        # if avg_deltas is not None and topk_layer is not None: 
-        #     print(avg_deltas.keys())
-        #     print(topk_layer.keys())
-        # else: 
-        #     print("avg_deltas: ", avg_deltas)
-        #     print("topk_layer: ", topk_layer)
+    
         if blocks_params is not None:
             blocks = []
             for _, params in blocks_params.items():
                 topk_layer = None
-                # params : {'arch': 'CNN', 'preset': 'softkrotov-c1536-k3-p1-s1-d1-b0-t0.25-lr0.01-lp0.5-e0', 'operation': 'batchnorm2d', 'num': 2, 'batch_norm': False, 'pool': {'type': 'avg', 'kernel_size': 2, 'stride': 2, 'padding': 0}, 'activation': {'function': 'triangle', 'param': 1.0}, 'resume': None, 'layer': {'arch': 'CNN', 'nb_train': None, 'lr': 0.01, 'adaptive': True, 'lr_sup': 0.001, 'speed': 7, 'lr_div': 96, 'lebesgue_p': 2, 'padding_mode': 'reflect', 'pre_triangle': False, 'ranking_param': 3, 'delta': 2, 't_invert': 0.25, 'groups': 1, 'stride': 1, 'dilation': 1, 'beta': 1, 'power': 4.5, 'padding': 1, 'weight_init': 'normal', 'weight_init_range': 0.4252586358998573, 'weight_init_offset': 0, 'mask_thsd': 0, 'radius': 25, 'power_lr': 0.5, 'weight_decay': 0, 'soft_activation_fn': 'exp', 'hebbian': True, 'resume': None, 'add_bias': False, 'normalize_inp': False, 'lr_decay': 'linear', 'seed': 0, 'softness': 'softkrotov', 'out_channels': 1536, 'kernel_size': 3, 'in_channels': 384, 'lr_scheduler': {'lr': 0.01, 'adaptive': True, 'nb_epochs': 1, 'ratio': 0.0002, 'speed': 7, 'div': 96, 'decay': 'linear', 'power_lr': 0.5}}}
                 if params['arch'] == 'CNN':
                     if len(self.avg_deltas) > 0:
                          

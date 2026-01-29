@@ -402,7 +402,8 @@ def run_sup(
         plot_fc=None,
         model_dir=None, 
         train_loader=None,
-        val_loader=None
+        val_loader=None,
+        task_num=0
 ):
     """
     Supervised training of BP blocks of one model
@@ -464,7 +465,10 @@ def run_sup(
                     val =  model.heads_thresh*len(model.heads)
                     val += val_acc/100
                     model.heads_thresh = val/(len(model.heads)+1)
-                model.heads.append(new_head)
+                if task_num == 0:
+                    model.heads.append(new_head)
+                else:
+                    model.heads[task_num] = new_head
 
             if save:
                  
