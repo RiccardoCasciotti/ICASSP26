@@ -10,7 +10,7 @@ except:
 from layer import generate_block
 import os
 import os.path as op
-from engine_cl import evaluate_sup, head_choser
+from engine_cl import evaluate_sup
 from dataset import make_data_loaders
 from utils import get_device
 import numpy
