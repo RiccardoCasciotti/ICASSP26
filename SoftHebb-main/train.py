@@ -65,7 +65,7 @@ def check_dimension(blocks, dataset_config):
 
         lp = blocks['b%s' % id]['layer']['lebesgue_p']
         initial_r = blocks['b%s' % id]['layer']['radius'] ** (lp)
-        print(blocks)
+        # print(blocks)
         if blocks['b%s' % id]['arch'] == 'CNN':
             kenel_size = blocks['b%s' % id]['layer']['kernel_size']
             input_channel = blocks['b%s' % id]['layer']['in_channels']
