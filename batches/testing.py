@@ -193,9 +193,9 @@ if data_num == 1:
         for i in range(n_experiments):
             task_classes = []
             random.shuffle(all_classes)
-            task_classes.append(all_classes[:2])
-            for i in range(2, 10, 2):
-                task_classes.append(all_classes[i:i+2])
+            task_classes.append(all_classes[:classes_per_task])
+            for i in range(classes_per_task, n_tasks*classes_per_task, classes_per_task):
+                task_classes.append(all_classes[i:i+classes_per_task])
             classes.append(task_classes)
         final = classes
     print(n_experiments)
