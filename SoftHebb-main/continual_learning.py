@@ -217,7 +217,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     metrics = {"test_loss":test_loss.item(), "test_acc": test_acc.item(), "convergence":conv, "R1":R1}
                 else: 
                     metrics = {"test_loss":test_loss, "test_acc": test_acc, "convergence":conv, "R1":R1}
-                if "dataset_sup" not in results.keys() and "cl_hyper" not in results .keys():
+                if "dataset_sup" not in results.keys() and "cl_hyper" not in results.keys():
                     metrics["dataset_sup"] = dataset_sup_config.copy()
                     metrics["dataset_unsup"] = dataset_unsup_config.copy()
                     results["cl_hyper"] = cl_hyper
@@ -530,7 +530,7 @@ if __name__ == '__main__':
                 # dataset_unsup_1["fold"] = fold + 1
                 # dataset_sup_1["fold"] = fold + 1
                 
-                # results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
+                results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
                 # # TASK 1
                 
                 # print("################################## TASK 0 ############################################")
