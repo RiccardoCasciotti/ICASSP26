@@ -70,6 +70,10 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
         print('\n')
     else:
         model = MultiLayer(params, cl_hyper=cl_hyper, heads=[])
+        state_dict_new = model.state_dict()
+        keys = list(state_dict_new.keys())
+        chosen_head = { keys[-1]:state_dict_new[keys[-1]], keys[-2]: state_dict_new[keys[-2]]}  
+        model.heads += [chosen_head, chosen_head, chosen_head, chosen_head, chosen_head]
 
     if verbose:
         model.__str__()

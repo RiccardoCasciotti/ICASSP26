@@ -63,22 +63,8 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
         measures.step(target.shape[0], loss.clone().detach().cpu(), acc.cpu(), convergence, R1, model.get_lr())
 
   
-    t_criteria = model.cl_hyper["t_criteria"]
-    topk_kernels = model.topk_kernels
-    num_blocks = len(topk_kernels) + 1
      
     return measures, optimizer.param_groups[0]['lr']
-
-"""
-The first thing we do is check if the model is hebbian or not (basically if it is we set the loss accuracy to False).
-Then we tell torch not to calculate any gradient because we don't need any for unsupervised hebbian. 
-We don't get inside the if loss_acc clause why???
-model.is_hebbian() returns true if the last block of the model is hebbian or not and checks if the criterion is not none.
-The criterion can be something like ... ??? criterion seems to be none always, just like measures. 
-So are they both to be defined??? 
-
-
-"""
 
 
 def getActivation(name):
@@ -219,11 +205,12 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
         for subl in layer.children():
             depth += 1
     depth -= 1
+    
+    if t_criteria == "activations" and model.cl_hyper["cf_sol"]:
+        prev_dict = deepcopy(model.state_dict())
+        prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in blocks}
+        activations_sum = {k: [] for k in prev_dict.keys() if int(k.split(".")[1]) in blocks}
         
-    prev_dict = deepcopy(model.state_dict())
-    prev_dict = {k: v for k, v in prev_dict.items() if "layer.weight" in k and int(k.split(".")[1]) in blocks}
-    activations_sum = {k: [] for k in prev_dict.keys() if int(k.split(".")[1]) in blocks}
-     
      
      
          
@@ -312,9 +299,6 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
     
         model.avg_deltas = avg_deltas                 
                          
-                        
-
-    
 
     info = model.radius()
     convergence, R1 = model.convergence()

@@ -326,10 +326,10 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     for h in handles:
         h.remove()
     handles.clear()
-    del model
-    gc.collect()
-    torch.cuda.synchronize()
-    torch.cuda.empty_cache()
+    # del model
+    # gc.collect()
+    # torch.cuda.synchronize()
+    # torch.cuda.empty_cache()
       
 def plot_confusion_matrix(cm, path, name, class_names=None, normalize=False, title="Confusion Matrix"):
 
