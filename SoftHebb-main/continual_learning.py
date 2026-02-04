@@ -590,6 +590,7 @@ if __name__ == '__main__':
                     dataset_unsup_x["out_channels"] = len(selected_classes)
                     task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=None, task_num=task_num)
                     dataset_sup_x["eval"] = True
+                    params.resume = True
                     procedure(params, name_model+"joint", blocks, dataset_sup_x, dataset_unsup_x, evaluate=True, results=results, task_num=task_num)
                     dataset_sup_x["eval"] = False
                     ###############################
