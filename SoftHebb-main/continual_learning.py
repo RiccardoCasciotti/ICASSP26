@@ -527,8 +527,8 @@ if __name__ == '__main__':
                 # print("#########################################################################################################")
                 # print("################################## FOLD # " + str(fold+1)+ " ############################################")
                 # print("#########################################################################################################")
-                # dataset_unsup_1["fold"] = fold + 1
-                # dataset_sup_1["fold"] = fold + 1
+                dataset_unsup_1["fold"] = fold + 1
+                dataset_sup_1["fold"] = fold + 1
                 
                 results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
                 # # TASK 1
@@ -561,8 +561,8 @@ if __name__ == '__main__':
                     # dataset_sup_x["eval"] = False
                     # dataset_unsup_x["eval"] = False
 
-                    # dataset_unsup_x["fold"] = fold + 1
-                    # dataset_sup_x["fold"] = fold + 1
+                    dataset_unsup_x["fold"] = fold + 1
+                    dataset_sup_x["fold"] = fold + 1
                     # dataset_sup_x["n_classes"] = len(selected_classes)
                     # dataset_unsup_x["n_classes"] = len(selected_classes)
                     # dataset_sup_x["out_channels"] = len(selected_classes)
