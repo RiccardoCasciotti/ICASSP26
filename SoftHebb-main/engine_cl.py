@@ -640,7 +640,7 @@ def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_ma
         # print("model.heads: ", model.heads)
         state_dict = model.state_dict()
         chosen_head = model.heads[model.task_num]
-        keys = list(chosen_head.keys())
+        
 
         # print("#################### CHOSEN HEAD ###############################")
         # print(len(model.heads), int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
@@ -668,9 +668,10 @@ def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_ma
         'model_name': model.model_name
     }, op.join(storing_path, "checkpoint.pth.tar"))
 
-        keys = list(chosen_head.keys())
-        state_dict[keys[0]] = chosen_head[keys[0]]
-        state_dict[keys[1]] = chosen_head[keys[1]]
+        if chosen_head != None:
+            keys = list(chosen_head.keys())
+            state_dict[keys[0]] = chosen_head[keys[0]]
+            state_dict[keys[1]] = chosen_head[keys[1]]
 
         # print("chosen_head: ", chosen_head)
 

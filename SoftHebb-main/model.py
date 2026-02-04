@@ -56,8 +56,8 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
                     chosen_head = { keys[-1]:state_dict_new[keys[-1]], keys[-2]: state_dict_new[keys[-2]]}
                     keys = list(chosen_head.keys())
                     
-                    if len(model.heads) == 1 and task_num == 1:
-                        model.heads += [chosen_head, chosen_head, chosen_head, chosen_head]
+                    # if len(model.heads) == 1 and task_num == 1:
+                    #     model.heads += [chosen_head, chosen_head, chosen_head, chosen_head]
 
                     state_dict_old[keys[0]] = chosen_head[keys[0]]
                     state_dict_old[keys[1]] = chosen_head[keys[1]]
@@ -69,11 +69,11 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             model = MultiLayer(params, cl_hyper=cl_hyper)
         print('\n')
     else:
-        model = MultiLayer(params, cl_hyper=cl_hyper, heads=[])
+        model = MultiLayer(params, cl_hyper=cl_hyper, heads=[None, None, None, None, None])
         state_dict_new = model.state_dict()
         keys = list(state_dict_new.keys())
         chosen_head = { keys[-1]:state_dict_new[keys[-1]], keys[-2]: state_dict_new[keys[-2]]}  
-        model.heads += [chosen_head, chosen_head, chosen_head, chosen_head, chosen_head]
+        
 
     if verbose:
         model.__str__()

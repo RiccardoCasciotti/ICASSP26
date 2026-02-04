@@ -524,56 +524,56 @@ if __name__ == '__main__':
         if out_channels >=  classes_per_task or shmh:
             for fold in range(folds):
                 
-                # print("#########################################################################################################")
-                # print("################################## FOLD # " + str(fold+1)+ " ############################################")
-                # print("#########################################################################################################")
+                print("#########################################################################################################")
+                print("################################## FOLD # " + str(fold+1)+ " ############################################")
+                print("#########################################################################################################")
                 dataset_unsup_1["fold"] = fold + 1
                 dataset_sup_1["fold"] = fold + 1
                 
                 results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
                 # # TASK 1
                 
-                # print("################################## TASK 0 ############################################")
-                # selected_classes = cl_hyper["selected_classes"][0]
-                # print("Selected Classes for the Task: ", selected_classes)
-                # dataset_sup_1["n_classes"] = len(selected_classes)
-                # dataset_unsup_1["n_classes"] = len(selected_classes)
-                # dataset_sup_1["out_channels"] = len(selected_classes)
-                # dataset_unsup_1["out_channels"] = len(selected_classes)
+                print("################################## TASK 0 ############################################")
+                selected_classes = cl_hyper["selected_classes"][0]
+                print("Selected Classes for the Task: ", selected_classes)
+                dataset_sup_1["n_classes"] = len(selected_classes)
+                dataset_unsup_1["n_classes"] = len(selected_classes)
+                dataset_sup_1["out_channels"] = len(selected_classes)
+                dataset_unsup_1["out_channels"] = len(selected_classes)
 
 
-                # task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=None, task_num=0)
-                # evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+                task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=None, task_num=0)
+                evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
                 
     
                 
                 for task_num in range(1, len(cl_hyper["selected_classes"])):
-                    # print("################################## TASK " + str(task_num)+ " ############################################")
+                    print("################################## TASK " + str(task_num)+ " ############################################")
 
-                    # selected_classes = cl_hyper["selected_classes"][task_num]
-                    # print("Selected Classes for the Task: ", selected_classes)
+                    selected_classes = cl_hyper["selected_classes"][task_num]
+                    print("Selected Classes for the Task: ", selected_classes)
                     dataset_sup_x = dataset_sup_ground.copy()
                     dataset_unsup_x = dataset_unsup_ground.copy()
 
-                    # dataset_sup_x["joint"] = False
-                    # dataset_unsup_x["joint"] = False
+                    dataset_sup_x["joint"] = False
+                    dataset_unsup_x["joint"] = False
 
-                    # dataset_sup_x["eval"] = False
-                    # dataset_unsup_x["eval"] = False
+                    dataset_sup_x["eval"] = False
+                    dataset_unsup_x["eval"] = False
 
                     dataset_unsup_x["fold"] = fold + 1
                     dataset_sup_x["fold"] = fold + 1
-                    # dataset_sup_x["n_classes"] = len(selected_classes)
-                    # dataset_unsup_x["n_classes"] = len(selected_classes)
-                    # dataset_sup_x["out_channels"] = len(selected_classes)
-                    # dataset_unsup_x["out_channels"] = len(selected_classes)
+                    dataset_sup_x["n_classes"] = len(selected_classes)
+                    dataset_unsup_x["n_classes"] = len(selected_classes)
+                    dataset_sup_x["out_channels"] = len(selected_classes)
+                    dataset_unsup_x["out_channels"] = len(selected_classes)
 
-                    # params.continual_learning = True
-                    # params.resume = True
+                    params.continual_learning = True
+                    params.resume = True
 
-                    # task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
-                    # # This evaluates all the tasks after training on a new task, needed to create the accuracy matrix.
-                    # evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+                    task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
+                    # This evaluates all the tasks after training on a new task, needed to create the accuracy matrix.
+                    evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
                     
                     # # JOINT
                     print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
