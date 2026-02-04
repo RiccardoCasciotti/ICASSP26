@@ -294,7 +294,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     result["dataset_unsup"] = dataset_unsup_config.copy()
                     result["train_config"] = train_config.copy()
                     print("RESULT: ", result)
-                    results["FOLD_#"+str(dataset_sup_config["fold"])]["R" + str(results["count"])] = result.copy()
+                    results["FOLD_#"+str(dataset_sup_config["fold"])]["T" + str(task_num)] = result.copy()
                     
                     results["count"] += 1
             # else:

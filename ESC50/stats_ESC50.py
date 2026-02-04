@@ -49,13 +49,13 @@ def gather_data(path, report):
                 #             "y_pred": [
                 y_pred = []
                 y_true = []
-                for fold_num in experiment["joint_confusion_matrix"]:
-                    for task in experiment["joint_confusion_matrix"][fold_num]:
-                        for y in experiment["joint_confusion_matrix"][fold_num][task]:
+                for fold_num in experiment["confusion_matrix"]:
+                    for task in experiment["confusion_matrix"][fold_num]:
+                        for y in experiment["confusion_matrix"][fold_num][task]:
                             if y == "y_pred":
-                                y_pred += experiment["joint_confusion_matrix"][fold_num][task][y]
+                                y_pred += experiment["confusion_matrix"][fold_num][task][y]
                             else:
-                                y_true += experiment["joint_confusion_matrix"][fold_num][task][y]
+                                y_true += experiment["confusion_matrix"][fold_num][task][y]
 
                 for i in range(1, len(experiment["cl_hyper"]["selected_classes"])):
                     y_pred_tmp = np.array(y_pred)
@@ -78,9 +78,12 @@ def gather_data(path, report):
 
     for k in report.keys():
         # print(report[k]["joint"])
-        report[k]["joint"] = np.mean(np.array(report[k]["joint"]), axis=0).tolist()
-        for i in range(1, 5):
-            report[k]["im_steps"][i] = np.mean(np.array(report[key]["im_steps"][i])).tolist()
+        if "joint" in report[k]:
+            report[k]["joint"] = np.mean(np.array(report[k]["joint"]), axis=0).tolist()
+        for i in range(1, 2):
+            if "im_steps" not in report[k]:
+                break
+            report[k]["im_steps"][i] = np.mean(np.array(report[k]["im_steps"][i])).tolist()
         
         print("###########################")
 
@@ -146,6 +149,8 @@ def calculate_average_AM(report):
     accuracy_matrix = {"k_off": [], "k_on": []}
     for exp_type in report.keys():
         # print(exp_type)
+        if report[exp_type] == {}:
+            break
         for task_num in report[exp_type]["accuracy_matrix"]:
             
             # average across all folds
@@ -249,6 +254,8 @@ fwt ={"k_off":{}, "k_on": {}}
 im ={"k_off":{}, "k_on": {}}
 bwt ={"k_off":{}, "k_on": {}}
 for key in R.keys():
+    if len(R[key]) == 0 or len(report[key])==0 :
+        break
     fm[key] = compute_FM(R[key])
     FWT = []
     bwt[key] = compute_BWT(R[key])
