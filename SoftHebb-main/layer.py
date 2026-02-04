@@ -283,7 +283,7 @@ def generate_block(params, avg_deltas_layer={}, topk_layer={}, cl_hyper={}, head
         layer.topk_layer = topk_layer
 
     elif config['arch'] == 'CNN':
-        print("CNN LAYER CONFIG: ", config)
+        # print("CNN LAYER CONFIG: ", config)
         if config['hebbian']:
             layer = select_Conv2d_layer(config, avg_deltas_layer, topk_layer, cl_hyper, heads)
         else:

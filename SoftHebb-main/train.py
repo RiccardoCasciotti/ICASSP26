@@ -234,7 +234,7 @@ def training_config(blocks, dataset_sup_config, dataset_unsup_config, mode, bloc
         train_layer_order = {'t1': train_layer_order}
     else:
         raise ValueError
-    print("train_layer_order:",  mode, train_layer_order, )
+    # print("train_layer_order:",  mode, train_layer_order, )
     return train_layer_order
 
 

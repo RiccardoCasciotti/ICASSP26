@@ -2,41 +2,62 @@
 Lmod is automatically replacing "craype-x86-rome" with "craype-x86-trento".
 
 
-Lmod is automatically replacing "craype-x86-rome" with "craype-x86-trento".
+Lmod is automatically replacing "craype-accel-host" with
+"craype-accel-amd-gfx90a".
 
--------------------------------------------------------------------------------
-There are messages associated with the following module(s):
--------------------------------------------------------------------------------
-
-rocm/6.2.2:
-   This module is not installed the way it is intended by AMD. Hence some
-   parts of ROCm may be broken or offer slower than expected performance and
-   there is nothing the LUMI User Support Team can do about that. As the
-   module is also not an official HPE Cray module there is no guarantee that
-   it will integrate properly with HPE Cray PE modules or work correctly in
-   that environment. In fact, it is know to cause problems with the CCE
-   compilers prior to cce/18.0.0 due to link incompatibilities. Note that
-   hipSolver now requires SuiteSparse, and since that one uses BLAS and
-   LAPACK, it depends on the programming environment so is a separate module
-   that needs to be loaded if you use hipSolver.
-
--------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------
-There are messages associated with the following module(s):
--------------------------------------------------------------------------------
-
-rocm/6.2.2:
-   This module is not installed the way it is intended by AMD. Hence some
-   parts of ROCm may be broken or offer slower than expected performance and
-   there is nothing the LUMI User Support Team can do about that. As the
-   module is also not an official HPE Cray module there is no guarantee that
-   it will integrate properly with HPE Cray PE modules or work correctly in
-   that environment. In fact, it is know to cause problems with the CCE
-   compilers prior to cce/18.0.0 due to link incompatibilities. Note that
-   hipSolver now requires SuiteSparse, and since that one uses BLAS and
-   LAPACK, it depends on the programming environment so is a separate module
-   that needs to be loaded if you use hipSolver.
-
--------------------------------------------------------------------------------
-
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+MIOpen(HIP): Error [FlushUnsafe] File is unwritable: /gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt
+MIOpen(HIP): Error [~FindDbRecord_t] Failed to store record to find-db at </gfx90a6e.HIP.3_00_0_f34a90f76-dirty.ufdb.txt>
+Traceback (most recent call last):
+  File "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py", line 591, in <module>
+    task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=None, task_num=task_num)
+  File "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py", line 403, in task_training
+    procedure(params, name_model, blocks, dataset_sup, dataset_unsup, evaluate, results, task_num)
+  File "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py", line 372, in procedure
+    main(blocks, name_model, params.resume, params.save, dataset_sup_config, dataset_unsup_config, train_config,
+  File "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py", line 276, in main
+    result = run_sup(
+             ^^^^^^^^
+  File "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/train.py", line 471, in run_sup
+    model.heads[task_num] = new_head
+    ~~~~~~~~~~~^^^^^^^^^^
+IndexError: list assignment index out of range
+srun: error: nid005164: task 0: Exited with exit code 1
+srun: Terminating StepId=15930840.0

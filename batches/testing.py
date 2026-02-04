@@ -10,12 +10,12 @@ import shlex
 import subprocess
 import random
 import numpy as np
-TEST = True # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
+TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
 SHMH = False
 SINGLE = False
 
 classes_per_task = 2
-n_experiments = 4
+n_experiments = 1
 n_tasks = 5
 
 evaluated_tasks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -37,7 +37,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "_full_run2"
+id = "_full_run_testing"
 folder_id = f"_{id}{n_tasks}tasks"
 
 
@@ -88,7 +88,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
     if TEST:
         sols = [(True, True)]
     else: 
-        sols = [(True, True), (False, True)]
+        sols = [(True, True)]#, (False, True)]
     if dataset == "ESC50":
         if SINGLE:
             sols = [(False, False)]

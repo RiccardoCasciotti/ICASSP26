@@ -15,6 +15,7 @@ from tabulate import tabulate
 #from continual_learning import topk_lock
 
 from activation import Triangle
+import gc
 global xyz
 import numpy as np
 R = [True]
@@ -533,6 +534,10 @@ class HebbHardConv2d(nn.Module):
                 #lr_mask = lr_mask.to("cuda:0")
                 self.weight[:self.nb_train].add_(self.lr *lr_mask*self.delta_w[:self.nb_train])
 ################################################################################################
+                del higher_lr_mask, lr_mask, current_kernels_avg, threshold_mask
+                gc.collect()
+                torch.cuda.synchronize()
+                torch.cuda.empty_cache()
             else:
                 self.weight[:self.nb_train].add_(self.lr*self.delta_w[:self.nb_train])
                 #self.weight[:self.nb_train].add_(self.lr*self.delta_w[:self.nb_train])

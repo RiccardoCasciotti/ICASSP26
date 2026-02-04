@@ -9,7 +9,7 @@
 #SBATCH --mem=128G
 #SBATCH --error=URBANSOUND8K/job.err            # standard error file
 #SBATCH --output=URBANSOUND8K/job.out           # standard output file
-
+module use /appl/local/csc/modulefiles/
 module load CrayEnv
 module load cotainr
 module load rocm

@@ -29,7 +29,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     Train only the traditional blocks with backprop
     """
     t = time.time()
-    model = model.to(device)
+    # model = model.to(device)
      
     DEVICE = get_device()
 
@@ -255,7 +255,7 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
             model.update()
            
             # I store the activations of every batch
-            if t_criteria == "activations":
+            if t_criteria == "activations" and model.cl_hyper["cf_sol"]:
                 for k in list(prev_dict.keys()):
                     if int(k.split(".")[1]) in blocks:
                         #here we have to dive deeper on the sign of the weights... should we consider abs value once we summed all the cells in the kernel
@@ -269,7 +269,7 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
 
 
 
-            if iteration % interval == 0: 
+            if iteration % interval == 0 and model.cl_hyper["cf_sol"]: 
 
                 delta_weights = get_delta_weights(model, device, blocks, depth, prev_dict, delta_weights)
                 
@@ -287,7 +287,7 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
     # here we sum all the values of each activation map to obtain 1 value of activation per kernel instead of a map.
     
 
-    if t_criteria == "activations":
+    if t_criteria == "activations" and model.cl_hyper["cf_sol"]:
         for k in list(activations_sum.keys()):
                     if int(k.split(".")[1]) in blocks:
                         
@@ -306,29 +306,15 @@ def train_hebb(model, loader, device, blocks=[], measures=None, criterion=None):
                         topk_kernels["conv" + k.split(".")[1]] = activations_sum[k][:K+1]
                          
                          
-                         
-                         
-                         
-    elif t_criteria == "KSE":
-        weights = deepcopy(model.state_dict())
-        weights = {int(k.split(".")[1]): v for k, v in weights.items() if ".layer.weight" in k and int(k.split(".")[1]) in blocks} 
-        kse_indicators = compute_kse_indicator(weights)
-         
-        for layer in kse_indicators.keys():
-            if layer in blocks:
-                kernels = {k:v for k, v in enumerate(kse_indicators[layer])}
-                kernels = sorted(kernels.items(), key = lambda item : item[1], reverse=False)
-                kernels = list(dict(kernels))
-                K = round(len(kernels)*model.cl_hyper["top_k"]) # K takes 20% of the kernels
-                topk_kernels["conv" + str(layer)] = kernels[:K+1]
-                 
+        model.topk_kernels = topk_kernels
      
-
-    model.topk_kernels = topk_kernels
-     
-    avg_deltas = average_deltas(delta_weights, avg_deltas, device)
+        avg_deltas = average_deltas(delta_weights, avg_deltas, device)
     
-    model.avg_deltas = avg_deltas
+        model.avg_deltas = avg_deltas                 
+                         
+                        
+
+    
 
     info = model.radius()
     convergence, R1 = model.convergence()

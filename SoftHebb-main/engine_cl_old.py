@@ -29,7 +29,7 @@ def train_BP(model, criterion, optimizer, loader, device, measures):
     Train only the traditional blocks with backprop
     """
     t = time.time()
-    model = model.to(device)
+    # model = model.to(device)
    
     
      
