@@ -591,11 +591,14 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
             # print(torch.sort(output[0]))
 
             ## 2. loss calculation
+           
             loss = criterion(output, target)
             loss_sum += loss.clone().detach()
             print("#######################################################")
+            print( "output: ", output.cpu().detach())
+            print( "target: ", target.cpu().detach())
             print("####################### LOSS: ", loss)
-            print("####################### LOSS_SUM: ", loss)
+            print("####################### LOSS_SUM: ", loss_sum)
             print("####################### n_inputs: ", n_inputs)
             print("#######################################################")
 
