@@ -45,7 +45,7 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             state_dict_old = checkpoint['state_dict']
 
             cl_hyper["heads_basis_t"]=float(checkpoint["heads_thresh"])
-            model = MultiLayer(params, topk_kernels=checkpoint["topk_kernels"], avg_deltas=checkpoint["avg_deltas"], heads=checkpoint["heads"], cl_hyper=cl_hyper)
+            model = MultiLayer(params, topk_kernels=checkpoint["topk_kernels"], avg_deltas=checkpoint["avg_deltas"], heads=checkpoint["heads"], cl_hyper=cl_hyper.copy())
         
             state_dict_new = model.state_dict()
             model.model_name = checkpoint['model_name']
@@ -66,10 +66,10 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             print('\n', 'Model %s loaded successfuly with best perf' % (model_name))
         else:
             print('\n', 'Model %s not found' % model_name)
-            model = MultiLayer(params, cl_hyper=cl_hyper, heads=[None, None, None, None, None])
+            model = MultiLayer(params, cl_hyper=cl_hyper.copy(), heads=[None, None, None, None, None])
         print('\n')
     else:
-        model = MultiLayer(params, cl_hyper=cl_hyper, heads=[None, None, None, None, None])
+        model = MultiLayer(params, cl_hyper=cl_hyper.copy(), heads=[None, None, None, None, None])
         state_dict_new = model.state_dict()
 
     if verbose:
