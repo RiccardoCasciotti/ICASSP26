@@ -130,11 +130,8 @@ def class_cleaner(dataset_config, dataset, selected_classes):
 
     classes_offset = [] 
     for i in range(len(selected_classes)): 
-        for j in range(len(targets)): 
-            #if  targets[j] == selected_classes[i]: 
-                # 
-            #    targets[j] =  i
-            targets[targets==selected_classes[i]] = i
+        
+        targets[targets==selected_classes[i]] = i
         classes_offset.append(selected_classes[i]-i)
     if dataset_config["name"] == "ESC50" or dataset_config["name"] == "URBANSOUND8K":
         dataset.targets = torch.tensor(targets, device=get_device(), dtype=torch.long)

@@ -593,8 +593,12 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
             ## 2. loss calculation
             loss = criterion(output, target)
             loss_sum += loss.clone().detach()
-                 
-                 
+            print("#######################################################")
+            print("####################### LOSS: ", loss)
+            print("####################### LOSS_SUM: ", loss)
+            print("####################### n_inputs: ", n_inputs)
+            print("#######################################################")
+
             ## 3. Accuracy assesment
             predict = output.data.max(1)[1]
             # print("predicted target: ", torch.Tensor.tolist(predict.cpu())[0])
