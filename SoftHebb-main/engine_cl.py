@@ -591,8 +591,10 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
             # print(torch.sort(output[0]))
 
             ## 2. loss calculation
+            K = 60
+            logits_for_loss = output.clamp(min=-K, max=K)
            
-            loss = criterion(output, target)
+            loss = criterion(logits_for_loss, target)
             loss_sum += loss.clone().detach()
             print("#######################################################")
             print( "output: ", output.cpu().detach())
@@ -609,7 +611,7 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
             acc = predict.eq(target.data).sum()
             acc_sum += acc
             n_inputs += target.shape[0]
-            print("target.shape[0]: ", target.shape[0])
+    
 
             if return_confusion_matrix:
                 all_preds.append(predict.cpu().detach().clone())
