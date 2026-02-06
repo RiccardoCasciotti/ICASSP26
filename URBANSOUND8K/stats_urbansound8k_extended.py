@@ -43,10 +43,7 @@ def gather_data(path, report):
                     report[key]["im_steps"] = {}
                 
 
-                # "joint_confusion_matrix": {
-                #     "FOLD_#1": {
-                #         "T1": {
-                #             "y_pred": [
+                
                 y_pred = []
                 y_true = []
                 for fold_num in experiment["confusion_matrix"]:
@@ -262,12 +259,6 @@ for key in R.keys():
     im[key] = compute_IM(R[key], list(report[key]["im_steps"].values()))
     R[key] = R[key].tolist()
 
-# print(R)
-# print(fm)
-# print(bwt)
-# print("report: ", report)
-# print("avg_accs: ", avg_accs)
-# print("confidence_intervals: ", confidence_intervals)
 
 with open(os.path.join(path, "stats.txt"), "w") as f:
     f.write("avg_accs: "+ json.dumps(avg_accs, indent=4))
