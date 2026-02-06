@@ -38,8 +38,7 @@ if TEST:
 
 id = "_full_run_testing"
 folder_id = f"_{id}{n_tasks}tasks"
-parent_f_id = f"experiments/EXP_{dataset}_{dataset2}"
-
+parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
 
 
 

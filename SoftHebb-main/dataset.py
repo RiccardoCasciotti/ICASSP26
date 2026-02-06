@@ -38,7 +38,7 @@ class AddGaussianNoise(object):
 
 def get_split(dataset, data_path, dataset_config, test_fold):
     val_fold = (test_fold + 1)%5 +1
-    print("VAL_FOLD TEST_FOLD: ", val_fold, test_fold)
+    print("VAL_FOLD, TEST_FOLD: ", val_fold, test_fold)
     folds = [val_fold, test_fold]
     
     return ESC50(dataset[~dataset["fold"].isin(folds)].reset_index(drop=True), data_path, dataset_config, augment=False), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path, dataset_config, augment=False), ESC50(dataset[dataset["fold"]==test_fold].reset_index(drop=True), data_path, dataset_config, augment=False)
@@ -135,9 +135,6 @@ def class_cleaner(dataset_config, dataset, selected_classes):
         classes_offset.append(selected_classes[i]-i)
     if dataset_config["name"] == "ESC50" or dataset_config["name"] == "URBANSOUND8K":
         dataset.targets = torch.tensor(targets, device=get_device(), dtype=torch.long)
-    
-
-        
     
 
     return dataset, classes_offset
