@@ -23,7 +23,7 @@ dataset="ESC50" # options: URBANSOUND8K, ESC50
 if dataset == "ESC50":
     if SINGLE:
         n_tasks = 1
-    # classes_per_task: fixed to 30 + 5 + 5 + 5 + 5
+    classes_per_task = 5 # fixed to 30 + 5 + 5 + 5 + 5
     n_tasks = 5
 
 elif dataset == "URBANSOUND8K":
