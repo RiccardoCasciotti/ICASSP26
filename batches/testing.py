@@ -14,11 +14,11 @@ TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, redu
 SHMH = False
 SINGLE = False
 
-n_experiments = 1
+n_experiments = 2
 
 
 
-dataset="URBANSOUND8K" # options: URBANSOUND8K, ESC50
+dataset="ESC50" # options: URBANSOUND8K, ESC50
 
 if dataset == "ESC50":
     if SINGLE:
@@ -36,7 +36,7 @@ if TEST:
     n_experiments = 1
     n_tasks = 2
 
-id = "_full_run_testing"
+id = "_full_run_gitcode"
 folder_id = f"_{id}{n_tasks}tasks"
 parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
 
