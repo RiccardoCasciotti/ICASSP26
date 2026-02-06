@@ -598,9 +598,12 @@ if __name__ == '__main__':
 
             results["count"] = 0
 
-            # clean up the used models to save space
-            # command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
-            # res = subprocess.run(command, shell=True, capture_output=False, text=True)
+            # clean up the used models
+            command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
+            res = subprocess.run(command, shell=True, capture_output=False, text=True)
+            command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model+"joint"}"
+            res = subprocess.run(command, shell=True, capture_output=False, text=True)
+
         results["model_name"] = name_model
 
         for task_num in range(0, cl_hyper["n_tasks"]):
@@ -616,13 +619,3 @@ if __name__ == '__main__':
 
     else: 
         print("Error: Not enough available classes to be organized in tasks of classes_per_task")
-
-
-
-    command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
-    result = subprocess.run(command, shell=True, capture_output=False, text=True)
-    
-    print(result.stdout)
-    if result.stderr:
-        print("Error:", result.stderr)
-
