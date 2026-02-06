@@ -596,18 +596,11 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
            
             loss = criterion(logits_for_loss, target)
             loss_sum += loss.clone().detach()
-            print("#######################################################")
-            print( "output: ", output.cpu().detach())
-            print( "target: ", target.cpu().detach())
-            print("####################### LOSS: ", loss)
-            print("####################### LOSS_SUM: ", loss_sum)
-            print("####################### n_inputs: ", n_inputs)
-            print("#######################################################")
+        
 
             ## 3. Accuracy assesment
             predict = output.data.max(1)[1]
-            # print("predicted target: ", torch.Tensor.tolist(predict.cpu())[0])
-            # print("#####################################################################")
+
             acc = predict.eq(target.data).sum()
             acc_sum += acc
             n_inputs += target.shape[0]
