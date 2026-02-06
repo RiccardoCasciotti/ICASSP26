@@ -2444,10 +2444,10 @@
         "nb_epoch": 10
       },
       "15": {
-        "nb_epoch": 10
+        "nb_epoch": 15
       },
       "20": {
-        "nb_epoch": 10
+        "nb_epoch": 20
       },
       "25": {
         "nb_epoch": 25

@@ -453,177 +453,176 @@ if __name__ == '__main__':
         print("\n\n ################################\n\n")
 
 
+    cl_hyper = {
+            'training_mode': params.training_mode,
+            'cf_sol': params.cf_sol,
+            'head_sol': params.head_sol,
+            'top_k': params.top_k,
+            "topk_lock": params.topk_lock,
+            'high_lr': params.high_lr,
+            'low_lr':params.low_lr,
+            't_criteria': params.t_criteria,
+            'delta_w_interval': params.delta_w_interval,
+            'heads_basis_t': params.heads_basis_t,
+            "classes_per_task": params.classes_per_task,
+            "n_tasks": params.n_tasks, 
+            'selected_classes': eval(params.selected_classes),
+            "evaluated_tasks": eval(params.evaluated_tasks), 
+            "shmh": shmh,
+            "SINGLE": False
 
-    if classes_per_task != -1: 
-
-        cl_hyper = {
-                'training_mode': params.training_mode,
-                'cf_sol': params.cf_sol,
-                'head_sol': params.head_sol,
-                'top_k': params.top_k,
-                "topk_lock": params.topk_lock,
-                'high_lr': params.high_lr,
-                'low_lr':params.low_lr,
-                't_criteria': params.t_criteria,
-                'delta_w_interval': params.delta_w_interval,
-                'heads_basis_t': params.heads_basis_t,
-                "classes_per_task": params.classes_per_task,
-                "n_tasks": params.n_tasks, 
-                'selected_classes': eval(params.selected_classes),
-                "evaluated_tasks": eval(params.evaluated_tasks), 
-                "shmh": shmh,
-                "SINGLE": False
-
-            }
-         
-        params.training_mode = cl_hyper["training_mode"]
-        params.cl_hyper = cl_hyper
+        }
         
-        
-        dataset_sup_ground  = load_config_dataset(params.dataset_sup, params.validation, params.continual_learning)
-        dataset_unsup_ground = load_config_dataset(params.dataset_unsup, params.validation, params.continual_learning)
-        
-        
-        out_channels = dataset_sup_ground["out_channels"]
-        dataset_sup_ground["old_dataset_size"] = dataset_sup_ground["width"]
-        dataset_unsup_ground["old_dataset_size"] = dataset_unsup_ground["width"]
-
-        dataset_sup_ground["n_classes"] = classes_per_task
-        dataset_unsup_ground["n_classes"] = classes_per_task
-
-        dataset_sup_ground["shmh"] = shmh
-        dataset_unsup_ground["shmh"] = shmh
-
-        dataset_sup_ground["out_channels"] = classes_per_task
-        dataset_unsup_ground["out_channels"] = classes_per_task
-
-        dataset_sup_ground["joint"] = False
-        dataset_unsup_ground["joint"] = False
-
-        dataset_sup_ground["eval"] = False
-        dataset_unsup_ground["eval"] = False
-
-        all_classes = np.arange(0, out_channels)
-        
-        if "ESC50" in params.dataset_sup:
-            folds = 5
-        elif "URBANSOUND8K" in params.dataset_sup:
-            folds = 10
-        folds = 1 ##############################################################################################################################
-
-        dataset_sup_1 = dataset_sup_ground.copy()
-        dataset_unsup_1 = dataset_unsup_ground.copy()
-
-        dataset_sup_1["joint"] = False
-        dataset_unsup_1["joint"] = False
-
-        results["performance_avg_folds"] = {}
-        results["accuracy_matrix"] = {}
-        results["joint"] = {}
-        results["confusion_matrix"] = {}
-        if out_channels >=  classes_per_task or shmh:
-            for fold in range(folds):
-                
-                print("#########################################################################################################")
-                print("################################## FOLD # " + str(fold+1)+ " ############################################")
-                print("#########################################################################################################")
-                dataset_unsup_1["fold"] = fold + 1
-                dataset_sup_1["fold"] = fold + 1
-                
-                results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
-                # # TASK 1
-                
-                print("################################## TASK 0 ############################################")
-                selected_classes = cl_hyper["selected_classes"][0]
-                print("Selected Classes for the Task: ", selected_classes)
-                dataset_sup_1["n_classes"] = len(selected_classes)
-                dataset_unsup_1["n_classes"] = len(selected_classes)
-                dataset_sup_1["out_channels"] = len(selected_classes)
-                dataset_unsup_1["out_channels"] = len(selected_classes)
-
-
-                task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=None, task_num=0)
-                evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
-                
+    params.training_mode = cl_hyper["training_mode"]
+    params.cl_hyper = cl_hyper
     
-                
-                for task_num in range(1, len(cl_hyper["selected_classes"])):
-                    print("################################## TASK " + str(task_num)+ " ############################################")
+    
+    dataset_sup_ground  = load_config_dataset(params.dataset_sup, params.validation, params.continual_learning)
+    dataset_unsup_ground = load_config_dataset(params.dataset_unsup, params.validation, params.continual_learning)
+    
+    
+    out_channels = dataset_sup_ground["out_channels"]
+    dataset_sup_ground["old_dataset_size"] = dataset_sup_ground["width"]
+    dataset_unsup_ground["old_dataset_size"] = dataset_unsup_ground["width"]
 
-                    selected_classes = cl_hyper["selected_classes"][task_num]
-                    print("Selected Classes for the Task: ", selected_classes)
-                    dataset_sup_x = dataset_sup_ground.copy()
-                    dataset_unsup_x = dataset_unsup_ground.copy()
+    dataset_sup_ground["n_classes"] = classes_per_task
+    dataset_unsup_ground["n_classes"] = classes_per_task
 
-                    dataset_sup_x["joint"] = False
-                    dataset_unsup_x["joint"] = False
+    dataset_sup_ground["shmh"] = shmh
+    dataset_unsup_ground["shmh"] = shmh
 
-                    dataset_sup_x["eval"] = False
-                    dataset_unsup_x["eval"] = False
+    dataset_sup_ground["out_channels"] = classes_per_task
+    dataset_unsup_ground["out_channels"] = classes_per_task
 
-                    dataset_unsup_x["fold"] = fold + 1
-                    dataset_sup_x["fold"] = fold + 1
-                    dataset_sup_x["n_classes"] = len(selected_classes)
-                    dataset_unsup_x["n_classes"] = len(selected_classes)
-                    dataset_sup_x["out_channels"] = len(selected_classes)
-                    dataset_unsup_x["out_channels"] = len(selected_classes)
+    dataset_sup_ground["joint"] = False
+    dataset_unsup_ground["joint"] = False
 
-                    params.continual_learning = True
-                    params.resume = True
+    dataset_sup_ground["eval"] = False
+    dataset_unsup_ground["eval"] = False
 
-                    task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
-                    # This evaluates all the tasks after training on a new task, needed to create the accuracy matrix.
-                    evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
-                    
-                    # # JOINT
-                    print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
+    all_classes = np.arange(0, out_channels)
+    
+    if "ESC50" in params.dataset_sup:
+        folds = 5
+    elif "URBANSOUND8K" in params.dataset_sup:
+        folds = 10
+    # folds = 1 ##############################################################################################################################
 
-                    selected_classes = list(itertools.chain(*(cl_hyper["selected_classes"][:task_num+1])))     ### collapse all the lists into 1
-                    dataset_sup_x["joint"] = True
-                    dataset_unsup_x["joint"] = True
-                    params.resume = None
-                    dataset_unsup_x["fold"] = fold + 1
-                    dataset_sup_x["fold"] = fold + 1
-                    dataset_sup_x["n_classes"] = len(selected_classes)
-                    dataset_unsup_x["n_classes"] = len(selected_classes)
-                    dataset_sup_x["out_channels"] = len(selected_classes)
-                    dataset_unsup_x["out_channels"] = len(selected_classes)
-                    task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=None, task_num=task_num)
-                    dataset_sup_x["eval"] = True
-                    params.resume = True
-                    procedure(params, name_model+"joint", blocks, dataset_sup_x, dataset_unsup_x, evaluate=True, results=results, task_num=task_num)
-                    dataset_sup_x["eval"] = False
-                    ###############################
-                # EVALUATION PHASE
+    dataset_sup_1 = dataset_sup_ground.copy()
+    dataset_unsup_1 = dataset_unsup_ground.copy()
 
-                evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+    dataset_sup_1["joint"] = False
+    dataset_unsup_1["joint"] = False
 
-
-                results["count"] = 0
-                command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
-                res = subprocess.run(command, shell=True, capture_output=False, text=True)
-            results["model_name"] = name_model
-
-            for task_num in range(0, cl_hyper["n_tasks"]):
-                for fold_num in range(folds):
-                    
-                    if f"eval_{task_num}" not in results["performance_avg_folds"].keys():
-                            results["performance_avg_folds"][f"eval_{task_num}"] = 0
-                    results["performance_avg_folds"][f"eval_{task_num}"] += results[f"FOLD_#{fold_num+1}"][f"eval_{task_num}"]["test_acc"]
-                results["performance_avg_folds"][f"eval_{task_num}"] = results["performance_avg_folds"][f"eval_{task_num}"]/folds
-
-            save_results_new(results, f"{params.parent_f_id}/TASKS_CL_{params.dataset_sup.split('_')[0] +  folder_id}", name_model)
+    results["performance_avg_folds"] = {}
+    results["accuracy_matrix"] = {}
+    results["joint"] = {}
+    results["confusion_matrix"] = {}
+    if out_channels >=  classes_per_task or shmh:
+        for fold in range(folds):
             
-   
-        else: 
-            print("Error: Not enough available classes to be organized in tasks of classes_per_task")
+            print("#########################################################################################################")
+            print("################################## FOLD # " + str(fold+1)+ " ############################################")
+            print("#########################################################################################################")
+            dataset_unsup_1["fold"] = fold + 1
+            dataset_sup_1["fold"] = fold + 1
+            
+            results["FOLD_#"+str(dataset_sup_1["fold"])] = {}
+            # # TASK 1
+            
+            print("################################## TASK 0 ############################################")
+            selected_classes = cl_hyper["selected_classes"][0]
+            print("Selected Classes for the Task: ", selected_classes)
+            dataset_sup_1["n_classes"] = len(selected_classes)
+            dataset_unsup_1["n_classes"] = len(selected_classes)
+            dataset_sup_1["out_channels"] = len(selected_classes)
+            dataset_unsup_1["out_channels"] = len(selected_classes)
+
+
+            task_training(params, name_model, blocks, selected_classes, dataset_sup_1, dataset_unsup_1, continual_learning=False, resume=None, task_num=0)
+            evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+            
+
+            
+            for task_num in range(1, len(cl_hyper["selected_classes"])):
+                print("################################## TASK " + str(task_num)+ " ############################################")
+
+                selected_classes = cl_hyper["selected_classes"][task_num]
+                print("Selected Classes for the Task: ", selected_classes)
+                dataset_sup_x = dataset_sup_ground.copy()
+                dataset_unsup_x = dataset_unsup_ground.copy()
+
+                dataset_sup_x["joint"] = False
+                dataset_unsup_x["joint"] = False
+
+                dataset_sup_x["eval"] = False
+                dataset_unsup_x["eval"] = False
+
+                dataset_unsup_x["fold"] = fold + 1
+                dataset_sup_x["fold"] = fold + 1
+                dataset_sup_x["n_classes"] = len(selected_classes)
+                dataset_unsup_x["n_classes"] = len(selected_classes)
+                dataset_sup_x["out_channels"] = len(selected_classes)
+                dataset_unsup_x["out_channels"] = len(selected_classes)
+
+                params.continual_learning = True
+                params.resume = True
+
+                task_training(params, name_model, blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=resume, task_num=task_num)
+                # This evaluates all the tasks after training on a new task, needed to create the accuracy matrix.
+                evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+                
+                # # JOINT
+                print(" ############################### JOINT PHASE at TASK " + str(task_num)+ " ############################")
+
+                selected_classes = list(itertools.chain(*(cl_hyper["selected_classes"][:task_num+1])))     ### collapse all the lists into 1
+                dataset_sup_x["joint"] = True
+                dataset_unsup_x["joint"] = True
+                params.resume = None
+                dataset_unsup_x["fold"] = fold + 1
+                dataset_sup_x["fold"] = fold + 1
+                dataset_sup_x["n_classes"] = len(selected_classes)
+                dataset_unsup_x["n_classes"] = len(selected_classes)
+                dataset_sup_x["out_channels"] = len(selected_classes)
+                dataset_unsup_x["out_channels"] = len(selected_classes)
+                task_training(params, name_model+"joint", blocks, selected_classes, dataset_sup_x, dataset_unsup_x, continual_learning=True, resume=None, task_num=task_num)
+                dataset_sup_x["eval"] = True
+                params.resume = True
+                procedure(params, name_model+"joint", blocks, dataset_sup_x, dataset_unsup_x, evaluate=True, results=results, task_num=task_num)
+                dataset_sup_x["eval"] = False
+                ###############################
+            # EVALUATION PHASE
+
+            evaluation_phase(params, name_model, results, blocks, dataset_sup_ground, dataset_unsup_ground, cl_hyper)
+
+
+            results["count"] = 0
+
+            # clean up the used models to save space
+            # command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
+            # res = subprocess.run(command, shell=True, capture_output=False, text=True)
+        results["model_name"] = name_model
+
+        for task_num in range(0, cl_hyper["n_tasks"]):
+            for fold_num in range(folds):
+                
+                if f"eval_{task_num}" not in results["performance_avg_folds"].keys():
+                        results["performance_avg_folds"][f"eval_{task_num}"] = 0
+                results["performance_avg_folds"][f"eval_{task_num}"] += results[f"FOLD_#{fold_num+1}"][f"eval_{task_num}"]["test_acc"]
+            results["performance_avg_folds"][f"eval_{task_num}"] = results["performance_avg_folds"][f"eval_{task_num}"]/folds
+
+        save_results_new(results, f"{params.parent_f_id}/TASKS_CL_{params.dataset_sup.split('_')[0] +  folder_id}", name_model)
+        
+
+    else: 
+        print("Error: Not enough available classes to be organized in tasks of classes_per_task")
 
 
 
     command = f"rm -rf -d {BASE_PATH}/Training/results/hebb/result/network/{name_model}"
-result = subprocess.run(command, shell=True, capture_output=False, text=True)
+    result = subprocess.run(command, shell=True, capture_output=False, text=True)
     
-print(result.stdout)
-if result.stderr:
-    print("Error:", result.stderr)
+    print(result.stdout)
+    if result.stderr:
+        print("Error:", result.stderr)
 
