@@ -11,7 +11,7 @@ import subprocess
 import random
 import numpy as np
 TEST = False # we reduced the epochs, reduced the folds, reduced the tasks, reduced the layers to 4
-SHMH = False
+SHMH = False 
 SINGLE = False
 
 n_experiments = 2
@@ -73,7 +73,7 @@ def execute_bash_command(evaluated_tasks: list, n_tasks: int, command: str, clas
 
     cl_hyper["SINGLE"] = SINGLE
 
-    f = open("/projappl/project_462001198/casciott/ICASSP26/batches/configs.sh", "w")
+    f = open("/projappl/project_462001198/casciott/ICASSP26/experiment_utils/configs.sh", "w")
     f.write("#!/bin/bash\n")
     
     for sol in sols:
@@ -129,7 +129,7 @@ if not os.path.isdir(f"{BASE_PATH}/{parent_f_id}"):
     os.mkdir(f"{BASE_PATH}/{parent_f_id}")
             
 
-command = f'cd /projappl/project_462001198/casciott/ICASSP26/batches/classes_CL/continual_learning/ && sbatch {dataset}.sh ' 
+command = f'cd /projappl/project_462001198/casciott/ICASSP26/experiment_utils/execs/ && sbatch {dataset}.sh ' 
 
 
 if dataset == "ESC50":  

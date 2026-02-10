@@ -58,16 +58,6 @@ parser.add_argument('--dataset-sup-1', choices=load_config_dataset(), default=No
                                    ' | '.join(load_config_dataset()) +
                                    ' (default: None)')
 
-parser.add_argument('--dataset-unsup-2', choices=load_config_dataset(), default=None,
-                    type=str, help='Dataset possibilities ' +
-                                   ' | '.join(load_config_dataset()) +
-                                   ' (default: None)')
-
-parser.add_argument('--dataset-sup-2', choices=load_config_dataset(), default=None,
-                    type=str, help='Dataset possibilities ' +
-                                   ' | '.join(load_config_dataset()) +
-                                   ' (default: None)')
-
 parser.add_argument('--training-mode', choices=['successive', 'consecutive', 'simultaneous'], default='consecuttive',   ###################
                     type=str, help='Training possibilities ' +
                                    ' | '.join(['successive', 'consecutive', 'simultaneous']) +
@@ -186,8 +176,8 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     test_acc = 0
     dataset_sup_config["SINGLE"] = cl_hyper["SINGLE"]
     for id, config in train_config.items():
-        if model.joint:
-            config["batch_size"] = 4
+        # if model.joint:
+        #     config["batch_size"] = 4
         train_loader, val_loader, test_loader, classes_offset = make_data_loaders(dataset_sup_config, config['batch_size'], device)
         model.classes_offset = classes_offset
 
@@ -297,39 +287,14 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     results["FOLD_#"+str(dataset_sup_config["fold"])]["T" + str(task_num)] = result.copy()
                     
                     results["count"] += 1
-            # else:
-            #     result = run_hybrid(
-            #         config['nb_epoch'],
-            #         config['print_freq'],
-            #         config['batch_size'],
-            #         config['lr'],
-            #         name_model,
-            #         dataset_sup_config,
-            #         model,
-            #         device,
-            #         log.sup[id],
-            #         blocks=config['blocks'],
-            #         save=save,
-            #         train_loader=train_loader,
-            #         val_loader=val_loader
-            #     )
-            #     result["dataset_sup"] = dataset_sup_config.copy()
-            #     result["dataset_unsup"] = dataset_unsup_config.copy()
-            #     result["train_config"] = train_config.copy()
-            #     print("RESULT: ", result)
-            #     results["R" + str(results["count"])] = result.copy()
-            #     print(f"IN R" + str(results["count"]) + ": ", results)
-            #     results["count"] += 1
+
     if "model_config" not in results.keys():
         results["model_config"] = blocks
     print("first heads: ", len(model.heads))
     for h in handles:
         h.remove()
     handles.clear()
-    # del model
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
+
       
 def plot_confusion_matrix(cm, path, name, class_names=None, normalize=False, title="Confusion Matrix"):
 
@@ -373,7 +338,7 @@ def procedure(params, name_model, blocks, dataset_sup_config, dataset_unsup_conf
           params.gpu_id, evaluate, results, cl_hyper=params.cl_hyper, task_num=task_num)
 
 
-def save_results_new(results, path, name):
+def save_results(results, path, name):
     print("results: ", results)
 
     if not os.path.exists(f"{BASE_PATH}/{path}"):
@@ -384,13 +349,6 @@ def save_results_new(results, path, name):
     with open(file, 'w') as f:
         json.dump(results, f, indent=4)
 
-def random_n_classes(all_classes, n_classes):
-    np.random.shuffle(all_classes)
-    # select n classes indices to extract the classes
-    classes = np.arange(0, n_classes)
-    selected_classes = all_classes[classes]
-    all_classes = np.delete(all_classes, classes)
-    return all_classes, selected_classes
 
 def task_training(params, name_model, blocks, selected_classes, dataset_sup, dataset_unsup, continual_learning, resume, task_num):
     
@@ -499,8 +457,6 @@ if __name__ == '__main__':
 
     dataset_sup_ground["eval"] = False
     dataset_unsup_ground["eval"] = False
-
-    all_classes = np.arange(0, out_channels)
     
     if "ESC50" in params.dataset_sup:
         folds = 5
@@ -614,7 +570,7 @@ if __name__ == '__main__':
                 results["performance_avg_folds"][f"eval_{task_num}"] += results[f"FOLD_#{fold_num+1}"][f"eval_{task_num}"]["test_acc"]
             results["performance_avg_folds"][f"eval_{task_num}"] = results["performance_avg_folds"][f"eval_{task_num}"]/folds
 
-        save_results_new(results, f"{params.parent_f_id}/TASKS_CL_{params.dataset_sup.split('_')[0] +  folder_id}", name_model)
+        save_results(results, f"{params.parent_f_id}/TASKS_CL_{params.dataset_sup.split('_')[0] +  folder_id}", name_model)
         
 
     else: 

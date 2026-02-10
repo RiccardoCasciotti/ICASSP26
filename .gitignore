@@ -9,18 +9,13 @@ quickdraw-*
 *archive.ics.uci.edu*
 code/model_zoo/cifar-10
 code/model_zoo/pytorch_ipynb/data
-*.out
-*.txt
+
 *.pdf
 *.tar
 *.sif
 
 # Binary PyTorch models
 *.pt
-
-SoftHebb-main/Training
-SoftHebb-main/EXP_*
-SoftHebb-main/experiments
 
 
 # Temporary OS files
@@ -125,6 +120,3 @@ ENV/
 
 # Rope project settings
 .ropeproject
-
-# Datasets
-MNIST*
