@@ -9,6 +9,8 @@ def gather_data(path, report):
     for root, dirs, files in os.walk(path):
         for file in files:
             print(file)
+            if ".json" not in file:
+                continue
             with open(os.path.join(root, file), "r") as f:
                 experiment = json.load(f)
                 if experiment["cl_hyper"]["cf_sol"] == True:
@@ -43,7 +45,10 @@ def gather_data(path, report):
                     report[key]["im_steps"] = {}
                 
 
-                
+                # "joint_confusion_matrix": {
+                #     "FOLD_#1": {
+                #         "T1": {
+                #             "y_pred": [
                 y_pred = []
                 y_true = []
                 for fold_num in experiment["confusion_matrix"]:
@@ -110,14 +115,15 @@ def compute_BWT(R):
 def compute_IM(R, joint):
     tasks = len(R)
     final = []
-    joint = np.array([None]+joint)
+    joint = [None]+joint
+
+   
 
     for k in range(tasks):
         if joint[k] is None:
             final.append(None)
         else:
-            final.append(joint[k]-R[k, k])
-
+            final.append((joint[k]-R[k, k]).tolist())
     return final
 
 def compute_FWT(R, b):
@@ -259,6 +265,12 @@ for key in R.keys():
     im[key] = compute_IM(R[key], list(report[key]["im_steps"].values()))
     R[key] = R[key].tolist()
 
+# print(R)
+# print(fm)
+# print(bwt)
+# print("report: ", report)
+# print("avg_accs: ", avg_accs)
+# print("confidence_intervals: ", confidence_intervals)
 
 with open(os.path.join(path, "stats.txt"), "w") as f:
     f.write("avg_accs: "+ json.dumps(avg_accs, indent=4))

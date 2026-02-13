@@ -405,12 +405,6 @@ if __name__ == '__main__':
     shmh = params.shmh
     
     
-    if classes_per_task != None and (params.dataset_sup_2 != None or params.dataset_sup_1 != None):
-        print("\n\n ########### WARNING ############\n\n")
-        print(" Invalid combination of parameters, provide either: [--classes, --dataset-sup, --dataset-unsup] or [--dataset-sup-1, --dataset-unsup-1, --dataset-sup-2, --dataset-unsup-2]\nThe continual learning is implemented per tasks where each task is made up of different classes \n of the same dataset, so only one dataset will be considered.")
-        print("\n\n ################################\n\n")
-
-
     cl_hyper = {
             'training_mode': params.training_mode,
             'cf_sol': params.cf_sol,

@@ -193,6 +193,24 @@
     }
   },
   "dataset": {
+    "default": {
+      "name": "MNIST",
+      "noise_std": 0,
+      "channels": 1,
+      "width": 28,
+      "height": 28,
+      "validation_split": 0.2,
+      "training_sample": 60000,
+      "testing_sample": 10000,
+      "out_channels": 10,
+      "num_workers": 0,
+      "seed": 0,
+      "shuffle": true,
+      "batch_size": 64,
+      "augmentation": false,
+      "zca_whitened": false,
+      "training_class": "all"
+    },
     "URBANSOUND8K": {
       "default": {
         "name": "URBANSOUND8K",
