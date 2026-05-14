@@ -57,6 +57,8 @@ Hebbian-TIL-develop/
 
 ## Quick start: run an experiment from `experiment_config.json`
 
+### Setup the environment by installing the packages in requirements.txt
+
 ### 1. Edit the experiment configuration
 
 Open:
