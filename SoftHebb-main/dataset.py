@@ -1,10 +1,8 @@
 import copy
 import random
 import h5py
-try:
-    from utils import seed_init_fn, DATASET
-except:
-    from hebb.utils import seed_init_fn, DATASET
+from utils import seed_init_fn
+
 import numpy as np
 import os
 import os.path as op
@@ -21,11 +19,8 @@ import pandas as pd
 from pathlib import Path
 
 torch.cuda.empty_cache()
-if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
-         # Apple Silicon GPU
-elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462001198/casciott"
+
+# BASE_PATH="/scratch/project_462001198/casciott"
 
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=1.):
@@ -43,7 +38,7 @@ def get_split(dataset, data_path, dataset_config, test_fold):
     
     return ESC50(dataset[~dataset["fold"].isin(folds)].reset_index(drop=True), data_path, dataset_config, augment=False), ESC50(dataset[dataset["fold"]==val_fold].reset_index(drop=True), data_path, dataset_config, augment=False), ESC50(dataset[dataset["fold"]==test_fold].reset_index(drop=True), data_path, dataset_config, augment=False)
 
-def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
+def make_data_loaders(dataset_config, batch_size, device, dataset_path=None):
     """
      Load Mnist Dataset and create a dataloader
 
@@ -61,6 +56,8 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         Training dataloader.
     test_loader : torch.utils.data.DataLoader
         Testing dataloader.
+    val_loader : torch.utils.data.DataLoader
+        Validation dataloader.
 
     """
     g = torch.Generator()
@@ -71,12 +68,13 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
     print("INSIDE:", dataset_config["name"])
     if dataset_config["name"] == "ESC50":
         classes_offset = []
-        fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
+        # fd = pd.read_csv(f"{BASE_PATH}/Training/data/ESC-50-master/meta/esc50.csv")
+        fd = pd.read_csv(f"{dataset_path}/meta/esc50.csv")
         fd = fd[["fold", "target", "filename"]]
-        train_split, val_split, test_split = get_split(fd, dataset_config=dataset_config, data_path=f"{BASE_PATH}/Training/data/ESC-50-master", test_fold=dataset_config["fold"])
+        train_split, val_split, test_split = get_split(fd, dataset_config=dataset_config, data_path=f"{dataset_path}", test_fold=dataset_config["fold"])
         if "n_classes" in dataset_config:
             selected_classes = dataset_config["selected_classes"]
-            if dataset_config["shmh"] or dataset_config["SINGLE"]:
+            if dataset_config["SINGLE"]:
                 test_split, classes_offset = classes_subset(dataset_config, test_split, selected_classes, device, False) 
             else: 
                 test_split, classes_offset = classes_subset(dataset_config, test_split, selected_classes, device, True)
@@ -90,10 +88,10 @@ def make_data_loaders(dataset_config, batch_size, device, dataset_path=DATASET):
         print("INSIDE CORRECT:")
         selected_classes = dataset_config["selected_classes"]
         eval_fold = dataset_config["fold"]
-        data_train = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=False, eval_fold=eval_fold, debug=False)
+        data_train = Urbansound8k(data_path=dataset_path, selected_classes=selected_classes, test=False, eval_fold=eval_fold, debug=False)
         data_train, classes_offset= class_cleaner(dataset_config, data_train, selected_classes)
         train_split, val_split = torch.utils.data.random_split(data_train, [0.9, 0.1])
-        test_split = Urbansound8k(data_path=f"/scratch/project_462001198/casciott/datasets/urbansound8k", selected_classes=selected_classes, test=True, eval_fold=eval_fold, debug=False)
+        test_split = Urbansound8k(data_path=dataset_path, selected_classes=selected_classes, test=True, eval_fold=eval_fold, debug=False)
         test_split, classes_offset = class_cleaner(dataset_config, test_split, selected_classes)
 
     train_loader = torch.utils.data.DataLoader(dataset=train_split,

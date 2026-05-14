@@ -14,7 +14,7 @@ import json
 from utils import load_presets, get_device, load_config_dataset, seed_init_fn, str2bool
 from model import load_layers
 from train import run_sup, run_unsup, check_dimension, training_config, run_hybrid
-from log_m import Log, save_logs
+from log_m import Log
 import warnings
 import copy
 
@@ -26,11 +26,8 @@ import torch.optim as optim
 import torch.nn as nn
 import numpy as np 
 
-if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
-         # Apple Silicon GPU
-elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462001198/casciott"
+
+BASE_PATH="/scratch/project_462001198/casciott"
 
 warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description='Multi layer Hebbian Training Continual Learning  implementation')
@@ -38,24 +35,32 @@ parser = argparse.ArgumentParser(description='Multi layer Hebbian Training Conti
 parser.add_argument('--continual_learning', choices=[True, False], default=False,
                     type=str2bool)
 
-
-parser.add_argument('--preset', choices=load_presets(), default=None,
+parser.add_argument('--results_path', default=None,
+                    type=str )
+parser.add_argument('--preset', default=None,
                     type=str, help='Preset of hyper-parameters ' +
-                                   ' | '.join(load_presets()) +
+                                   ' | ' +
                                    ' (default: None)')
 parser.add_argument('--folder-id', default=None,
                     type=str )
 parser.add_argument('--parent-f-id', default=None,
                     type=str )
 
-parser.add_argument('--dataset-unsup-1', choices=load_config_dataset(), default=None,
+
+parser.add_argument('--datasets_path', default=None,
+                    type=str )
+
+parser.add_argument('--presets_path', default=None,
+                    type=str )
+
+parser.add_argument('--dataset-unsup-1', default=None,
                     type=str, help='Dataset possibilities ' +
-                                   ' | '.join(load_config_dataset()) +
+                                   ' | ' +
                                    ' (default: None)')
 
-parser.add_argument('--dataset-sup-1', choices=load_config_dataset(), default=None,
+parser.add_argument('--dataset-sup-1', default=None,
                     type=str, help='Dataset possibilities ' +
-                                   ' | '.join(load_config_dataset()) +
+                                   ' | ' +
                                    ' (default: None)')
 
 parser.add_argument('--training-mode', choices=['successive', 'consecutive', 'simultaneous'], default='consecuttive',   ###################
@@ -93,14 +98,14 @@ parser.add_argument('--skip-1', default=False, type=str2bool, metavar='N',
                     help='Set to True if you want to skip the training on the first dataset and directly retrieve a model to train it again on the second dataset (you don \'t have to specify a preset if set True) ')
 parser.add_argument('--classes-per-task', default=-1, type=int,
                     help='The continual learning is organized in tasks made up of different classes of the same dataset. Number of classes belonging to each task.')
-parser.add_argument('--dataset-unsup', choices=load_config_dataset(),  default=None,
+parser.add_argument('--dataset-unsup',  default=None,
                     type=str, help='Dataset possibilities ' +
-                                   ' | '.join(load_config_dataset()) +
+                                   ' | '+
                                    ' (default: None)')
 
-parser.add_argument('--dataset-sup', choices=load_config_dataset(),  default=None,
+parser.add_argument('--dataset-sup',  default=None,
                     type=str, help='Dataset possibilities ' +
-                                   ' | '.join(load_config_dataset()) +
+                                   ' | ' +
                                    ' (default: None)')
 
 parser.add_argument('--head-sol', choices=[True, False], default='True',   ###################
@@ -128,8 +133,7 @@ parser.add_argument('--n-tasks', default=2,   ###################
                     type=int)
 parser.add_argument('--evaluated-tasks', default="[0,1]",   ###################
                     type=str)
-parser.add_argument('--shmh', default="False",   ###################
-                    type=str2bool)
+
 # we need first to pass both the datasets, the evaluation parameter is not needed, or it could be if we decide to validate just one model on one dataset. 
 # after we passed both the datasets, train the model on the 1st dataset ( the resume all flag must be artificially set to false) and retrieved the model saved. The continual learning flag will cut the dataset, but it must be applied only 
 # during the second training of the model. And so the evaluate must be set to true in the last iteration and continual learning again to false.
@@ -137,10 +141,10 @@ parser.add_argument('--shmh', default="False",   ###################
 results = {"count": 0}
 
 
-def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_config, train_config, gpu_id, evaluate, results, cl_hyper, task_num = -1):
+def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_config, train_config, gpu_id, evaluate, results, cl_hyper, task_num = -1, dataset_path=None, result_path=None):
     device = get_device()
 
-    model = load_layers(blocks, name_model, resume, dataset_sup_config=dataset_sup_config, batch_size=list(train_config.values())[-1]["batch_size"], cl_hyper=cl_hyper, task_num=task_num, eval=dataset_sup_config["eval"])
+    model = load_layers(blocks, name_model, resume, dataset_sup_config=dataset_sup_config, batch_size=list(train_config.values())[-1]["batch_size"], cl_hyper=cl_hyper, task_num=task_num, eval=dataset_sup_config["eval"], result_path=result_path)
     # if torch.cuda.is_available() and torch.cuda.device_count() > 1:
     #     model = torch.nn.DataParallel(model)
     model = model.to(device)
@@ -178,7 +182,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
     for id, config in train_config.items():
         # if model.joint:
         #     config["batch_size"] = 4
-        train_loader, val_loader, test_loader, classes_offset = make_data_loaders(dataset_sup_config, config['batch_size'], device)
+        train_loader, val_loader, test_loader, classes_offset = make_data_loaders(dataset_config=dataset_sup_config, batch_size=config['batch_size'], dataset_path=dataset_path, device=device)
         model.classes_offset = classes_offset
 
         if evaluate:
@@ -188,7 +192,7 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                 result = {}
                 task_cf = None
                 if cl_hyper["head_sol"] and not model.joint:
-                    res = evaluate_sup_multihead(model, criterion, test_loader, device, return_confusion_matrix=True) ##################################
+                    res = evaluate_sup_multihead(model, criterion, test_loader, device, return_confusion_matrix=True, result_path=result_path) ##################################
                     test_loss = res[0]
                     test_acc = res[1]
                     if len(res) == 3:
@@ -259,7 +263,8 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     blocks=config['blocks'],
                     save=save, 
                     train_loader=train_loader,
-                    val_loader=val_loader
+                    val_loader=val_loader, 
+                    result_path=result_path
                 )
                 
             elif config['mode'] == 'supervised':
@@ -277,7 +282,8 @@ def main(blocks, name_model, resume, save, dataset_sup_config, dataset_unsup_con
                     save=save,
                     train_loader=train_loader,
                     val_loader=val_loader,
-                    task_num=task_num
+                    task_num=task_num ,
+                    result_path=result_path
                 )
                 if not dataset_sup_config["joint"]:
                     result["dataset_sup"] = dataset_sup_config.copy()
@@ -335,7 +341,7 @@ def procedure(params, name_model, blocks, dataset_sup_config, dataset_unsup_conf
                                    params.training_blocks)
     
     main(blocks, name_model, params.resume, params.save, dataset_sup_config, dataset_unsup_config, train_config,
-          params.gpu_id, evaluate, results, cl_hyper=params.cl_hyper, task_num=task_num)
+          params.gpu_id, evaluate, results, cl_hyper=params.cl_hyper, task_num=task_num, dataset_path=params.datasets_path, result_path=params.results_path)
 
 
 def save_results(results, path, name):
@@ -399,10 +405,9 @@ if __name__ == '__main__':
     name_model = params.preset if params.model_name is None else params.model_name
     name_model = name_model + str(uuid.uuid4())
     #name_model = "C100_2C_CLb50abfcf-7c09-4b6f-a581-dc7b529dd310"
-    blocks = load_presets(params.preset)
+    blocks = load_presets(name=params.preset, preset_path=params.presets_path)
     classes_per_task = params.classes_per_task
     resume = params.resume
-    shmh = params.shmh
     
     
     cl_hyper = {
@@ -415,12 +420,10 @@ if __name__ == '__main__':
             'low_lr':params.low_lr,
             't_criteria': params.t_criteria,
             'delta_w_interval': params.delta_w_interval,
-            'heads_basis_t': params.heads_basis_t,
             "classes_per_task": params.classes_per_task,
             "n_tasks": params.n_tasks, 
             'selected_classes': eval(params.selected_classes),
             "evaluated_tasks": eval(params.evaluated_tasks), 
-            "shmh": shmh,
             "SINGLE": False
 
         }
@@ -429,8 +432,8 @@ if __name__ == '__main__':
     params.cl_hyper = cl_hyper
     
     
-    dataset_sup_ground  = load_config_dataset(params.dataset_sup, params.validation, params.continual_learning)
-    dataset_unsup_ground = load_config_dataset(params.dataset_unsup, params.validation, params.continual_learning)
+    dataset_sup_ground  = load_config_dataset(name=params.dataset_sup, validation=params.validation, cl=params.continual_learning, preset_path=params.presets_path)
+    dataset_unsup_ground = load_config_dataset(name=params.dataset_unsup, validation=params.validation, cl=params.continual_learning, preset_path=params.presets_path)
     
     
     out_channels = dataset_sup_ground["out_channels"]
@@ -439,9 +442,6 @@ if __name__ == '__main__':
 
     dataset_sup_ground["n_classes"] = classes_per_task
     dataset_unsup_ground["n_classes"] = classes_per_task
-
-    dataset_sup_ground["shmh"] = shmh
-    dataset_unsup_ground["shmh"] = shmh
 
     dataset_sup_ground["out_channels"] = classes_per_task
     dataset_unsup_ground["out_channels"] = classes_per_task
@@ -468,7 +468,7 @@ if __name__ == '__main__':
     results["accuracy_matrix"] = {}
     results["joint"] = {}
     results["confusion_matrix"] = {}
-    if out_channels >=  classes_per_task or shmh:
+    if out_channels >=  classes_per_task:
         for fold in range(folds):
             
             print("#########################################################################################################")

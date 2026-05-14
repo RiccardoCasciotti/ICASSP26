@@ -1,0 +1,31 @@
+{
+  "debug": true,
+  "single": false,
+
+  "n_experiments": 1,
+
+  "dataset": "URBANSOUND8K",
+  "_comment": "dataset options: ESC50, URBANSOUND8K",
+
+  "id": "TEST",
+
+  "base_path": "/scratch/project_462001198/casciott",
+  "project_path": "/projappl/project_462001198/casciott/ICASSP26",
+  "presets_path": "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/presets.json",
+  "results_path": "/scratch/project_462001198/casciott/Training/results/hebb/result",
+  "preset_name": "6SoftHebbCnnESC50",
+  "datasets_path": "/scratch/project_462001198/casciott/datasets/urbansound8k",
+  "execs_dir": "/projappl/project_462001198/casciott/ICASSP26/experiment_utils/execs",
+
+  "evaluated_tasks": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+
+  "cl_hyper": {
+    "training_mode": "consecutive",
+    "top_k": 0.6,
+    "topk_lock": false,
+    "high_lr": 0.15,
+    "low_lr": 0.9,
+    "t_criteria": "activations",
+    "delta_w_interval": 5
+  }
+}

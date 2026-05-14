@@ -11,17 +11,13 @@ import pickle
 import numpy as np
 from utils import get_device
 import os.path as op
-try:
-    from utils import RESULT, activation
-except:
-    from hebb.utils import RESULT, activation
+from utils import activation
+
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 activations = {}
 curr_layer = 0
-
-POP_HEAD = True
 
 
 def train_BP(model, criterion, optimizer, loader, device, measures):
@@ -633,57 +629,52 @@ def evaluate_sup(model, criterion, loader, device, return_confusion_matrix=False
 
     return loss_sum.cpu() / n_inputs, 100 * acc_sum.cpu() / n_inputs
 
-def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_matrix=False):
+def evaluate_sup_multihead(model, criterion, loader, device, return_confusion_matrix=False, result_path=None):
 
     """
     Evaluate the multihead model, returning the best loss and acc
     """
     print("task_num: ", model.task_num)
-    if POP_HEAD and not model.shmh: 
-        # print("model.heads: ", model.heads)
-        state_dict = model.state_dict()
-        chosen_head = model.heads[model.task_num]
-        
+    # print("model.heads: ", model.heads)
+    state_dict = model.state_dict()
+    chosen_head = model.heads[model.task_num]
+    
 
-        # print("#################### CHOSEN HEAD ###############################")
-        # print(len(model.heads), int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
-        # print(int(chosen_head[keys[0]].shape[0]), len(model.selected_classes), model.selected_classes)
-        # print("###################################################")
+    # print("#################### CHOSEN HEAD ###############################")
+    # print(len(model.heads), int(chosen_head[keys[1]].shape[0]), chosen_head, len(model.selected_classes), model.selected_classes)
+    # print(int(chosen_head[keys[0]].shape[0]), len(model.selected_classes), model.selected_classes)
+    # print("###################################################")
 
-        if not op.isdir(RESULT):
-            os.makedirs(RESULT)
-        if not op.isdir(op.join(RESULT, 'network')):
-            os.mkdir(op.join(RESULT, 'network'))
-            os.mkdir(op.join(RESULT, 'layer'))
+    if not op.isdir(result_path):
+        os.makedirs(result_path)
+    if not op.isdir(op.join(result_path, 'network')):
+        os.mkdir(op.join(result_path, 'network'))
+        os.mkdir(op.join(result_path, 'layer'))
 
-        folder_path = op.join(RESULT, 'network', model.model_name)
-        if not op.isdir(folder_path):
-            os.makedirs(op.join(folder_path, 'models'))
-        storing_path = op.join(folder_path, 'models')
-        torch.save({
-        'state_dict': model.state_dict(),
-        'config': model.config,
-        'avg_deltas': model.avg_deltas,
-        'topk_kernels': model.topk_kernels,
-        'epoch': 50, 
-        'heads': model.heads.copy(), 
-        'heads_thresh' : model.heads_thresh, 
-        'model_name': model.model_name
-    }, op.join(storing_path, "checkpoint.pth.tar"))
+    folder_path = op.join(result_path, 'network', model.model_name)
+    if not op.isdir(folder_path):
+        os.makedirs(op.join(folder_path, 'models'))
+    storing_path = op.join(folder_path, 'models')
+    torch.save({
+    'state_dict': model.state_dict(),
+    'config': model.config,
+    'avg_deltas': model.avg_deltas,
+    'topk_kernels': model.topk_kernels,
+    'epoch': 50, 
+    'heads': model.heads.copy(), 
+    'model_name': model.model_name
+}, op.join(storing_path, "checkpoint.pth.tar"))
 
-        if chosen_head != None:
-            keys = list(chosen_head.keys())
-            state_dict[keys[0]] = chosen_head[keys[0]]
-            state_dict[keys[1]] = chosen_head[keys[1]]
+    if chosen_head != None:
+        keys = list(chosen_head.keys())
+        state_dict[keys[0]] = chosen_head[keys[0]]
+        state_dict[keys[1]] = chosen_head[keys[1]]
 
-        # print("chosen_head: ", chosen_head)
+    # print("chosen_head: ", chosen_head)
 
-        model.load_state_dict(state_dict)
+    model.load_state_dict(state_dict)
 
-        return evaluate_sup(model, criterion, loader, device, return_confusion_matrix=return_confusion_matrix)
-    else:
-        print("\n\n\nWARNING !!!! POP_HEAD AND SHMH ARE BOTH TRUE, THIS IS NOT SUPPORTED YET\n\n\n")
-
+    return evaluate_sup(model, criterion, loader, device, return_confusion_matrix=return_confusion_matrix)
 
 
 def accuracy(output, target, topk=(1,)):

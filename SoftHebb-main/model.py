@@ -3,10 +3,6 @@ import pickle
 import torch
 import torch.nn as nn
 
-try:
-    from utils import RESULT, activation
-except:
-    from hebb.utils import RESULT, activation
 from layer import generate_block
 import os
 import os.path as op
@@ -29,14 +25,14 @@ def load(path, map_location):
     return torch.load(path, **kwargs)
 
 
-def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}, task_num=-1, eval=False):
+def load_layers(params, model_name, resume=None, verbose=True, model_path_override=None, dataset_sup_config=None, batch_size=None, cl_hyper={}, task_num=-1, eval=False, result_path=None):
     """
     Create Model and load state if resume
     """
     
     if resume is not None:
         if model_path_override is None:
-            model_path = op.join(RESULT, 'network', model_name, 'models', 'checkpoint.pth.tar')
+            model_path = op.join(result_path, 'network', model_name, 'models', 'checkpoint.pth.tar')
         else:
             model_path = model_path_override
 
@@ -44,7 +40,6 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
             checkpoint =  load(model_path, get_device())
             state_dict_old = checkpoint['state_dict']
 
-            cl_hyper["heads_basis_t"]=float(checkpoint["heads_thresh"])
             model = MultiLayer(params, topk_kernels=checkpoint["topk_kernels"], avg_deltas=checkpoint["avg_deltas"], heads=checkpoint["heads"], cl_hyper=cl_hyper.copy())
         
             state_dict_new = model.state_dict()
@@ -76,24 +71,23 @@ def load_layers(params, model_name, resume=None, verbose=True, model_path_overri
         model.__str__()
      
     model.selected_classes = dataset_sup_config["selected_classes"]
-    model.shmh = dataset_sup_config["shmh"]
     return model
 
 
-def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar', storing_path=None):
+def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar', storing_path=None, result_path=None):
     """
     Save model and each of its training blocks
     """
 
     if storing_path is None:
          
-        if not op.isdir(RESULT):
-            os.makedirs(RESULT)
-        if not op.isdir(op.join(RESULT, 'network')):
-            os.mkdir(op.join(RESULT, 'network'))
-            os.mkdir(op.join(RESULT, 'layer'))
+        if not op.isdir(result_path):
+            os.makedirs(result_path)
+        if not op.isdir(op.join(result_path, 'network')):
+            os.mkdir(op.join(result_path, 'network'))
+            os.mkdir(op.join(result_path, 'layer'))
 
-        folder_path = op.join(RESULT, 'network', model_name)
+        folder_path = op.join(result_path, 'network', model_name)
         if not op.isdir(folder_path):
             os.makedirs(op.join(folder_path, 'models'))
         storing_path = op.join(folder_path, 'models')
@@ -104,14 +98,13 @@ def save_layers(model, model_name, epoch, blocks, filename='checkpoint.pth.tar',
         'avg_deltas': model.avg_deltas,
         'topk_kernels': model.topk_kernels,
         'epoch': epoch, 
-        'heads': model.heads, 
-        'heads_thresh' : model.heads_thresh, 
+        'heads': model.heads,
         'model_name' : model_name
     }, op.join(storing_path, filename))
 
     for block_id in blocks:
         block = model.get_block(block_id)
-        block_path = op.join(RESULT, 'layer', 'block%s' % block.num)
+        block_path = op.join(result_path, 'layer', 'block%s' % block.num)
         if not op.isdir(block_path):
             os.makedirs(block_path)
         folder_path = op.join(block_path, block.get_name())
@@ -140,7 +133,6 @@ class MultiLayer(nn.Module):
         self.avg_deltas = avg_deltas
         self.topk_kernels = topk_kernels
         self.heads = heads
-        self.heads_thresh = cl_hyper["heads_basis_t"]
         self.cl_hyper = cl_hyper
         
 

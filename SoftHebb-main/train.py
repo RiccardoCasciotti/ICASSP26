@@ -256,7 +256,8 @@ def run_hybrid(
         plot_fc=None,
         model_dir=None, 
         train_loader=None,
-        val_loader=None
+        val_loader=None, 
+        result_path=None
 ):
     """
     Hybrid training of one model, happens during simultaneous training mode
@@ -307,14 +308,10 @@ def run_hybrid(
                 keys = list(state_dict.keys())
                 new_head = {keys[-1]: state_dict[keys[-1]], keys[-2]: state_dict[keys[-2]]}
                  
-                if len(model.heads) > 0:
-                    val =  model.heads_thresh*len(model.heads)
-                    val += val_acc/100
-                    model.heads_thresh = val/(len(model.heads)+1)
                 model.heads.append(new_head)
 
             if save:
-                save_layers(model, folder_name, epoch, blocks, storing_path=model_dir)
+                save_layers(model, folder_name, epoch, blocks, storing_path=model_dir, result_path=result_path)
 
             if plot_fc is not None:
                 for block in blocks:
@@ -344,7 +341,8 @@ def run_unsup(
         reset=False,
         model_dir=None, 
         train_loader=None,
-        val_loader=None
+        val_loader=None, 
+        result_path=None
 ):
     """
     Unsupervised training of hebbians blocks of one model
@@ -374,7 +372,7 @@ def run_unsup(
 
         
             if save:
-                save_layers(model, folder_name, epoch, blocks, storing_path=model_dir)
+                save_layers(model, folder_name, epoch, blocks, storing_path=model_dir, result_path=result_path)
 
             if plot_fc is not None:
                 for block in blocks:
@@ -403,7 +401,8 @@ def run_sup(
         model_dir=None, 
         train_loader=None,
         val_loader=None,
-        task_num=0
+        task_num=0, 
+        result_path=None
 ):
     """
     Supervised training of BP blocks of one model
@@ -462,15 +461,12 @@ def run_sup(
                 new_head = {keys[-1]: state_dict[keys[-1]], keys[-2]: state_dict[keys[-2]]}
                  
                 if len(model.heads) > 0:
-                    val =  model.heads_thresh*len(model.heads)
-                    val += val_acc/100
-                    model.heads_thresh = val/(len(model.heads)+1)
-                
+            
                     model.heads[task_num] = new_head
 
             if save:
                  
-                save_layers(model, folder_name, epoch, blocks, storing_path=model_dir)
+                save_layers(model, folder_name, epoch, blocks, storing_path=model_dir, result_path=result_path)
 
             if plot_fc is not None:
                 for block in blocks:

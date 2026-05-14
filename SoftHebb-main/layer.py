@@ -2,11 +2,6 @@ import torch
 from torch import Tensor
 import torch.nn as nn
 
-try:
-    from utils import RESULT
-except:
-    from hebb.utils import RESULT
-
 import torch.nn.functional as F
 from typing import Callable, List, Optional
 from hebblinear import select_linear_layer
@@ -109,8 +104,7 @@ class BasicBlock(nn.Module):
         self.att_dropout = att_dropout
         self.hebbian = hebbian
         self.resume = resume
-        if resume is not None:
-            self.resume_block()
+        
 
     def get_name(self):
         s = ''
@@ -212,17 +206,6 @@ class BasicBlock(nn.Module):
         if self.resume is not None:
             print('***', self.resume)
 
-    def resume_block(self, device: str = 'cpu'):
-        model_path = op.join(RESULT, 'layer', 'block%s' % self.num, self.get_name(), 'checkpoint.pth.tar')
-        if op.isfile(model_path):
-            try:
-                checkpoint = torch.load(model_path, map_location=device)
-                self.load_state_dict(checkpoint['state_dict'])
-                self.resume = 'Block %s loaded successfuly' % self.get_name()
-            except Exception as e:
-                self.resume = 'File %s exist but %s' % (self.get_name(), e)
-        else:
-            self.resume = 'Block %s not found' % self.get_name()
 
 
 def generate_block(params, avg_deltas_layer={}, topk_layer={}, cl_hyper={}, heads=None) -> BasicBlock:

@@ -8,16 +8,13 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
-if torch.backends.mps.is_available(): 
-    BASE_PATH="/Users/kmc479/Desktop/ICASSP26/SoftHebb-main"
-         # Apple Silicon GPU
-elif torch.cuda.is_available():
-    BASE_PATH="/scratch/project_462001198/casciott"
-data_candidate = f"{BASE_PATH}/Training"
-DATA = op.realpath(op.expanduser(data_candidate))
-RESULT = op.join(DATA, 'results', 'hebb', 'result')  # everything from multi_layer.py
-SEARCH = op.join(DATA, 'results', 'hebb', 'search')  # everything from ray_search
-DATASET = op.join(DATA, 'data')
+# f"/scratch/project_462001198/casciott/Training"
+# BASE_PATH=""
+# data_candidate = f"{BASE_PATH}/Training"
+# DATA = op.realpath(op.expanduser(data_candidate))
+# RESULT = op.join("/scratch/project_462001198/casciott/Training/results/hebb/result", 'results', 'hebb', 'result')  # everything from multi_layer.py
+# SEARCH = op.join(DATA, 'results', 'hebb', 'search')  # everything from ray_search
+# DATASET = op.join(DATA, 'data')
 
 
 def get_folder_name(params):
@@ -392,12 +389,12 @@ def generate_config(preset, arch):
     return config
 
 
-def load_presets(name=None):
+def load_presets(name=None, preset_path=None):
     """
     Load blocks config from name of the models
 
     """
-    f = open(f'/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/presets.json', "r")
+    f = open(preset_path, "r")
     presets = json.load(f)
     if name is None:
         return list(presets['model'].keys())
@@ -433,12 +430,12 @@ def load_presets(name=None):
     return blocks
 
 
-def load_config_dataset(name=None, validation=True, cl=False):
+def load_config_dataset(name=None, preset_path=None, validation=True, cl=False):
     """
     Load dataset config from name of the dataset
 
     """
-    f = open(f'/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/presets.json', "r")
+    f = open(preset_path, "r")
     dataset = json.load(f)['dataset']
     if name is None:
         lst_dataset = []

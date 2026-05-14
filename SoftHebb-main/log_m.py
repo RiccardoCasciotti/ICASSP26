@@ -1,10 +1,7 @@
 import numpy as np
 import time
 
-try:
-    from utils import RESULT
-except:
-    from hebb.utils import RESULT
+
 import torch
 import os
 import os.path as op
@@ -186,8 +183,8 @@ class Log:
         return self
 
 
-def save_logs(log, model_name, filename='final.pth.tar'):
-    folder_path = op.join(RESULT, 'network', model_name, 'measures')
+def save_logs(log, model_name, filename='final.pth.tar', result_path=None):
+    folder_path = op.join(result_path, 'network', model_name, 'measures')
     if not op.isdir(folder_path):
         os.mkdir(folder_path)
 
@@ -196,9 +193,9 @@ def save_logs(log, model_name, filename='final.pth.tar'):
     }, op.join(folder_path, filename))
 
 
-def load_logs(model_name, configs, filename='final.pth.tar'):
+def load_logs(model_name, configs, filename='final.pth.tar', result_path=None):
     print(model_name)
-    folder_path = op.join(RESULT, 'network', model_name, 'measures')
+    folder_path = op.join(result_path, 'network', model_name, 'measures')
     print("Log Folder Path: ", folder_path)
     if not op.isdir(folder_path):
         os.mkdir(folder_path)

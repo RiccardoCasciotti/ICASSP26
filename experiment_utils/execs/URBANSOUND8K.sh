@@ -13,20 +13,10 @@ module use /appl/local/csc/modulefiles/
 module load CrayEnv
 module load cotainr
 module load rocm
-# srun python3 /projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py --preset 6SoftHebbCnnESC --resume all --model-name 'ESC50_CL' --dataset-unsup ESC50_1 --dataset-sup ESC50_50 --continual_learning True --evaluate True --training-mode $1 --cf-sol $2 --head-sol $3 --top-k $4 --high-lr $5 --low-lr $6 --t-criteria $7 --delta-w-interval $8 --heads-basis-t $9 --selected-classes "${10}" --n-tasks "${11}" --evaluated-task "${12}" --classes-per-task "${13}" --topk-lock "${14}" --folder-id "${15}" --parent-f-id "${16}" 
 srun singularity exec \
                  --rocm \
     --bind /projappl/project_462001198/casciott/ICASSP26 \
     --bind /scratch/project_462001198/casciott \
     --pwd  /projappl/project_462001198/casciott/ICASSP26 \
     /scratch/project_462001198/casciott/softhebb_env/softhebb.sif \
-    python3 /projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py --preset 6SoftHebbCnnUrbanSound8k --resume all --model-name 'URBANSOUND8K_CL' --dataset-unsup URBANSOUND8K_1 --dataset-sup URBANSOUND8K_100 --continual_learning True --evaluate True --training-mode $1 --cf-sol $2 --head-sol $3 --top-k $4 --high-lr $5 --low-lr $6 --t-criteria $7 --delta-w-interval $8 --heads-basis-t $9 --selected-classes "${10}" --n-tasks "${11}" --evaluated-task "${12}" --classes-per-task "${13}" --topk-lock "${14}" --folder-id "${15}" --parent-f-id "${16}" --shmh "${17}"
-
-    #  python3 /projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py --preset 4SoftHebbCnnESC_B --resume all --model-name 'ESC50_CL' --dataset-unsup ESC50_1 --dataset-sup ESC50_25 --continual_learning True --evaluate True --training-mode $1 --cf-sol $2 --head-sol $3 --top-k $4 --high-lr $5 --low-lr $6 --t-criteria $7 --delta-w-interval $8 --heads-basis-t $9 --selected-classes "${10}" --n-tasks "${11}" --evaluated-task "${12}" --classes-per-task "${13}" --topk-lock "${14}" --folder-id "${15}" --parent-f-id "${16}" --shmh "${17}"
-    
-# srun --partition=standard-g --account=project_462001198 singularity exec --rocm --bind /projappl/project_462001198/casciott/ICASSP26 --pwd  /projappl/project_462001198/casciott/ICASSP26 /projappl/project_462001198/casciott/ICASSP26/softhebb_env/softhebb.sif pip list
-# srun singularity exec --rocm \
-#     --bind /projappl/project_462001198/casciott/ICASSP26 \
-#     --pwd  /projappl/project_462001198/casciott/ICASSP26 \
-#     /projappl/project_462001198/casciott/ICASSP26/softhebb_env/softhebb.sif \
-#      python3 /projappl/project_462001198/casciott/ICASSP26/batches/dummy.py
+    python3 /projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/continual_learning.py --preset "${18}" --resume all --model-name 'URBANSOUND8K_CL' --dataset-unsup URBANSOUND8K_1 --dataset-sup URBANSOUND8K_100 --continual_learning True --evaluate True --training-mode $1 --cf-sol $2 --head-sol $3 --top-k $4 --high-lr $5 --low-lr $6 --t-criteria $7 --delta-w-interval $8 --selected-classes "$9" --n-tasks "${10}" --evaluated-task "${11}" --classes-per-task "${12}" --topk-lock "${13}" --folder-id "${14}" --parent-f-id "${15}" --presets_path "${16}" --datasets_path "${17}" --results_path "${19}"

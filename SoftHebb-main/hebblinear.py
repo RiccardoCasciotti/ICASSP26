@@ -1,11 +1,8 @@
 import torch
 import torch.nn as nn
 from typing import Generator, Union
+from utils import init_weight, normalize, activation, unsup_lr_scheduler
 
-try:
-    from utils import init_weight, normalize, activation, unsup_lr_scheduler
-except:
-    from hebb.utils import init_weight, normalize, activation, unsup_lr_scheduler
 import einops
 from tabulate import tabulate
 

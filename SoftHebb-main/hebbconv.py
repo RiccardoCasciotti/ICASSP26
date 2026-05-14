@@ -6,10 +6,8 @@ from typing import Generator, Union
 import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 from utils import DEVICE
-try:
-    from utils import init_weight, activation, unsup_lr_scheduler
-except:
-    from hebb.utils import init_weight, activation, unsup_lr_scheduler
+from utils import init_weight, activation, unsup_lr_scheduler
+
 import einops
 from tabulate import tabulate
 #from continual_learning import topk_lock
