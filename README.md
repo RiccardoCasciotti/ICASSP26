@@ -57,7 +57,14 @@ Hebbian-TIL-develop/
 
 ## Quick start: run an experiment from `experiment_config.json`
 
-### Setup the environment by installing the packages in requirements.txt
+### 0. Create and Activate the Conda Environment
+
+```bash
+conda env create -f softhebb.yml
+conda activate softhebb_env
+pip install -r softhebb_env/pip_reqs.txt
+```
+
 
 ### 1. Edit the experiment configuration
 
