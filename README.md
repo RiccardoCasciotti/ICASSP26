@@ -1,3 +1,4 @@
+FINAL VERSION
 # Incremental Learning for Audio Classification with Hebbian Deep Neural Networks
 
 ## Author
@@ -62,7 +63,6 @@ Hebbian-TIL-develop/
 ```bash
 conda env create -f softhebb.yml
 conda activate softhebb_env
-pip install -r softhebb_env/pip_reqs.txt
 ```
 
 
