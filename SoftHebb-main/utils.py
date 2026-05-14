@@ -8,13 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
-# f"/scratch/project_462001198/casciott/Training"
-# BASE_PATH=""
-# data_candidate = f"{BASE_PATH}/Training"
-# DATA = op.realpath(op.expanduser(data_candidate))
-# RESULT = op.join("/scratch/project_462001198/casciott/Training/results/hebb/result", 'results', 'hebb', 'result')  # everything from multi_layer.py
-# SEARCH = op.join(DATA, 'results', 'hebb', 'search')  # everything from ray_search
-# DATASET = op.join(DATA, 'data')
+
 
 
 def get_folder_name(params):

@@ -7,16 +7,24 @@ Co-authors: Prof. Alberto Antonietti, Politecnico di Milano; Francesco De Santis
 
 ## Overview
 
-This repository contains experiments for **task-incremental audio classification** with a SoftHebb-inspired neural architecture. The code trains a Hebbian convolutional feature extractor together with supervised classifier heads, then evaluates how performance changes as new tasks/classes are introduced.
+This repository contains task-incremental audio-classification experiments based on a SoftHebb-inspired convolutional architecture. The main workflow is controlled by:
 
-The main continual-learning mechanisms are:
+```text
+experiment_utils/experiment_config.json
+```
 
-- **Kernel plasticity / CF solution**: ranks kernels by importance and changes their learning rate during later tasks to reduce catastrophic forgetting.
-- **Multi-head / head solution**: stores a separate classifier head for each task and reloads the correct head during evaluation.
-- **Joint baseline inside each run**: after each new task, the code also trains/evaluates a joint model over all classes seen so far.
-- **LwF/EWC baselines**: implemented separately in `SoftHebb-main/baselines_LwF_EWC.py`.
+A user normally edits this JSON file, then launches `experiment_utils/testing.py`. The script reads the JSON, creates random task/class splits, chooses the continual-learning solution combinations, and submits one or more SLURM jobs with `sbatch`.
 
-Supported experiment datasets in the current code path are **ESC-50** and **UrbanSound8K**.
+Supported datasets in the current experiment launcher are:
+
+- `ESC50`
+- `URBANSOUND8K`
+
+The main continual-learning options are:
+
+- `cf_sol`: kernel-plasticity / catastrophic-forgetting solution.
+- `head_sol`: multi-head classifier solution.
+- `top_k`, `high_lr`, `low_lr`, `t_criteria`, `delta_w_interval`: hyperparameters controlling how kernels are selected and how their learning rates are modified.
 
 ---
 
@@ -26,490 +34,554 @@ Supported experiment datasets in the current code path are **ESC-50** and **Urba
 Hebbian-TIL-develop/
 ├── README.md
 ├── SoftHebb-main/
-│   ├── continual_learning.py      # Main continual-learning experiment runner
-│   ├── baselines_LwF_EWC.py       # LwF and EWC baseline runner
+│   ├── continual_learning.py      # Main continual-learning runner
+│   ├── baselines_LwF_EWC.py       # LwF/EWC baseline runner
 │   ├── presets.json               # Model, layer, and dataset presets
-│   ├── dataset.py                 # ESC-50 / UrbanSound8K dataset loaders
-│   ├── model.py                   # SoftHebb model construction and checkpoint loading
-│   ├── engine_cl.py               # Continual-learning training/evaluation loops
-│   ├── hebbconv.py                # Hebbian convolution layer and plasticity masks
-│   └── train.py                   # Supervised/unsupervised training utilities
+│   ├── dataset.py                 # ESC-50 and UrbanSound8K dataset loading
+│   ├── model.py                   # Model construction/checkpoint loading
+│   ├── engine_cl.py               # Continual-learning train/eval loops
+│   └── hebbconv.py                # Hebbian convolution layer and plasticity logic
 ├── experiment_utils/
-│   ├── testing.py                 # Generates many experiment submission commands
-│   ├── configs.sh                 # Generated/ready-to-run batch commands
+│   ├── experiment_config.json     # Main file users edit to start experiments
+│   ├── testing.py                 # Reads the JSON and submits sbatch jobs
+│   ├── configs.sh                 # Older/generated command file; not the main current workflow
 │   └── execs/
-│       ├── ESC50.sh               # SLURM wrapper for ESC-50 experiments
-│       ├── URBANSOUND8K.sh        # SLURM wrapper for UrbanSound8K experiments
-│       ├── ESC50_apple.sh         # Local Apple Silicon wrapper, path-specific
+│       ├── ESC50.sh               # SLURM wrapper for ESC-50
+│       ├── URBANSOUND8K.sh        # SLURM wrapper for UrbanSound8K
+│       ├── ESC50_apple.sh         # Local Apple-specific wrapper
 │       └── baselines.sh           # SLURM wrapper for LwF/EWC baselines
 └── experiment_results/            # Example/result-processing files from previous runs
 ```
 
 ---
 
-## Before running: environment, paths, and data
+## Quick start: run an experiment from `experiment_config.json`
 
-### 1. Create a Python environment
-
-The repository does not currently include a requirements file. The code imports at least the following packages:
+### 0. Create and Activate the Conda Environment
 
 ```bash
-conda create -n softhebb python=3.8 -y
-conda activate softhebb
-pip install numpy pandas h5py matplotlib seaborn torch torchvision torchaudio
+conda env create -f softhebb.yml
+conda activate softhebb_env
+pip install -r softhebb_env/pip_reqs.txt
 ```
 
-On CSC/SLURM, the provided job scripts expect a Singularity image at:
 
-```text
-/scratch/project_462001198/casciott/softhebb_env/softhebb.sif
+### 1. Edit the experiment configuration
+
+Open:
+
+```bash
+experiment_utils/experiment_config.json
 ```
 
-If you are not running on that exact environment, update the paths in the shell scripts under `experiment_utils/execs/`.
+A minimal example for an UrbanSound8K debug run is:
 
-### 2. Check hard-coded paths
+```json
+{
+  "debug": true,
+  "single": false,
+  "n_experiments": 1,
+  "dataset": "URBANSOUND8K",
+  "id": "TEST",
 
-Several files contain machine-specific paths. Before launching a run on a different machine or project directory, update these paths:
+  "base_path": "/scratch/project_462001198/casciott",
+  "project_path": "/projappl/project_462001198/casciott/ICASSP26",
+  "presets_path": "/projappl/project_462001198/casciott/ICASSP26/SoftHebb-main/presets.json",
+  "results_path": "/scratch/project_462001198/casciott/Training/results/hebb/result",
+  "preset_name": "6SoftHebbCnnUrbanSound8k",
+  "datasets_path": "/scratch/project_462001198/casciott/datasets/urbansound8k",
+  "execs_dir": "/projappl/project_462001198/casciott/ICASSP26/experiment_utils/execs",
 
-| File | What to check |
-|---|---|
-| `SoftHebb-main/utils.py` | `BASE_PATH`, `DATA`, `DATASET`, `RESULT`, and the hard-coded path used to open `presets.json`. |
-| `SoftHebb-main/dataset.py` | ESC-50 path under `Training/data/ESC-50-master`; UrbanSound8K HDF5 path under `/scratch/.../datasets/urbansound8k`. |
-| `SoftHebb-main/continual_learning.py` | `BASE_PATH` used for result saving and cleanup. |
-| `experiment_utils/testing.py` | `BASE_PATH`, `parent_f_id`, and the path where `configs.sh` is written. |
-| `experiment_utils/execs/*.sh` | SLURM account/partition, container path, bind mounts, and Python script paths. |
+  "evaluated_tasks": [0, 1, 2, 3, 4],
 
-### 3. Prepare the datasets
-
-The current loaders expect:
-
-| Dataset | Expected format/path in the current code |
-|---|---|
-| ESC-50 | Raw ESC-50 folder with metadata at `<BASE_PATH>/Training/data/ESC-50-master/meta/esc50.csv` and audio under `<BASE_PATH>/Training/data/ESC-50-master/audio/`. |
-| UrbanSound8K | HDF5 file at `/scratch/project_462001198/casciott/datasets/urbansound8k/h5s/urbansound8k.h5`. |
-| ESC-50 baselines | HDF5 file at `<data_path>/h5s/esc50.h5`, where `data_path` defaults to `/scratch/project_462001198/casciott/datasets/esc50`. |
-
----
-
-## Quick start: run an experiment
-
-There are two ways to start an experiment.
-
-### Option A — Generate and submit several SLURM jobs
-
-This is the workflow used by `experiment_utils/testing.py`.
-
-1. Open `experiment_utils/testing.py`.
-2. Choose the dataset and experiment size:
-
-```python
-TEST = False          # True = reduced/debug run
-SHMH = False          # Special single-head/multi-head behavior; keep False unless needed
-SINGLE = False        # True = train one task containing all classes
-n_experiments = 2     # Number of random task splits / repeated runs
-
-dataset = "ESC50"     # Options: "ESC50" or "URBANSOUND8K"
-```
-
-3. Set the task structure:
-
-```python
-# ESC-50 default: task 0 has 30 classes, tasks 1-4 have 5 classes each.
-classes_per_task = 5
-n_tasks = 5
-
-evaluated_tasks = [0, 1, 2, 3, 4]
-```
-
-4. Set the continual-learning hyperparameters in `cl_hyper`:
-
-```python
-cl_hyper = {
+  "cl_hyper": {
     "training_mode": "consecutive",
     "top_k": 0.6,
-    "topk_lock": False,
+    "topk_lock": false,
     "high_lr": 0.15,
     "low_lr": 0.9,
     "t_criteria": "activations",
-    "delta_w_interval": 5,
-    "heads_basis_t": 0.90,
-    "n_tasks": n_tasks,
-    "classes_per_task": classes_per_task,
+    "delta_w_interval": 5
+  }
 }
 ```
 
-5. Generate the batch commands:
+
+
+### 2. Check the SLURM wrappers once
+
+The launcher submits one of these scripts depending on the selected dataset:
+
+```text
+experiment_utils/execs/ESC50.sh
+experiment_utils/execs/URBANSOUND8K.sh
+```
+
+Update these scripts if your cluster account, partition, container path, bind mounts, or project paths are different.
+
+Also check the evaluated-task argument name. `SoftHebb-main/continual_learning.py` expects:
 
 ```bash
-cd Hebbian-TIL-develop
+--evaluated-tasks
+```
+
+If a wrapper contains `--evaluated-task`, change it to `--evaluated-tasks` before launching.
+
+### 3. Launch the experiment
+
+From the repository root:
+
+```bash
 python experiment_utils/testing.py
 ```
 
-This writes one `sbatch ...` command per run into `experiment_utils/configs.sh` or into the path configured inside `testing.py`.
+When prompted:
 
-6. Submit the jobs:
-
-```bash
-bash experiment_utils/configs.sh
+```text
+Insert the full path for the experiment configuration json file:
 ```
 
-7. Follow the logs:
+paste the full path to your configuration file, for example:
+
+```text
+/projappl/project_462001198/casciott/ICASSP26/experiment_utils/experiment_config.json
+```
+
+`testing.py` then:
+
+1. reads the JSON file,
+2. infers the number of tasks and classes per task from `dataset` and `single`,
+3. randomly generates the class split for each experiment,
+4. derives the result folders from `id`, `dataset`, and the task structure,
+5. chooses the solution combinations to run,
+6. submits one `sbatch` job for each generated experiment/solution pair.
+
+### 4. Read job logs
+
+For ESC-50:
 
 ```bash
 tail -f experiment_utils/execs/ESC50/job.out
 tail -f experiment_utils/execs/ESC50/job.err
 ```
 
-For UrbanSound8K, use the corresponding `URBANSOUND8K/job.out` and `URBANSOUND8K/job.err` paths.
-
-> Important: `continual_learning.py` defines the argument as `--evaluated-tasks` with an **s**. If a wrapper script uses `--evaluated-task`, change it to `--evaluated-tasks` before running.
-
-### Option B — Run one experiment directly
-
-Use this when debugging one configuration without generating many SLURM jobs.
-
-From the repository root:
+For UrbanSound8K:
 
 ```bash
-cd SoftHebb-main
-python continual_learning.py \
-  --preset 6SoftHebbCnnESC50 \
-  --resume all \
-  --model-name ESC50_CL \
-  --dataset-unsup ESC50_1 \
-  --dataset-sup ESC50_100 \
-  --continual_learning True \
-  --evaluate True \
-  --training-mode consecutive \
-  --cf-sol True \
-  --head-sol True \
-  --top-k 0.6 \
-  --high-lr 0.15 \
-  --low-lr 0.9 \
-  --t-criteria activations \
-  --delta-w-interval 5 \
-  --heads-basis-t 0.90 \
-  --selected-classes '[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],[30,31,32,33,34],[35,36,37,38,39],[40,41,42,43,44],[45,46,47,48,49]]' \
-  --n-tasks 5 \
-  --evaluated-tasks '[0,1,2,3,4]' \
-  --classes-per-task 5 \
-  --topk-lock False \
-  --folder-id _debug5tasks \
-  --parent-f-id experiments/EXP_ESC50_5C \
-  --shmh False
+tail -f experiment_utils/execs/URBANSOUND8K/job.out
+tail -f experiment_utils/execs/URBANSOUND8K/job.err
 ```
 
-For UrbanSound8K, change the preset and dataset fields:
+### 5. Find results
 
-```bash
---preset 6SoftHebbCnnUrbanSound8k \
---model-name URBANSOUND8K_CL \
---dataset-unsup URBANSOUND8K_1 \
---dataset-sup URBANSOUND8K_100
-```
-
----
-
-## What happens during a continual-learning run
-
-For every fold and every task, `continual_learning.py` performs the following steps:
-
-1. Loads the model preset from `SoftHebb-main/presets.json`.
-2. Creates dataset configurations from the selected dataset preset.
-3. Trains task 0 from scratch.
-4. Evaluates task 0.
-5. For each later task:
-   - reloads the previous checkpoint,
-   - trains on the new task,
-   - applies the kernel plasticity solution if `cf_sol=True`,
-   - stores/uses task heads if `head_sol=True`,
-   - evaluates all requested previous/current tasks,
-   - trains a joint model over classes seen so far for comparison.
-6. Saves a JSON result file under:
+The launcher creates/checks folders under:
 
 ```text
-<BASE_PATH>/<parent_f_id>/TASKS_CL_<dataset><folder_id>/<model_name>.json
+<base_path>/<parent_f_id>/TASKS_CL_<dataset><folder_id>/
 ```
 
-The code uses 5 folds for ESC-50 and 10 folds for UrbanSound8K.
+where `parent_f_id` and `folder_id` are generated automatically:
+
+```python
+folder_id = f"_{id}{n_tasks}tasks"
+parent_f_id = f"experiments/EXP_{dataset}_{classes_per_task}C"
+```
+
+Example for UrbanSound8K with `id = "TEST"`, `n_tasks = 5`, and `classes_per_task = 2`:
+
+```text
+/scratch/project_462001198/casciott/experiments/EXP_URBANSOUND8K_2C/TASKS_CL_URBANSOUND8K_TEST5tasks/
+```
 
 ---
 
-## Meaning of fields in `experiment_utils/testing.py`
+## Meaning of every field in `experiment_config.json`
 
-| Field | Meaning |
+### Top-level fields
+
+| Field | Type | Used by | Meaning |
+|---|---:|---|---|
+| `debug` | boolean | `testing.py` | Enables a reduced/debug run. When `true`, `testing.py` forces `n_experiments = 1`, uses `n_tasks = 2`, and only runs the `(cf_sol=True, head_sol=True)` solution. Use `true` for a quick test before launching a full run. Use `false` for the real experiment. |
+| `single` | boolean | `testing.py` | If `true`, all classes are placed into one task. This disables the normal incremental sequence. If `false`, classes are split into multiple tasks. |
+| `n_experiments` | integer | `testing.py` | Number of independent random class splits to generate. Each split can produce multiple SLURM jobs because `testing.py` may run more than one solution combination. Ignored/reduced to `1` when `debug` is `true`. |
+| `dataset` | string | `testing.py` and wrapper selection | Dataset to run. Supported values are `"ESC50"` and `"URBANSOUND8K"`. This determines the SLURM wrapper, number of classes, classes per task, and task split logic. |
+| `_comment` | string | not used | Human-readable comment. It has no effect on the code. |
+| `id` | string | `testing.py` | Experiment label used to create the output folder suffix. For example, `"TEST"` with 5 tasks becomes `folder_id = "_TEST5tasks"`. Change this for each meaningful run to avoid mixing results. |
+| `base_path` | string/path | `testing.py` | Root path where `testing.py` creates/checks experiment result folders. The script creates `<base_path>/experiments` and `<base_path>/<parent_f_id>` if needed. |
+| `project_path` | string/path | mostly documentation in current code | Path to the repository/project on the cluster. The current `testing.py` does not directly read this field when building commands, but the shell wrappers contain hard-coded project paths that should usually match this value. |
+| `presets_path` | string/path | passed to `continual_learning.py` | Full path to `SoftHebb-main/presets.json`. The runner uses this file to load model, layer, and dataset presets. |
+| `results_path` | string/path | passed to `continual_learning.py` | Base path used by the model/checkpoint/result logic inside the training code. This is passed to `--results_path`. |
+| `preset_name` | string | passed to `continual_learning.py` | Model preset key inside `presets.json`. Use `6SoftHebbCnnESC50` for ESC-50 and `6SoftHebbCnnUrbanSound8k` for UrbanSound8K unless you add new presets. |
+| `datasets_path` | string/path | passed to `dataset.py` through `continual_learning.py` | Dataset root path. For ESC-50 this should point to the `ESC-50-master` folder containing `meta/esc50.csv` and `audio/`. For UrbanSound8K this should point to the folder containing `h5s/urbansound8k.h5`. |
+| `execs_dir` | string/path | `testing.py` | Folder containing the SLURM wrapper scripts. `testing.py` runs `sbatch <DATASET>.sh` with `cwd=execs_dir`, so this directory must contain `ESC50.sh` and/or `URBANSOUND8K.sh`. |
+| `evaluated_tasks` | list of integers | passed to `continual_learning.py` | Task indices evaluated after training. For a normal 5-task run use `[0, 1, 2, 3, 4]`. If this list contains indices greater than `n_tasks - 1`, `continual_learning.py` clips it to all valid tasks. |
+| `cl_hyper` | object/dict | copied and extended by `testing.py` | Continual-learning hyperparameters. See the next table. |
+
+### `cl_hyper` fields
+
+| Field | Type | Meaning |
+|---|---:|---|
+| `training_mode` | string | Training schedule passed to `--training-mode`. Accepted values in `continual_learning.py` are `successive`, `consecutive`, and `simultaneous`. The standard experiments use `consecutive`. |
+| `top_k` | float | Fraction of kernels selected as important according to `t_criteria`. Example: `0.6` selects roughly the top 60% of kernels per Hebbian convolutional layer. |
+| `topk_lock` | boolean | Controls how the top-k kernel mask is applied. When `false`, the code combines top-k information with the weight-change threshold logic. When `true`, the top-k mask is used more directly to reduce/lock protected kernels. The standard setting is `false`. |
+| `high_lr` | float | Relative learning-rate increase for non-protected kernels. Example: `0.15` makes the multiplier approximately `1.15` for kernels selected for increased plasticity. |
+| `low_lr` | float | Relative learning-rate decrease for protected kernels. Example: `0.9` makes the multiplier approximately `0.10` where the lower-learning-rate mask is active. Higher values mean stronger reduction. |
+| `t_criteria` | string | Criterion for choosing important kernels. The recommended/default experiment value is `activations`, which ranks kernels by accumulated activation magnitude. `KSE` is referenced in the model code, but the current configuration uses `activations`. |
+| `delta_w_interval` | integer/float | Number of training iterations between weight-change measurements. Smaller values update the tracked deltas more frequently and add overhead. Larger values measure less often. |
+
+### Fields added automatically by `testing.py`
+
+These fields are not written manually in `experiment_config.json`; `testing.py` derives them and passes them to the shell wrapper / training script.
+
+| Generated field | Meaning |
 |---|---|
-| `TEST` | Debug switch. When `True`, the script reduces the run size and only generates one solution/run. |
-| `SHMH` | Special single-head/multi-head flag passed to `--shmh`. Keep `False` for the standard multi-head flow. The current evaluation code warns that `POP_HEAD=True` and `SHMH=True` are not supported together. |
-| `SINGLE` | If `True`, creates one task containing all classes instead of an incremental sequence. Useful for non-continual single-task testing. |
-| `n_experiments` | Number of independent class orderings/random task splits to generate. Each split becomes one or more `sbatch` commands. |
-| `dataset` | Dataset name used by the batch generator. Supported values in this file: `"ESC50"`, `"URBANSOUND8K"`. |
-| `classes_per_task` | Number of classes in each incremental task. For ESC-50, the current code uses a special split: 30 classes in task 0, then 5 classes per later task. |
-| `n_tasks` | Number of tasks in the incremental sequence. Default ESC-50 and UrbanSound8K settings use 5. |
-| `evaluated_tasks` | Tasks to evaluate after training each task. If the list contains indices beyond `n_tasks - 1`, the runner clips it to `range(n_tasks)`. |
-| `id` | Free-text experiment identifier used to build `folder_id`. |
-| `folder_id` | Suffix added to the result folder name. Example: `_full_run_gitcode5tasks`. |
-| `parent_f_id` | Parent result directory relative to `BASE_PATH`. Example: `experiments/EXP_ESC50_5C`. |
-| `BASE_PATH` | Root path where experiments and results are stored. Currently cluster-specific. |
-| `command` | Base SLURM command. It changes into `experiment_utils/execs/` and calls `sbatch <dataset>.sh ...`. |
-| `all_classes` | List of global class labels used to create task splits. ESC-50 uses `0..49`; UrbanSound8K uses `0..9`. |
-| `classes` / `final` | Generated list of task splits. This becomes the `--selected-classes` argument. |
-| `sols` | Solution combinations to run. Each tuple is `(cf_sol, head_sol)`. For standard ESC-50 with `SINGLE=False`, the script generates `(False, True)` and `(True, True)`. |
+| `n_tasks` | Number of tasks. For normal runs, both datasets use 5 tasks. If `single=true`, this becomes 1. If `debug=true`, this becomes 2 inside `testing.py`. |
+| `classes_per_task` | Number of classes per incremental task. UrbanSound8K uses 2. ESC-50 uses 5 for incremental tasks, but its current split is special: task 0 has 30 classes and tasks 1-4 have 5 classes each. |
+| `selected_classes` | Randomly generated list of class lists, one list per task. This is what determines which classes belong to each task in a run. |
+| `folder_id` | Result-folder suffix generated from `id` and `n_tasks`, for example `_TEST5tasks`. |
+| `parent_f_id` | Parent experiment folder generated from dataset and class count, for example `experiments/EXP_ESC50_5C`. |
+| `cf_sol` | Whether to enable the kernel-plasticity catastrophic-forgetting solution. This is not currently controlled from JSON; it is selected by `get_solutions()` in `testing.py`. |
+| `head_sol` | Whether to enable the multi-head classifier solution. This is not currently controlled from JSON; it is selected by `get_solutions()` in `testing.py`. |
+| `SINGLE` | Internal copy of `single`, stored in `cl_hyper`. |
 
 ---
 
-## Meaning of `cl_hyper` fields
+## Dataset-specific behavior
 
-`cl_hyper` is created in `testing.py`, passed through the shell scripts, and reconstructed inside `continual_learning.py`.
+### ESC-50
 
-| Field | Meaning |
+`testing.py` uses:
+
+```python
+classes_per_task = 5
+all_classes = list(range(50))
+```
+
+For normal incremental ESC-50 runs, the split is:
+
+```text
+Task 0: 30 classes
+Task 1: 5 classes
+Task 2: 5 classes
+Task 3: 5 classes
+Task 4: 5 classes
+```
+
+So even though `classes_per_task = 5`, task 0 is intentionally larger in the current code.
+
+Recommended matching fields:
+
+```json
+{
+  "dataset": "ESC50",
+  "preset_name": "6SoftHebbCnnESC50",
+  "datasets_path": "/path/to/ESC-50-master",
+  "evaluated_tasks": [0, 1, 2, 3, 4]
+}
+```
+
+Expected ESC-50 dataset structure:
+
+```text
+ESC-50-master/
+├── meta/esc50.csv
+└── audio/
+```
+
+### UrbanSound8K
+
+`testing.py` uses:
+
+```python
+classes_per_task = 2
+all_classes = list(range(10))
+```
+
+For normal incremental UrbanSound8K runs, the split is:
+
+```text
+Task 0: 2 classes
+Task 1: 2 classes
+Task 2: 2 classes
+Task 3: 2 classes
+Task 4: 2 classes
+```
+
+Recommended matching fields:
+
+```json
+{
+  "dataset": "URBANSOUND8K",
+  "preset_name": "6SoftHebbCnnUrbanSound8k",
+  "datasets_path": "/path/to/urbansound8k",
+  "evaluated_tasks": [0, 1, 2, 3, 4]
+}
+```
+
+Expected UrbanSound8K dataset structure:
+
+```text
+urbansound8k/
+└── h5s/urbansound8k.h5
+```
+
+---
+
+## Which jobs are submitted?
+
+`testing.py` does not currently let the JSON directly set `cf_sol` and `head_sol`. Instead, it calls `get_solutions(dataset, single, test)`.
+
+The current solution combinations are:
+
+| Condition | Submitted `(cf_sol, head_sol)` combinations |
 |---|---|
-| `training_mode` | Controls the order of block training. Accepted values are `successive`, `consecutive`, and `simultaneous`. The default experiments use `consecutive`. |
-| `cf_sol` | Enables the catastrophic-forgetting / kernel-plasticity solution. When `True`, the code tracks activations and weight changes, ranks kernels, and modifies Hebbian learning rates. |
-| `head_sol` | Enables the multi-head solution. When `True`, the model keeps task-specific classifier heads and reloads the appropriate head for evaluation. |
-| `top_k` | Fraction of kernels considered important according to `t_criteria`. Example: `0.6` protects/marks roughly the top 60% of kernels per layer. |
-| `topk_lock` | If `True`, the top-k kernel mask is used directly to reduce/freeze protected kernels, instead of combining it with the weight-change threshold mask. |
-| `high_lr` | Relative increase applied to non-top-k kernels. Example: `0.15` makes their update multiplier approximately `1.15`. |
-| `low_lr` | Relative decrease applied to protected kernels. Example: `0.9` makes their update multiplier approximately `0.10` when the lower-learning-rate mask is active. |
-| `t_criteria` | Kernel ranking criterion. `activations` ranks kernels by accumulated activation magnitude. `KSE` is referenced in the model-loading path but the default current experiments use `activations`. |
-| `delta_w_interval` | Number of training iterations between weight-change measurements. Smaller values update the tracked deltas more often. |
-| `heads_basis_t` | Threshold value saved in the model as `heads_thresh`. It is intended for head-selection/head-basis logic and is stored in checkpoints. |
-| `n_tasks` | Number of tasks in the run. |
-| `classes_per_task` | Expected number of classes per incremental task. For ESC-50, task 0 is currently a special larger task. |
-| `selected_classes` | List of class lists, one list per task. Example: `[[0,1,2],[3,4],[5,6]]`. The shell scripts pass this as a quoted JSON/Python list string. |
-| `evaluated_tasks` | Task indices evaluated after each training phase. |
-| `shmh` | Special mode flag copied into the dataset/model config. Leave `False` for normal task-incremental multi-head experiments. |
-| `SINGLE` | Internal flag indicating single-task mode. |
+| `debug = true` | `(True, True)` only |
+| `dataset = "ESC50"` and `single = true` | `(False, False)` |
+| `dataset = "ESC50"` and `single = false` | `(False, True)` and `(True, True)` |
+| `dataset = "URBANSOUND8K"` and `single = false` | `(True, True)` and `(False, True)` |
+
+Therefore, the number of submitted jobs is approximately:
+
+```text
+number of jobs = n_experiments × number of solution combinations
+```
+
+with the exception that `debug=true` forces `n_experiments=1` and only one solution.
+
+If you want to run only one specific combination, edit `get_solutions()` in `experiment_utils/testing.py`.
 
 ---
 
-## Meaning of `continual_learning.py` command-line arguments
+## How the JSON fields map to the submitted command
 
-| Argument | Meaning |
-|---|---|
-| `--preset` | Model preset key from `presets.json`, such as `6SoftHebbCnnESC50` or `6SoftHebbCnnUrbanSound8k`. |
-| `--folder-id` | Experiment folder suffix used when saving results. |
-| `--parent-f-id` | Parent results folder. |
-| `--dataset-unsup` | Dataset preset used for unsupervised/Hebbian blocks. Examples: `ESC50_1`, `URBANSOUND8K_1`. The suffix selects a dataset sub-preset in `presets.json`; `_1` means 1 epoch. |
-| `--dataset-sup` | Dataset preset used for supervised classifier training. Examples: `ESC50_100`, `URBANSOUND8K_100`. |
-| `--dataset-unsup-1`, `--dataset-sup-1` | Legacy/extra dataset arguments parsed by the script but not used in the current main execution path. |
-| `--continual_learning` | Boolean flag copied into the dataset config. During the scripted task loop, the code sets this internally for each task phase. |
-| `--training-mode` | Training schedule: `successive`, `consecutive`, or `simultaneous`. |
-| `--resume` | Checkpoint loading mode. `all` loads the previous full model; `without_classifier` is available in the parser; `None` starts from scratch. |
-| `--model-name` | Prefix for saved checkpoint/result names. A UUID is appended automatically. |
-| `--training-blocks` | Optional list of block indices to train. If omitted, the training configuration decides the blocks from the preset. |
-| `--seed` | Random seed copied into dataset configs. |
-| `--gpu-id` | GPU index argument. The current `get_device()` implementation selects CUDA if available. |
-| `--save` | Enables/disables checkpoint saving. |
-| `--validation` | Enables validation split handling in dataset config. |
-| `--evaluate` | Evaluation flag. The main task loop also sets evaluation internally. |
-| `--topk-lock` | Enables direct locking/reduction of top-k kernels. |
-| `--skip-1` | Legacy flag intended to skip first-dataset training and resume directly; not used in the current main loop. |
-| `--classes-per-task` | Number of classes per task used to initialize dataset output sizes. |
-| `--head-sol` | Enables/disables task-specific heads. |
-| `--cf-sol` | Enables/disables the kernel-plasticity continual-learning solution. |
-| `--top-k` | Fraction of kernels selected as important. |
-| `--high-lr` | Relative learning-rate increase for non-protected kernels. |
-| `--low-lr` | Relative learning-rate decrease for protected kernels. |
-| `--delta-w-interval` | Interval for measuring weight deltas. |
-| `--t-criteria` | Kernel ranking criterion, usually `activations`. |
-| `--heads-basis-t` | Head threshold value stored in checkpoints. |
-| `--selected-classes` | String representation of the tasks/classes list. The script evaluates this string, so keep it quoted. |
-| `--n-tasks` | Number of tasks. |
-| `--evaluated-tasks` | String representation of the list of task indices to evaluate. Keep the plural form. |
-| `--shmh` | Special head-mode flag; leave `False` for standard experiments. |
-
----
-
-## Positional fields passed by the SLURM wrappers
-
-`testing.py` writes commands like:
+For dataset `ESC50`, `testing.py` submits:
 
 ```bash
-sbatch ESC50.sh <1> <2> ... <17>
+sbatch ESC50.sh <arguments...>
 ```
 
-The wrapper scripts map these positions to `continual_learning.py` arguments as follows:
+For dataset `URBANSOUND8K`, it submits:
 
-| Position | Shell variable | Meaning |
+```bash
+sbatch URBANSOUND8K.sh <arguments...>
+```
+
+The important arguments are passed in this order:
+
+| Position | Value passed by `testing.py` | Comes from |
 |---:|---|---|
-| 1 | `$1` | `training_mode` |
-| 2 | `$2` | `cf_sol` |
-| 3 | `$3` | `head_sol` |
-| 4 | `$4` | `top_k` |
-| 5 | `$5` | `high_lr` |
-| 6 | `$6` | `low_lr` |
-| 7 | `$7` | `t_criteria` |
-| 8 | `$8` | `delta_w_interval` |
-| 9 | `$9` | `heads_basis_t` |
-| 10 | `${10}` | `selected_classes` |
-| 11 | `${11}` | `n_tasks` |
-| 12 | `${12}` | `evaluated_tasks` |
-| 13 | `${13}` | `classes_per_task` |
-| 14 | `${14}` | `topk_lock` |
-| 15 | `${15}` | `folder_id` |
-| 16 | `${16}` | `parent_f_id` |
-| 17 | `${17}` | `shmh` |
+| 1 | `training_mode` | `cl_hyper.training_mode` |
+| 2 | `cf_sol` | generated by `get_solutions()` |
+| 3 | `head_sol` | generated by `get_solutions()` |
+| 4 | `top_k` | `cl_hyper.top_k` |
+| 5 | `high_lr` | `cl_hyper.high_lr` |
+| 6 | `low_lr` | `cl_hyper.low_lr` |
+| 7 | `t_criteria` | `cl_hyper.t_criteria` |
+| 8 | `delta_w_interval` | `cl_hyper.delta_w_interval` |
+| 9 | `selected_classes` | generated class split |
+| 10 | `n_tasks` | derived from dataset/debug/single |
+| 11 | `evaluated_tasks` | `evaluated_tasks` |
+| 12 | `classes_per_task` | derived from dataset |
+| 13 | `topk_lock` | `cl_hyper.topk_lock` |
+| 14 | `folder_id` | generated from `id` and `n_tasks` |
+| 15 | `parent_f_id` | generated from dataset and classes per task |
+| 16 | `presets_path` | `presets_path` |
+| 17 | `datasets_path` | `datasets_path` |
+| 18 | `preset_name` | `preset_name` |
+| 19 | `results_path` | `results_path` |
 
 ---
 
-## Meaning of important `presets.json` fields
+## Common configuration examples
 
-`presets.json` has three top-level sections: `model`, `layer`, and `dataset`.
+### Debug run
 
-### `model`
+Use this to check that paths, imports, dataset loading, and SLURM submission work.
 
-A model preset is a sequence of blocks, for example `6SoftHebbCnnESC50`.
-
-| Field | Meaning |
-|---|---|
-| `b0`, `b1`, ... | Ordered model blocks. Earlier blocks are convolutional Hebbian blocks; the final block is usually an MLP classifier. |
-| `arch` | Block type: `CNN` or `MLP`. |
-| `preset` | Compact layer description. Example: `softkrotov-c48-k5-p2-s1-d1-b0-t1.1-lr0.08`. |
-| `operation` | Operation wrapped around the layer, such as `batchnorm2d` or `flatten`. |
-| `num` | Block index. |
-| `batch_norm` | Whether batch normalization is enabled for that block. |
-| `pool` | Pooling specification in the form `<type>_<kernel_size>_<stride>_<padding>`, such as `max_4_2_1`. |
-| `activation` | Activation specification, such as `triangle_0.7`. |
-| `resume` | Optional resume/checkpoint behavior for that block. |
-| `dropout`, `att_dropout` | Dropout settings used by MLP/classifier blocks. |
-
-### Compact layer preset tokens
-
-| Token | Meaning |
-|---|---|
-| `softkrotov` | Hebbian/SoftHebb-style layer. |
-| `BP` | Backpropagation-trained layer. |
-| `c<number>` | Output channels/classes/neurons, depending on layer type. |
-| `k<number>` | CNN kernel size. |
-| `p<number>` | CNN padding. |
-| `s<number>` | CNN stride. |
-| `d<number>` | CNN dilation. |
-| `b0` / `b1` | Disable/enable bias. |
-| `t<number>` | `t_invert`, the SoftHebb activation temperature/inversion factor. |
-| `lr<number>` | Hebbian learning rate. |
-| `ls<number>` | Supervised learning rate. |
-| `lb<number>` | Lebesgue-p value. |
-| `lp<number>` | Power learning-rate value. |
-| `a<number>` | Delta parameter. |
-| `r<number>` | Radius parameter. |
-| `v0` / `v1` | Disable/enable adaptive behavior. |
-
-### `layer`
-
-Layer defaults define values used when a compact preset does not override them.
-
-| Field | Meaning |
-|---|---|
-| `lr` | Hebbian learning rate. |
-| `lr_sup` | Supervised learning rate. |
-| `adaptive` | Enables adaptive behavior in the layer. |
-| `speed`, `lr_div`, `lr_decay` | Learning-rate schedule controls. |
-| `lebesgue_p` | Norm/order parameter used in the layer computations. |
-| `t_invert` | SoftHebb activation scaling/temperature parameter. |
-| `beta`, `power`, `power_lr` | Activation and update-shaping parameters. |
-| `ranking_param` | Ranking parameter used by Hebbian layer logic. |
-| `delta` | Delta/update control parameter. |
-| `hebbian` | Whether the layer uses Hebbian learning. |
-| `add_bias` | Whether to add bias parameters. |
-| `normalize_inp` | Whether to normalize inputs. |
-| `softness`, `soft_activation_fn` | SoftHebb activation behavior. |
-| `plasticity` | Plasticity rule name. |
-| `metric_mode` | Metric mode, for example `unsupervised`. |
-| `weight_init`, `weight_init_range`, `weight_init_offset` | Weight initialization configuration. |
-| `weight_decay` | Weight decay coefficient. |
-| `radius` | Radius parameter used by Hebbian layers. |
-| `padding_mode`, `padding`, `stride`, `dilation`, `groups` | CNN convolution settings. |
-| `mask_thsd` | Mask threshold. |
-| `pre_triangle` | Whether to apply pre-triangle behavior in CNN config. |
-| `seed` | Layer-level random seed. |
-
-### `dataset`
-
-Dataset presets configure input shape, sample counts, and training duration.
-
-| Field | Meaning |
-|---|---|
-| `name` | Dataset name used by `dataset.py`, such as `ESC50` or `URBANSOUND8K`. |
-| `split` | Dataset split name used by the preset. |
-| `channels` | Number of input channels. Audio spectrograms use `1`. |
-| `width`, `height` | Expected input dimensions after preprocessing. |
-| `n_mels` | Number of mel bands for spectrograms. |
-| `n_fft` | FFT window size for mel-spectrogram extraction. |
-| `hop_len` | Hop length for mel-spectrogram extraction. |
-| `out_channels` | Total number of dataset classes before task splitting. |
-| `training_sample`, `testing_sample` | Dataset sample counts used in configuration. |
-| `nb_epoch` | Number of epochs for the selected dataset preset. For example, `ESC50_1` overrides this to 1 epoch. |
-| `print_freq` | How often training progress is printed. |
-| `batch_size` | Batch size. |
-| `num_workers` | DataLoader worker count. |
-| `seed` | Dataset seed. |
-| `shuffle` | Whether to shuffle data where applicable. |
-| `augmentation` | Whether data augmentation is enabled. |
-| `zca_whitened` | Whether ZCA whitening is expected/enabled. |
-| `validation_split` | Fraction of training data used for validation when validation is enabled. |
-| `training_class` | Class selection field used by older/general dataset logic. |
-
----
-
-## Meaning of result JSON fields
-
-Each experiment writes a JSON file containing the training/evaluation summary.
-
-| Field | Meaning |
-|---|---|
-| `FOLD_#1`, `FOLD_#2`, ... | Per-fold task results. Each fold contains entries like `T0`, `T1`, and evaluation summaries such as `eval_0`. |
-| `accuracy_matrix` | Accuracy after each training step on each evaluated task. This is the main structure for measuring forgetting. |
-| `joint` | Joint-training baseline results over the classes seen so far. |
-| `confusion_matrix` | Confusion matrices from multi-head evaluation, organized by fold and task. |
-| `performance_avg_folds` | Average task performance across folds. |
-| `model_config` | Expanded model/block configuration used for the run. |
-| `model_name` | Final model name, including the generated UUID suffix. |
-| `count` | Internal counter used while filling the result object. |
-
----
-
-## Running LwF/EWC baselines
-
-The baseline script is independent from the SoftHebb continual-learning runner:
-
-```bash
-cd SoftHebb-main
-python baselines_LwF_EWC.py \
-  --data_path /scratch/project_462001198/casciott/datasets/esc50 \
-  --strategy both \
-  --train_epochs 100 \
-  --lr 1e-3 \
-  --tasks '[[34,12,11,45,31,14,28,13,25,49,46,33,15,39,29,3,47,4,44,36,35,7,23,21,1,40,0,9,41,32],[5,26,27,16,38],[43,10,24,20,18],[37,17,22,19,30],[6,42,48,2,8]]'
+```json
+{
+  "debug": true,
+  "single": false,
+  "n_experiments": 1,
+  "dataset": "URBANSOUND8K",
+  "id": "DEBUG_URBAN",
+  "preset_name": "6SoftHebbCnnUrbanSound8k",
+  "evaluated_tasks": [0, 1],
+  "cl_hyper": {
+    "training_mode": "consecutive",
+    "top_k": 0.6,
+    "topk_lock": false,
+    "high_lr": 0.15,
+    "low_lr": 0.9,
+    "t_criteria": "activations",
+    "delta_w_interval": 5
+  }
+}
 ```
 
-Important baseline arguments:
+Keep the path fields from your real machine/cluster configuration.
 
-| Argument | Meaning |
+### Full ESC-50 incremental run
+
+```json
+{
+  "debug": false,
+  "single": false,
+  "n_experiments": 2,
+  "dataset": "ESC50",
+  "id": "ESC50_FULL",
+  "preset_name": "6SoftHebbCnnESC50",
+  "datasets_path": "/scratch/project_462001198/casciott/datasets/ESC-50-master",
+  "evaluated_tasks": [0, 1, 2, 3, 4],
+  "cl_hyper": {
+    "training_mode": "consecutive",
+    "top_k": 0.6,
+    "topk_lock": false,
+    "high_lr": 0.15,
+    "low_lr": 0.9,
+    "t_criteria": "activations",
+    "delta_w_interval": 5
+  }
+}
+```
+
+This submits two random class splits. Since normal ESC-50 runs submit `(False, True)` and `(True, True)`, this produces 4 jobs.
+
+### Full UrbanSound8K incremental run
+
+```json
+{
+  "debug": false,
+  "single": false,
+  "n_experiments": 3,
+  "dataset": "URBANSOUND8K",
+  "id": "URBAN_FULL",
+  "preset_name": "6SoftHebbCnnUrbanSound8k",
+  "datasets_path": "/scratch/project_462001198/casciott/datasets/urbansound8k",
+  "evaluated_tasks": [0, 1, 2, 3, 4],
+  "cl_hyper": {
+    "training_mode": "consecutive",
+    "top_k": 0.6,
+    "topk_lock": false,
+    "high_lr": 0.15,
+    "low_lr": 0.9,
+    "t_criteria": "activations",
+    "delta_w_interval": 5
+  }
+}
+```
+
+This submits three random class splits. Since normal UrbanSound8K runs submit `(True, True)` and `(False, True)`, this produces 6 jobs.
+
+---
+
+## What the main continual-learning fields mean conceptually
+
+### `cf_sol`
+
+`cf_sol` enables the kernel-plasticity solution. When active, the code tracks Hebbian convolutional kernels, measures weight changes, ranks important kernels, and modifies learning-rate multipliers so that some kernels become more stable while others remain more plastic.
+
+This field is generated by `testing.py`, not directly read from `experiment_config.json`.
+
+### `head_sol`
+
+`head_sol` enables the multi-head classifier solution. When active, the model keeps task-specific classifier heads and uses the corresponding head during evaluation.
+
+This field is generated by `testing.py`, not directly read from `experiment_config.json`.
+
+### `top_k`
+
+`top_k` controls how many kernels are considered important. For example:
+
+```json
+"top_k": 0.6
+```
+
+means that about 60% of kernels are selected as top kernels according to the selected criterion.
+
+### `high_lr` and `low_lr`
+
+These values control relative learning-rate changes:
+
+```text
+non-protected kernels: multiplier roughly 1 + high_lr
+protected kernels:     multiplier roughly 1 - low_lr
+```
+
+Examples:
+
+```json
+"high_lr": 0.15
+```
+
+increases selected plastic kernels by about 15%.
+
+```json
+"low_lr": 0.9
+```
+
+strongly reduces protected-kernel updates, giving a multiplier around 0.10 where the lower-learning-rate mask applies.
+
+### `t_criteria`
+
+The recommended value is:
+
+```json
+"t_criteria": "activations"
+```
+
+With `activations`, the model accumulates activation magnitude for each kernel and uses that ranking to select top kernels.
+
+### `delta_w_interval`
+
+This controls how often the code measures weight-change deltas during Hebbian training:
+
+```json
+"delta_w_interval": 5
+```
+
+means every 5 training iterations.
+
+Smaller values update the measurements more often but add overhead. Larger values are cheaper but less fine-grained.
+
+---
+
+## Result JSON fields
+
+Each experiment writes a JSON result file. Important fields include:
+
+| Field | Meaning |
 |---|---|
-| `--data_path` | Folder containing `h5s/esc50.h5`. |
-| `--strategy` | `lwf`, `ewc`, or `both`. |
-| `--device` | Device string, for example `cuda` or `cpu`. |
-| `--seed` | Random seed. |
-| `--debug` | Uses a smaller debug subset. |
-| `--stats_num_classes` | Global number of classes, normally `50` for ESC-50. |
-| `--train_mb_size`, `--eval_mb_size` | Training and evaluation minibatch sizes. |
-| `--train_epochs` | Number of supervised training epochs per task. |
-| `--lr` | Optimizer learning rate. |
-| `--lwf_alpha` | LwF distillation loss weight. |
-| `--lwf_temperature` | LwF distillation temperature. |
-| `--ewc_lambda` | EWC regularization strength. |
-| `--ewc_mode` | EWC accumulation mode: `separate`, `onlinesum`, or `onlineweightedsum`. |
-| `--log_class_hists` | Logs class histograms. |
-| `--tasks` | JSON list of task class lists. |
+| `accuracy_matrix` | Main matrix for continual-learning performance. It stores accuracy after each training step on each evaluated task. |
+| `performance_avg_folds` | Average task performance across folds. |
+| `joint` | Joint-training baseline results over all classes seen so far. |
+| `confusion_matrix` | Predictions and labels used to build confusion matrices, organized by fold/task. |
+| `cl_hyper` | Continual-learning hyperparameters used for the run, including generated fields such as `selected_classes`. |
+| `model_config` | Expanded model/block configuration loaded from `presets.json`. |
+| `model_name` | Final model name, including the UUID appended by `continual_learning.py`. |
+| `FOLD_#1`, `FOLD_#2`, ... | Per-fold training/evaluation summaries. ESC-50 uses 5 folds. UrbanSound8K uses 10 folds. |
 
 ---
 
 ## Common pitfalls
 
-- **Wrong path errors**: most failures on new machines come from hard-coded `/projappl/...`, `/scratch/...`, or `/Users/...` paths.
-- **Argument typo**: use `--evaluated-tasks`, not `--evaluated-task`.
-- **Quoted lists**: keep `--selected-classes` and `--evaluated-tasks` inside quotes so the shell passes them as one argument.
-- **ESC-50 split**: the default ESC-50 experiment is not equal-sized across all tasks; task 0 uses 30 classes, followed by four 5-class tasks.
-- **`SHMH=True`**: the current evaluation path prints a warning when `POP_HEAD=True` and `SHMH=True`, so use `SHMH=False` for standard runs.
-- **Result overwrite**: choose a new `id`/`folder_id` for each experiment if you want a separate result directory.
+- **Dataset and preset mismatch**: if `dataset` is `URBANSOUND8K`, use `preset_name = "6SoftHebbCnnUrbanSound8k"`. If `dataset` is `ESC50`, use `preset_name = "6SoftHebbCnnESC50"`.
+- **Wrong dataset root**: ESC-50 expects the root containing `meta/esc50.csv`; UrbanSound8K expects a root containing `h5s/urbansound8k.h5`.
+- **Wrapper path mismatch**: `project_path` in the JSON does not automatically rewrite the hard-coded paths inside `experiment_utils/execs/*.sh`. Edit the wrappers manually if you move the repository.
+- **Wrong evaluated-task argument**: the Python runner expects `--evaluated-tasks` with an `s`.
+- **Reusing the same `id`**: if a result folder already exists, `testing.py` asks whether to continue. Use a new `id` for clean runs.
+- **Expecting JSON to control `cf_sol`/`head_sol` directly**: these are currently chosen inside `get_solutions()` in `testing.py`.
+- **Debug mode changes task count**: `debug=true` forces a reduced run and may not represent the full experiment structure.
+
+---
+
+## Baselines
+
+The LwF/EWC baseline code is separate from `experiment_config.json` and is launched through:
+
+```text
+SoftHebb-main/baselines_LwF_EWC.py
+experiment_utils/execs/baselines.sh
+```
+
+The JSON configuration described above is for the SoftHebb continual-learning experiments launched by `experiment_utils/testing.py`.
