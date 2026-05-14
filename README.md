@@ -107,7 +107,6 @@ A minimal example for an UrbanSound8K debug run is:
 ```
 
 
-
 ### 2. Check the SLURM wrappers once
 
 The launcher submits one of these scripts depending on the selected dataset:
