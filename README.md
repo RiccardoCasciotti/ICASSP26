@@ -6,6 +6,9 @@ FINAL VERSION
 Riccardo Casciotti, Tampere University  
 Co-authors: Prof. Alberto Antonietti, Politecnico di Milano; Francesco De Santis, Politecnico di Milano; Prof. Annamaria Mesaros, Tampere University
 
+## Contact
+If you have any questions about the code shoot me an email: riccardo.casciotti@tuni.fi
+
 ## Overview
 
 This repository contains task-incremental audio-classification experiments based on a SoftHebb-inspired convolutional architecture. The main workflow is controlled by:
